@@ -1,8 +1,8 @@
-
 import { ChatBody } from '@/types/chat';
+
 import { authOptions, getServerSession } from '@/lib/auth';
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from "@/lib/const";
-import { OpenAIError, OpenAIStream } from "@/lib/stream";
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/lib/const';
+import { OpenAIError, OpenAIStream } from '@/lib/stream';
 
 export const config = {
   runtime: 'edge',
@@ -11,7 +11,7 @@ export const config = {
 const handler = async (req: Request, res: Response): Promise<Response> => {
   // @ts-ignore
   const session = await getServerSession(req, res, authOptions);
-//   console.log({ session });
+  console.log('chat handler', { session });
 
   try {
     const { model, messages, key, prompt, temperature } =
@@ -45,4 +45,4 @@ const handler = async (req: Request, res: Response): Promise<Response> => {
   }
 };
 
-export {handler as POST};
+export { handler as POST };

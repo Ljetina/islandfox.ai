@@ -22,11 +22,11 @@ import { Message } from '@/types/chat';
 import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
-import ChatContext from '@/app/chat/chat.context';
-
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+
+import ChatContext from '@/app/chat/chat.context';
 
 interface Props {
   onSend: (message: Message, plugin: Plugin | null) => void;

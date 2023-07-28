@@ -2,9 +2,8 @@ import { FC, useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import { DEFAULT_TEMPERATURE } from '@/lib/const';
-
 import ChatContext from '@/app/chat/chat.context';
+import { DEFAULT_TEMPERATURE } from '@/lib/const';
 
 interface Props {
   label: string;

@@ -61,7 +61,7 @@ async function requestCompletion({
 
   const res = await fetch(url, {
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
     method: 'POST',
     body: JSON.stringify({
@@ -199,12 +199,15 @@ export const OpenAIStream = async (
                   messages.push({
                     role: 'assistant',
                     content: null,
-                    function_call: { name: <string>functionName, arguments: functionArgs}
-                  })
+                    function_call: {
+                      name: functionName as string,
+                      arguments: functionArgs,
+                    },
+                  });
                   messages.push({
                     role: 'function',
                     name: `${functionName}`,
-                    
+
                     content: `${JSON.stringify(response)}`,
                   });
                   console.log({ messages });
@@ -279,13 +282,16 @@ async function callLocalFunction(
     );
   }
   // Make a POST request to your local API at /functions/<function_name>
-  const response = await fetch(`${process.env.FUNC_URL}/functions/${functionName}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  const response = await fetch(
+    `${process.env.FUNC_URL}/functions/${functionName}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ args: functionArgs }),
     },
-    body: JSON.stringify({ args: functionArgs }),
-  });
+  );
 
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);

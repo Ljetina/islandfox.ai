@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -8,8 +8,23 @@ import { useQuery } from 'react-query';
 // import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 // import useErrorService from '@/services/errorService';
 // import useApiService from '@/services/useApiService';
-
 import Head from 'next/head';
+
+import { useCreateReducer } from '@/hooks/useCreateReducer';
+
+import { Conversation } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
+import { FolderInterface, FolderType } from '@/types/folder';
+import { OpenAIModelID, OpenAIModels } from '@/types/openai';
+import { Prompt } from '@/types/prompt';
+
+import { Chat } from '@/components/Chat/Chat';
+import { Chatbar } from '@/components/Chatbar/Chatbar';
+import { Navbar } from '@/components/Mobile/Navbar';
+import Promptbar from '@/components/Promptbar';
+
+import ChatContext from './chat.context';
+import { ChatInitialState, initialState } from './chat.state';
 
 import {
   cleanConversationHistory,
@@ -24,23 +39,7 @@ import {
 import { saveFolders } from '@/lib/folders';
 import { savePrompts } from '@/lib/prompts';
 import { getSettings } from '@/lib/settings';
-
-import { Conversation } from '@/types/chat';
-import { KeyValuePair } from '@/types/data';
-import { FolderInterface, FolderType } from '@/types/folder';
-import { OpenAIModelID, OpenAIModels } from '@/types/openai';
-import { Prompt } from '@/types/prompt';
-
-import { Chat } from '@/components/Chat/Chat';
-import { Chatbar } from '@/components/Chatbar/Chatbar';
-import { Navbar } from '@/components/Mobile/Navbar';
-import Promptbar from '@/components/Promptbar';
-
-import { ChatInitialState, initialState } from './chat.state';
-
 import { v4 as uuidv4 } from 'uuid';
-import { useCreateReducer } from '@/hooks/useCreateReducer';
-import ChatContext from './chat.context';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -53,11 +52,11 @@ const ChatHome = ({
   serverSideApiKeyIsSet,
   serverSidePluginKeysSet,
   defaultModelId = OpenAIModelID.GPT_3_5,
-  conversationId
+  conversationId,
 }: Props) => {
-//   const { t } = useTranslation('chat');
-//   const { getModels } = useApiService();
-//   const { getModelsError } = useErrorService();
+  //   const { t } = useTranslation('chat');
+  //   const { getModels } = useApiService();
+  //   const { getModelsError } = useErrorService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
 
   const contextValue = useCreateReducer<ChatInitialState>({
@@ -66,7 +65,7 @@ const ChatHome = ({
 
   const {
     state: {
-    //   apiKey,
+      //   apiKey,
       lightMode,
       folders,
       conversations,
@@ -79,28 +78,28 @@ const ChatHome = ({
 
   const stopConversationRef = useRef<boolean>(false);
 
-//   const { data, error, refetch } = useQuery(
-//     ['GetModels', apiKey, serverSideApiKeyIsSet],
-//     ({ signal }) => {
-//       if (!apiKey && !serverSideApiKeyIsSet) return null;
+  //   const { data, error, refetch } = useQuery(
+  //     ['GetModels', apiKey, serverSideApiKeyIsSet],
+  //     ({ signal }) => {
+  //       if (!apiKey && !serverSideApiKeyIsSet) return null;
 
-//       return getModels(
-//         {
-//           key: apiKey,
-//         },
-//         signal,
-//       );
-//     },
-//     { enabled: true, refetchOnMount: false },
-//   );
+  //       return getModels(
+  //         {
+  //           key: apiKey,
+  //         },
+  //         signal,
+  //       );
+  //     },
+  //     { enabled: true, refetchOnMount: false },
+  //   );
 
-//   useEffect(() => {
-//     if (data) dispatch({ field: 'models', value: data });
-//   }, [data, dispatch]);
+  //   useEffect(() => {
+  //     if (data) dispatch({ field: 'models', value: data });
+  //   }, [data, dispatch]);
 
-//   useEffect(() => {
-//     dispatch({ field: 'modelError', value: getModelsError(error) });
-//   }, [dispatch, error, getModelsError]);
+  //   useEffect(() => {
+  //     dispatch({ field: 'modelError', value: getModelsError(error) });
+  //   }, [dispatch, error, getModelsError]);
 
   // FETCH MODELS ----------------------------------------------
 
@@ -183,7 +182,7 @@ const ChatHome = ({
 
   const handleNewConversation = () => {
     const lastConversation = conversations[conversations.length - 1];
-    console.log(defaultModelId)
+    console.log(defaultModelId);
 
     const newConversation: Conversation = {
       id: uuidv4(),
@@ -289,7 +288,7 @@ const ChatHome = ({
     }
 
     const conversationHistory = localStorage.getItem('conversationHistory');
-    console.log({conversationHistory})
+    console.log({ conversationHistory });
     if (conversationHistory) {
       const parsedConversationHistory: Conversation[] =
         JSON.parse(conversationHistory);
@@ -299,43 +298,40 @@ const ChatHome = ({
 
       dispatch({ field: 'conversations', value: cleanedConversationHistory });
 
-      
       if (conversationId && cleanedConversationHistory) {
-        const selectedConversation = cleanedConversationHistory.find(c => c.id == conversationId)
-        console.log("DISPATCHING", {selectedConversation})
+        const selectedConversation = cleanedConversationHistory.find(
+          (c) => c.id == conversationId,
+        );
+        console.log('DISPATCHING', { selectedConversation });
         if (selectedConversation) {
-            dispatch({
-                field: 'selectedConversation',
-                value: selectedConversation,
-            });
+          dispatch({
+            field: 'selectedConversation',
+            value: selectedConversation,
+          });
         } else {
-            dispatchDefaultNewConversation()
+          dispatchDefaultNewConversation();
         }
       } else {
-        dispatchDefaultNewConversation()
+        dispatchDefaultNewConversation();
       }
     } else {
-        dispatchDefaultNewConversation()
+      dispatchDefaultNewConversation();
     }
     function dispatchDefaultNewConversation() {
-        console.log("DEFAULT NEW CONVERSATION")
-        dispatch({
-            field: 'selectedConversation',
-            value: {
-              id: uuidv4(),
-              name: 'New Conversation',
-              messages: [],
-              model: OpenAIModels[defaultModelId],
-              prompt: DEFAULT_SYSTEM_PROMPT,
-              temperature: temperature ?? DEFAULT_TEMPERATURE,
-              folderId: null,
-            },
-          });
-        }
-
-    
-
-    
+      console.log('DEFAULT NEW CONVERSATION');
+      dispatch({
+        field: 'selectedConversation',
+        value: {
+          id: uuidv4(),
+          name: 'New Conversation',
+          messages: [],
+          model: OpenAIModels[defaultModelId],
+          prompt: DEFAULT_SYSTEM_PROMPT,
+          temperature: temperature ?? DEFAULT_TEMPERATURE,
+          folderId: null,
+        },
+      });
+    }
 
     // const selectedConversation = localStorage.getItem('selectedConversation');
     // console.log({selectedConversation})
@@ -370,9 +366,9 @@ const ChatHome = ({
     dispatch,
     serverSideApiKeyIsSet,
     serverSidePluginKeysSet,
-    conversationId
+    conversationId,
   ]);
-//   console.log({contextValue})
+  //   console.log({contextValue})
 
   return (
     <ChatContext.Provider

@@ -5,10 +5,7 @@ import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 import { useTranslation } from 'next-i18next';
 
-import {
-  generateRandomString,
-  programmingLanguages,
-} from '@/lib/codeblock';
+import { generateRandomString, programmingLanguages } from '@/lib/codeblock';
 
 interface Props {
   language: string;

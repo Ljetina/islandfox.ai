@@ -4,17 +4,10 @@ import { useTranslation } from 'next-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/lib/const';
-import { saveConversation, saveConversations } from '@/lib/conversation';
-import { saveFolders } from '@/lib/folders';
-import { exportData, importData } from '@/lib/importExport';
-
 import { Conversation } from '@/types/chat';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { OpenAIModels } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
-
-import ChatContext from '@/app/chat/chat.context';
 
 import { ChatFolders } from './components/ChatFolders';
 import { ChatbarSettings } from './components/ChatbarSettings';
@@ -24,6 +17,11 @@ import Sidebar from '../Sidebar';
 import ChatbarContext from './Chatbar.context';
 import { ChatbarInitialState, initialState } from './Chatbar.state';
 
+import ChatContext from '@/app/chat/chat.context';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/lib/const';
+import { saveConversation, saveConversations } from '@/lib/conversation';
+import { saveFolders } from '@/lib/folders';
+import { exportData, importData } from '@/lib/importExport';
 import { v4 as uuidv4 } from 'uuid';
 
 export const Chatbar = () => {

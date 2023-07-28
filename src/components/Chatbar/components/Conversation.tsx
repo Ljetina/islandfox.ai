@@ -14,21 +14,21 @@ import {
   useState,
 } from 'react';
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
 import { Conversation } from '@/types/chat';
 
-import ChatContext from '@/app/chat/chat.context';
-
 import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
 import ChatbarContext from '@/components/Chatbar/Chatbar.context';
+
+import ChatContext from '@/app/chat/chat.context';
 
 interface Props {
   conversation: Conversation;
 }
 
 export const ConversationComponent = ({ conversation }: Props) => {
-  const router = useRouter()
+  const router = useRouter();
   const {
     state: { selectedConversation, messageIsStreaming },
     // handleSelectConversation,

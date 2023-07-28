@@ -1,12 +1,20 @@
-import { authOptions } from "@/lib/auth";
-import NextAuth from "next-auth/next";
+import NextAuth from 'next-auth/next';
 
-const handler = NextAuth(authOptions);
+import { authOptions } from '@/lib/auth';
+import { headers } from 'next/headers';
 
-// async function handler(...params: any[]) {
-//     const authHandler = NextAuth(authOptions);
-//     await authHandler(...params);
-//     console.log('HERE')
-// }
+// const handler = NextAuth(authOptions);
 
-export { handler as GET, handler as POST }
+async function handler(...params: any[]) {
+  const authHandler = NextAuth(authOptions);
+  console.log('params',params[1]);
+  const h = headers();
+  console.log({
+    cookie: h.get('cookie')
+  })
+  
+  const response = await authHandler(...params);
+  return response;
+}
+
+export { handler as GET, handler as POST };

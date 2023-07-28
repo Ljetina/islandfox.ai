@@ -2,12 +2,12 @@ import { useContext } from 'react';
 
 import { FolderInterface } from '@/types/folder';
 
-import ChatContext from '@/app/chat/chat.context';
-
 import Folder from '@/components/Folder';
 import { PromptComponent } from '@/components/Promptbar/components/Prompt';
 
 import PromptbarContext from '../PromptBar.context';
+
+import ChatContext from '@/app/chat/chat.context';
 
 export const PromptFolders = () => {
   const {

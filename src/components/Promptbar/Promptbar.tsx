@@ -3,12 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-import { savePrompts } from '@/lib/prompts';
-
 import { OpenAIModels } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
-
-import ChatContext from '@/app/chat/chat.context';
 
 import { PromptFolders } from './components/PromptFolders';
 import { PromptbarSettings } from './components/PromptbarSettings';
@@ -18,6 +14,8 @@ import Sidebar from '../Sidebar';
 import PromptbarContext from './PromptBar.context';
 import { PromptbarInitialState, initialState } from './Promptbar.state';
 
+import ChatContext from '@/app/chat/chat.context';
+import { savePrompts } from '@/lib/prompts';
 import { v4 as uuidv4 } from 'uuid';
 
 const Promptbar = () => {

@@ -4,11 +4,10 @@ import { useTranslation } from 'next-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-import { getSettings, saveSettings } from '@/lib/settings';
-
 import { Settings } from '@/types/settings';
 
 import ChatContext from '@/app/chat/chat.context';
+import { getSettings, saveSettings } from '@/lib/settings';
 
 interface Props {
   open: boolean;

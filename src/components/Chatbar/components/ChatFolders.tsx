@@ -2,11 +2,11 @@ import { useContext } from 'react';
 
 import { FolderInterface } from '@/types/folder';
 
-import ChatContext from '@/app/chat/chat.context';
-
 import Folder from '@/components/Folder';
 
 import { ConversationComponent } from './Conversation';
+
+import ChatContext from '@/app/chat/chat.context';
 
 interface Props {
   searchTerm: string;

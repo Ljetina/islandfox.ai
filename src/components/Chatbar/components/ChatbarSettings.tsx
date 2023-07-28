@@ -1,9 +1,8 @@
 import { Icon2fa, IconFileExport, IconSettings } from '@tabler/icons-react';
-import { useContext, useState } from 'react';
+import { signIn, signOut, useSession } from 'next-auth/react';
+import { useContext, useEffect, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
-
-import ChatContext from '@/app/chat/chat.context';
 
 import { SettingDialog } from '@/components/Settings/SettingDialog';
 
@@ -11,20 +10,22 @@ import { Import } from '../../Settings/Import';
 import { SidebarButton } from '../../Sidebar/SidebarButton';
 import ChatbarContext from '../Chatbar.context';
 import { ClearConversations } from './ClearConversations';
-import { useSession, signIn, signOut } from "next-auth/react"
+
+import ChatContext from '@/app/chat/chat.context';
 
 export const ChatbarSettings = () => {
   const { t } = useTranslation('sidebar');
   const [isSettingDialogOpen, setIsSettingDialog] = useState<boolean>(false);
 
   const {
-    state: {
-      conversations,
-    },
+    state: { conversations },
     dispatch: homeDispatch,
   } = useContext(ChatContext);
 
-  // const { data: session } = useSession()
+  const { data: session } = useSession()
+  useEffect(() => {
+    console.log('chatbar', {session});
+  }, [session])
   // if (session) {
   //   return (
   //     <>
@@ -42,7 +43,6 @@ export const ChatbarSettings = () => {
 
   function login() {
     signIn();
-
   }
 
   const {
@@ -51,6 +51,7 @@ export const ChatbarSettings = () => {
     handleExportData,
     handleApiKeyChange,
   } = useContext(ChatbarContext);
+  
 
   return (
     <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
@@ -72,11 +73,10 @@ export const ChatbarSettings = () => {
         onClick={() => setIsSettingDialog(true)}
       />
 
-      <SidebarButton
-        text={'Login'}
-        icon={<Icon2fa />}
-        onClick={() => login()}
-        />
+        {session ? 
+        <SidebarButton text={'Logout'} icon={<Icon2fa />} onClick={() => signOut()} /> : 
+        <SidebarButton text={'Login'} icon={<Icon2fa />} onClick={() => signIn()} />
+        }
 
       <SettingDialog
         open={isSettingDialogOpen}

@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 
 import { PluginID, PluginKey } from '@/types/plugin';
 
-import ChatContext from '@/app/chat/chat.context';
-
 import { SidebarButton } from '@/components/Sidebar/SidebarButton';
 
 import ChatbarContext from '../Chatbar.context';
+
+import ChatContext from '@/app/chat/chat.context';
 
 export const PluginKeys = () => {
   const { t } = useTranslation('sidebar');

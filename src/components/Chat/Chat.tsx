@@ -1,4 +1,5 @@
-"use client"
+'use client';
+
 import { IconClearAll, IconSettings } from '@tabler/icons-react';
 import {
   MutableRefObject,
@@ -13,26 +14,25 @@ import toast from 'react-hot-toast';
 
 import { useTranslation } from 'next-i18next';
 
+import { ChatBody, Conversation, Message } from '@/types/chat';
+import { Plugin } from '@/types/plugin';
+
+import Spinner from '../Spinner';
+import { ChatInput } from './ChatInput';
+import { ChatLoader } from './ChatLoader';
+import { ErrorMessageDiv } from './ErrorMessageDiv';
+import { MemoizedChatMessage } from './MemoizedChatMessage';
+import { ModelSelect } from './ModelSelect';
+import { SystemPrompt } from './SystemPrompt';
+import { TemperatureSlider } from './Temperature';
+
+import ChatContext from '@/app/chat/chat.context';
 import { getEndpoint } from '@/lib/api';
 import {
   saveConversation,
   saveConversations,
   updateConversation,
 } from '@/lib/conversation';
-
-import { ChatBody, Conversation, Message } from '@/types/chat';
-import { Plugin } from '@/types/plugin';
-
-import ChatContext from '@/app/chat/chat.context';
-
-import Spinner from '../Spinner';
-import { ChatInput } from './ChatInput';
-import { ChatLoader } from './ChatLoader';
-import { ErrorMessageDiv } from './ErrorMessageDiv';
-import { ModelSelect } from './ModelSelect';
-import { SystemPrompt } from './SystemPrompt';
-import { TemperatureSlider } from './Temperature';
-import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { throttle } from '@/lib/throttle';
 
 interface Props {
@@ -124,82 +124,82 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'messageIsStreaming', value: false });
           return;
         }
-      if (!plugin) {
-        if (updatedConversation.messages.length === 1 && message.content) {
-          const { content } = message;
-          const customName =
-            content.length > 30 ? content.substring(0, 30) + '...' : content;
-          updatedConversation = {
-            ...updatedConversation,
-            name: customName,
-          };
-        }
-        homeDispatch({ field: 'loading', value: false });
-        const reader = data.getReader();
-        const decoder = new TextDecoder();
-        let done = false;
-        let isFirst = true;
-        let text = '';
-        while (!done) {
-          if (stopConversationRef.current === true) {
-            controller.abort();
-            done = true;
-            break;
-          }
-          const { value, done: doneReading } = await reader.read();
-          done = doneReading;
-          const chunkValue = decoder.decode(value);
-          text += chunkValue;
-          if (isFirst) {
-            isFirst = false;
-            const updatedMessages: Message[] = [
-              ...updatedConversation.messages,
-              { role: 'assistant', content: chunkValue },
-            ];
+        if (!plugin) {
+          if (updatedConversation.messages.length === 1 && message.content) {
+            const { content } = message;
+            const customName =
+              content.length > 30 ? content.substring(0, 30) + '...' : content;
             updatedConversation = {
               ...updatedConversation,
-              messages: updatedMessages,
+              name: customName,
             };
-            homeDispatch({
-              field: 'selectedConversation',
-              value: updatedConversation,
-            });
-          } else {
-            const updatedMessages: Message[] =
-              updatedConversation.messages.map((message, index) => {
-                if (index === updatedConversation.messages.length - 1) {
-                  return {
-                    ...message,
-                    content: text,
-                  };
-                }
-                return message;
-              });
-            updatedConversation = {
-              ...updatedConversation,
-              messages: updatedMessages,
-            };
-            homeDispatch({
-              field: 'selectedConversation',
-              value: updatedConversation,
-            });
           }
-        }
-        saveConversation(updatedConversation);
-        const updatedConversations: Conversation[] = conversations.map(
-          (conversation) => {
-            if (conversation.id === selectedConversation.id) {
-              return updatedConversation;
+          homeDispatch({ field: 'loading', value: false });
+          const reader = data.getReader();
+          const decoder = new TextDecoder();
+          let done = false;
+          let isFirst = true;
+          let text = '';
+          while (!done) {
+            if (stopConversationRef.current === true) {
+              controller.abort();
+              done = true;
+              break;
             }
-            return conversation;
-          },
-        );
-        if (updatedConversations.length === 0) {
-          updatedConversations.push(updatedConversation);
-        }
-        homeDispatch({ field: 'conversations', value: updatedConversations });
-        saveConversations(updatedConversations);
-        homeDispatch({ field: 'messageIsStreaming', value: false });
+            const { value, done: doneReading } = await reader.read();
+            done = doneReading;
+            const chunkValue = decoder.decode(value);
+            text += chunkValue;
+            if (isFirst) {
+              isFirst = false;
+              const updatedMessages: Message[] = [
+                ...updatedConversation.messages,
+                { role: 'assistant', content: chunkValue },
+              ];
+              updatedConversation = {
+                ...updatedConversation,
+                messages: updatedMessages,
+              };
+              homeDispatch({
+                field: 'selectedConversation',
+                value: updatedConversation,
+              });
+            } else {
+              const updatedMessages: Message[] =
+                updatedConversation.messages.map((message, index) => {
+                  if (index === updatedConversation.messages.length - 1) {
+                    return {
+                      ...message,
+                      content: text,
+                    };
+                  }
+                  return message;
+                });
+              updatedConversation = {
+                ...updatedConversation,
+                messages: updatedMessages,
+              };
+              homeDispatch({
+                field: 'selectedConversation',
+                value: updatedConversation,
+              });
+            }
+          }
+          saveConversation(updatedConversation);
+          const updatedConversations: Conversation[] = conversations.map(
+            (conversation) => {
+              if (conversation.id === selectedConversation.id) {
+                return updatedConversation;
+              }
+              return conversation;
+            },
+          );
+          if (updatedConversations.length === 0) {
+            updatedConversations.push(updatedConversation);
+          }
+          homeDispatch({ field: 'conversations', value: updatedConversations });
+          saveConversations(updatedConversations);
+          homeDispatch({ field: 'messageIsStreaming', value: false });
         }
       }
     },
@@ -282,7 +282,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   }, [selectedConversation, throttledScrollDown]);
 
   useEffect(() => {
-    console.log({selectedConversation})
+    console.log({ selectedConversation });
     const observer = new IntersectionObserver(
       ([entry]) => {
         setAutoScrollEnabled(entry.isIntersecting);

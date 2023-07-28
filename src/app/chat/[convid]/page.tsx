@@ -1,6 +1,18 @@
-import { OpenAIModelID } from "@/types/openai";
-import ChatHome from "../ChatHome";
+import { OpenAIModelID } from '@/types/openai';
 
-export default function ChatHomePage({params}: {params: {convid: string}}) {
-    return <ChatHome conversationId={params.convid} serverSideApiKeyIsSet={false} serverSidePluginKeysSet={false} defaultModelId={OpenAIModelID.GPT_3_5}/>
+import ChatHome from '../ChatHome';
+
+export default function ChatHomePage({
+  params,
+}: {
+  params: { convid: string };
+}) {
+  return (
+    <ChatHome
+      conversationId={params.convid}
+      serverSideApiKeyIsSet={false}
+      serverSidePluginKeysSet={false}
+      defaultModelId={OpenAIModelID.GPT_3_5}
+    />
+  );
 }

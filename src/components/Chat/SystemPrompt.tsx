@@ -9,13 +9,13 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
-import { DEFAULT_SYSTEM_PROMPT } from '@/lib/const';
-
 import { Conversation } from '@/types/chat';
 import { Prompt } from '@/types/prompt';
 
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+
+import { DEFAULT_SYSTEM_PROMPT } from '@/lib/const';
 
 interface Props {
   conversation: Conversation;
