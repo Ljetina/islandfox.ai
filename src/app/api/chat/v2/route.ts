@@ -1,6 +1,6 @@
 import { ChatBody } from '@/types/chat';
 
-import { authOptions, getServerSession } from '@/lib/auth';
+import { authOptions } from '@/lib/auth';
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/lib/const';
 import { OpenAIError, OpenAIStream } from '@/lib/stream';
 

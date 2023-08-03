@@ -35,7 +35,7 @@ export const ChatMessage: FC<Props> = memo(
 
     const {
       state: {
-        selectedConversation,
+        // selectedConversation,
         conversations,
         currentMessage,
         messageIsStreaming,

@@ -20,8 +20,8 @@ interface Props<T> {
   searchTerm: string;
   handleSearchTerm: (searchTerm: string) => void;
   toggleOpen: () => void;
-  handleCreateItem: () => void;
-  handleCreateFolder: () => void;
+  // handleCreateItem: () => void;
+  // handleCreateFolder: () => void;
   handleDrop: (e: any) => void;
 }
 
@@ -36,8 +36,8 @@ const Sidebar = <T,>({
   searchTerm,
   handleSearchTerm,
   toggleOpen,
-  handleCreateItem,
-  handleCreateFolder,
+  // handleCreateItem,
+  // handleCreateFolder,
   handleDrop,
 }: Props<T>) => {
   const { t } = useTranslation('promptbar');
@@ -53,6 +53,7 @@ const Sidebar = <T,>({
   const removeHighlight = (e: any) => {
     e.target.style.background = 'none';
   };
+  console.log({isOpen});
 
   return isOpen ? (
     <div>
@@ -63,8 +64,9 @@ const Sidebar = <T,>({
           <button
             className="text-sidebar flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10"
             onClick={() => {
-              handleCreateItem();
-              handleSearchTerm('');
+              console.log('not implemented')
+              // handleCreateItem();
+              // handleSearchTerm('');
             }}
           >
             <IconPlus size={16} />
@@ -73,7 +75,8 @@ const Sidebar = <T,>({
 
           <button
             className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
-            onClick={handleCreateFolder}
+            // onClick={handleCreateFolder}
+            onClick={() => console.log('not implemented')}
           >
             <IconFolderPlus size={16} />
           </button>

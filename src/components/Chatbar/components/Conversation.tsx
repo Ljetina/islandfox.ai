@@ -30,10 +30,15 @@ interface Props {
 export const ConversationComponent = ({ conversation }: Props) => {
   const router = useRouter();
   const {
-    state: { selectedConversation, messageIsStreaming },
+    state: { 
+      messageIsStreaming, 
+      // selectedConversationId
+    },
     // handleSelectConversation,
-    handleUpdateConversation,
+    // handleUpdateConversation,
   } = useContext(ChatContext);
+
+  const selectedConversationId = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0'
 
   const { handleDeleteConversation } = useContext(ChatbarContext);
 
@@ -44,7 +49,8 @@ export const ConversationComponent = ({ conversation }: Props) => {
   const handleEnterDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      selectedConversation && handleRename(selectedConversation);
+      // TODO
+      // selectedConversation && handleRename(selectedConversation);
     }
   };
 
@@ -59,10 +65,11 @@ export const ConversationComponent = ({ conversation }: Props) => {
 
   const handleRename = (conversation: Conversation) => {
     if (renameValue.trim().length > 0) {
-      handleUpdateConversation(conversation, {
-        key: 'name',
-        value: renameValue,
-      });
+      // TODO
+      // handleUpdateConversation(conversation, {
+      //   key: 'name',
+      //   value: renameValue,
+      // });
       setRenameValue('');
       setIsRenaming(false);
     }
@@ -88,7 +95,8 @@ export const ConversationComponent = ({ conversation }: Props) => {
   const handleOpenRenameModal: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
     setIsRenaming(true);
-    selectedConversation && setRenameValue(selectedConversation.name);
+    // TODO
+    // selectedConversation && setRenameValue(selectedConversation.name);
   };
   const handleOpenDeleteModal: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
@@ -105,7 +113,7 @@ export const ConversationComponent = ({ conversation }: Props) => {
 
   return (
     <div className="relative flex items-center">
-      {isRenaming && selectedConversation?.id === conversation.id ? (
+      {isRenaming && selectedConversationId === conversation.id ? (
         <div className="flex w-full items-center gap-3 rounded-lg bg-[#343541]/90 p-3">
           <IconMessage size={18} />
           <input
@@ -122,7 +130,7 @@ export const ConversationComponent = ({ conversation }: Props) => {
           className={`flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200 hover:bg-[#343541]/90 ${
             messageIsStreaming ? 'disabled:cursor-not-allowed' : ''
           } ${
-            selectedConversation?.id === conversation.id
+            selectedConversationId === conversation.id
               ? 'bg-[#343541]/90'
               : ''
           }`}
@@ -135,7 +143,7 @@ export const ConversationComponent = ({ conversation }: Props) => {
           <IconMessage size={18} />
           <div
             className={`relative max-h-5 flex-1 overflow-hidden text-ellipsis whitespace-nowrap break-all text-left text-[12.5px] leading-3 ${
-              selectedConversation?.id === conversation.id ? 'pr-12' : 'pr-1'
+              selectedConversationId === conversation.id ? 'pr-12' : 'pr-1'
             }`}
           >
             {conversation.name}
@@ -144,7 +152,7 @@ export const ConversationComponent = ({ conversation }: Props) => {
       )}
 
       {(isDeleting || isRenaming) &&
-        selectedConversation?.id === conversation.id && (
+        selectedConversationId === conversation.id && (
           <div className="absolute right-1 z-10 flex text-gray-300">
             <SidebarActionButton handleClick={handleConfirm}>
               <IconCheck size={18} />
@@ -155,7 +163,7 @@ export const ConversationComponent = ({ conversation }: Props) => {
           </div>
         )}
 
-      {selectedConversation?.id === conversation.id &&
+      {selectedConversationId === conversation.id &&
         !isDeleting &&
         !isRenaming && (
           <div className="absolute right-1 z-10 flex text-gray-300">

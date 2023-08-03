@@ -10,7 +10,7 @@ export const Conversations = ({ conversations }: Props) => {
   return (
     <div className="flex w-full flex-col gap-1">
       {conversations
-        .filter((conversation) => !conversation.folderId)
+        .filter((conversation) => !conversation.folder_id)
         .slice()
         .reverse()
         .map((conversation, index) => (

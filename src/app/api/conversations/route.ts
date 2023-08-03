@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { authError, getServerSession, getTenant } from '@/lib/auth';
+import { authError, authOptions, getTenant } from '@/lib/auth';
 import { getDbClient } from '@/lib/db';
 import { v4 as uuidv4 } from 'uuid';
+import { getServerSession } from 'next-auth';
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession();
-  console.log('conversation get', { session });
+  const session = await getServerSession(authOptions);
   const client = await getDbClient();
   const tenantId = req.headers.get('x-tenant-id');
 
@@ -27,10 +27,10 @@ SELECT
     conversations.model_id 
 FROM 
     conversations
-WHERE 
-    conversations.user_id = $1 
+WHERE
+    conversations.user_id = $1
     AND conversations.tenant_id = $2
-ORDER BY 
+ORDER BY
     conversations.created_at DESC;
 `,
         [userId, tenantId],

@@ -9,25 +9,27 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
-import { Conversation } from '@/types/chat';
 import { Prompt } from '@/types/prompt';
-
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 
 import { DEFAULT_SYSTEM_PROMPT } from '@/lib/const';
+import { OpenAIModel } from '@/types/openai';
 
 interface Props {
-  conversation: Conversation;
-  prompts: Prompt[];
+  model?: OpenAIModel;
+  initialPrompt: string;
   onChangePrompt: (prompt: string) => void;
 }
 
 export const SystemPrompt: FC<Props> = ({
-  conversation,
-  prompts,
+  model,
+  initialPrompt,
   onChangePrompt,
 }) => {
+  // TODO Get prompts from context
+  const prompts: Prompt[] = [];
+
   const { t } = useTranslation('chat');
 
   const [value, setValue] = useState<string>('');
@@ -46,7 +48,7 @@ export const SystemPrompt: FC<Props> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    const maxLength = conversation.model.maxLength;
+    const maxLength = model?.maxLength;
 
     if (value.length > maxLength) {
       alert(
@@ -167,12 +169,12 @@ export const SystemPrompt: FC<Props> = ({
   }, [value]);
 
   useEffect(() => {
-    if (conversation.prompt) {
-      setValue(conversation.prompt);
+    if (initialPrompt) {
+      setValue(initialPrompt);
     } else {
       setValue(DEFAULT_SYSTEM_PROMPT);
     }
-  }, [conversation]);
+  }, [initialPrompt]);
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {

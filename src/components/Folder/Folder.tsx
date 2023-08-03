@@ -33,7 +33,11 @@ const Folder = ({
   handleDrop,
   folderComponent,
 }: Props) => {
-  const { handleDeleteFolder, handleUpdateFolder } = useContext(ChatContext);
+  // const { handleDeleteFolder, handleUpdateFolder } = useContext(ChatContext);
+  const { handleDeleteFolder, handleUpdateFolder } = {
+    handleDeleteFolder: () => console.log('not implemented'),
+    handleUpdateFolder: () => console.log('not implemented')
+  }
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
@@ -47,8 +51,10 @@ const Folder = ({
     }
   };
 
-  const handleRename = () => {
-    handleUpdateFolder(currentFolder.id, renameValue);
+  const handleRename = () => {  
+    // TODO rename
+
+    // handleUpdateFolder(currentFolder.id, renameValue);
     setRenameValue('');
     setIsRenaming(false);
   };
@@ -138,7 +144,8 @@ const Folder = ({
                 e.stopPropagation();
 
                 if (isDeleting) {
-                  handleDeleteFolder(currentFolder.id);
+                  // TODO
+                  // handleDeleteFolder(currentFolder.id);
                 } else if (isRenaming) {
                   handleRename();
                 }

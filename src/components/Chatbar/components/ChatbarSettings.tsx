@@ -55,17 +55,19 @@ export const ChatbarSettings = () => {
 
   return (
     <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
-      {conversations.length > 0 ? (
+      {/* TODO CLEAR CONVERSATIONS */}
+      {/* {conversations.length > 0 ? (
         <ClearConversations onClearConversations={handleClearConversations} />
-      ) : null}
+      ) : null} */}
 
-      <Import onImport={handleImportConversations} />
+      {/* TODO import and export */}
+      {/* <Import onImport={handleImportConversations} />
 
       <SidebarButton
         text={t('Export data')}
         icon={<IconFileExport size={18} />}
         onClick={() => handleExportData()}
-      />
+      /> */}
 
       <SidebarButton
         text={t('Settings')}

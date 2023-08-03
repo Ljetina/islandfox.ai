@@ -5,50 +5,56 @@ import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
-export interface ChatInitialState {
-  apiKey: string;
-  pluginKeys: PluginKey[];
+export type ChatInitialState = InitialServerData & ClientState;
+export interface ClientState {
   loading: boolean;
   lightMode: 'light' | 'dark';
   messageIsStreaming: boolean;
   modelError: ErrorMessage | null;
-  models: OpenAIModel[];
-  folders: FolderInterface[];
-  conversations: Conversation[];
-  selectedConversation: Conversation | undefined;
-  currentMessage: Message | undefined;
-  prompts: Prompt[];
-  temperature: number;
-  showChatbar: boolean;
-  showPromptbar: boolean;
+  selectedConversationId?: string | undefined;
   currentFolder: FolderInterface | undefined;
+  currentMessage: Message | undefined;
   messageError: boolean;
   searchTerm: string;
-  defaultModelId: OpenAIModelID | undefined;
-  serverSideApiKeyIsSet: boolean;
-  serverSidePluginKeysSet: boolean;
 }
 
-export const initialState: ChatInitialState = {
-  apiKey: '',
+export interface InitialServerData {
+  id: string;
+  email: string;
+  name: string;
+  ui_show_prompts: boolean;
+  ui_show_conversations: boolean;
+  selected_tenant_id: string;
+  conversations?: {
+    id: string;
+    created_at: string;
+    updated_at: string;
+    folder_id?: string;
+    name: string;
+    prompt: string;
+    temperature: number;
+    model_id: string;
+    messages: {
+      role: string,
+      content: string,
+      conversation_id: string,
+      created_at: string,
+      updated_at: string
+    }[]
+  }[];
+  folders?: {
+    id: string;
+    name: string;
+  }[];
+}
+
+export const initialState: ClientState = {
   loading: false,
-  pluginKeys: [],
   lightMode: 'dark',
   messageIsStreaming: false,
   modelError: null,
-  models: [],
-  folders: [],
-  conversations: [],
-  selectedConversation: undefined,
-  currentMessage: undefined,
-  prompts: [],
-  temperature: 1,
-  showPromptbar: true,
-  showChatbar: true,
   currentFolder: undefined,
+  currentMessage: undefined,
   messageError: false,
   searchTerm: '',
-  defaultModelId: OpenAIModelID.GPT_3_5,
-  serverSideApiKeyIsSet: false,
-  serverSidePluginKeysSet: false,
 };

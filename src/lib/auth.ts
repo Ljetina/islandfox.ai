@@ -1,10 +1,22 @@
-import type { NextAuthOptions, Session } from 'next-auth';
+import {
+  type NextAuthOptions,
+  type Session,
+  getServerSession,
+} from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import { headers as nextHeaders } from 'next/headers';
+import { NextRequest } from 'next/server';
 
 import { getDbClient } from './db';
 
 import { PoolClient } from 'pg';
+
+export interface AuthSession extends Session {
+  user: {
+    id: string;
+    email: string;
+  };
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -18,19 +30,12 @@ export const authOptions: NextAuthOptions = {
       const client = await getDbClient();
       const tokenId: string = token.sub as string;
       await client.query('DELETE FROM oauth_tokens WHERE id = $1', [tokenId]);
+
       client.release();
     },
   },
   callbacks: {
-    async jwt(props) {
-      const { session, token, user } = props;
-      // console.log('jwt', props);
-      // token.id = user.id
-      token.sub;
-      return token;
-    },
     async signIn({ user, account, profile }) {
-      // console.log('signin', { user, account, profile });
       const email = profile?.email;
       if (!email) {
         return false;
@@ -60,20 +65,17 @@ export const authOptions: NextAuthOptions = {
         if (userId) {
           const tokenId = await createTokenRecord(userId);
           user.id = tokenId;
-          console.log('userId', userId);
         } else {
           const tenantRes = await client.query(
             `INSERT INTO tenants (name) VALUES ($1) RETURNING id`,
             ['Your Organization'],
           );
           const tenantId = tenantRes.rows[0].id;
-          console.log('tenantId', tenantId);
           const userRes = await client.query(
-            `INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id`,
-            [user.name, user.email],
+            `INSERT INTO users (name, email, selected_tenant_id) VALUES ($1, $2, $3) RETURNING id`,
+            [user.name, user.email, tenantId],
           );
           const userId = userRes.rows[0].id;
-          console.log('new userId', userId);
           await client.query(
             `INSERT INTO user_tenants (user_id, tenant_id) VALUES ($1, $2)`,
             [userId, tenantId],
@@ -92,8 +94,9 @@ export const authOptions: NextAuthOptions = {
     },
     async session(props) {
       const { session, token, user } = props;
-      token.exp;
-      // console.log('session', props);
+      if (session.user && token.sub) {
+        (session as AuthSession).user.id = token.sub;
+      }
       return session;
     },
   },
@@ -116,6 +119,19 @@ export function authError() {
   });
 }
 
+export async function getUserAndTenant(session: Session, client: PoolClient) {
+
+  console.log({session})
+  const resp = await client.query(
+    `SELECT u.id as user_id, u.selected_tenant_id as tenant_id FROM users u INNER JOIN oauth_tokens ot ON ot.user_id = u.id WHERE ot.id = $1`,
+    [(session as AuthSession)?.user.id],
+  );
+  console.log({resp})
+  return resp.rows[0];
+  // console.log('conversation get', { session });
+  // const tenantId = req.headers.get('x-tenant-id');
+}
+
 export async function getTenant(userId: string, tenantId: string) {
   const client = await getDbClient();
   const res = await client.query(
@@ -129,30 +145,30 @@ export async function getTenant(userId: string, tenantId: string) {
   return res.rows[0];
 }
 
-export async function getServerSession(): Promise<Session | null> {
-  const cookie = nextHeaders().get('cookie');
-  if (!cookie) {
-    return null;
-  }
-  const response = await fetch(
-    `${process.env.LOCAL_AUTH_URL}/api/auth/session`,
-    // `${process.env.LOCAL_AUTH_URL}/api/auth/signin`,
-    {
-      headers: {
-        cookie,
-      },
-    },
-  );
+// export async function getServerSession(): Promise<Session | null> {
+//   const cookie = nextHeaders().get('cookie');
+//   if (!cookie) {
+//     return null;
+//   }
+//   const response = await fetch(
+//     `${process.env.LOCAL_AUTH_URL}/api/auth/session`,
+//     // `${process.env.LOCAL_AUTH_URL}/api/auth/signin`,
+//     {
+//       headers: {
+//         cookie,
+//       },
+//     },
+//   );
 
-  if (response.headers.get('content-type') !== 'application/json') {
-    //   console.log(await response.text())
-    return null;
-  }
-  const session = await response.json();
-  if (!session.user) {
-    return null;
-  }
-  // console.log({session})
+//   if (response.headers.get('content-type') !== 'application/json') {
+//     //   console.log(await response.text())
+//     return null;
+//   }
+//   const session = await response.json();
+//   if (!session.user) {
+//     return null;
+//   }
+//   // console.log({session})
 
-  return Object.keys(session).length > 0 ? session : null;
-}
+//   return Object.keys(session).length > 0 ? session : null;
+// }

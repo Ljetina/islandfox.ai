@@ -1,6 +1,8 @@
 import { OpenAIModel } from './openai';
 
 export interface Message {
+  // id: string,
+  // conversation_id: string,
   role: Role;
   content: string | null;
   name?: string;
@@ -21,8 +23,8 @@ export interface Conversation {
   id: string;
   name: string;
   messages: Message[];
-  model: OpenAIModel;
+  model_id: OpenAIModel;
   prompt: string;
   temperature: number;
-  folderId: string | null;
+  folder_id: string | null;
 }

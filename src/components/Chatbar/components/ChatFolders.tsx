@@ -15,16 +15,16 @@ interface Props {
 export const ChatFolders = ({ searchTerm }: Props) => {
   const {
     state: { folders, conversations },
-    handleUpdateConversation,
+    // handleUpdateConversation,
   } = useContext(ChatContext);
 
   const handleDrop = (e: any, folder: FolderInterface) => {
     if (e.dataTransfer) {
       const conversation = JSON.parse(e.dataTransfer.getData('conversation'));
-      handleUpdateConversation(conversation, {
-        key: 'folderId',
-        value: folder.id,
-      });
+      // handleUpdateConversation(conversation, {
+      //   key: 'folderId',
+      //   value: folder.id,
+      // });
     }
   };
 
@@ -47,7 +47,7 @@ export const ChatFolders = ({ searchTerm }: Props) => {
 
   return (
     <div className="flex w-full flex-col pt-2">
-      {folders
+      {(folders || [])
         .filter((folder) => folder.type === 'chat')
         .sort((a, b) => a.name.localeCompare(b.name))
         .map((folder, index) => (

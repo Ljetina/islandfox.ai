@@ -1,13 +1,18 @@
-import { OpenAIModelID } from '@/types/openai';
+import { getServerSession } from 'next-auth';
 
+import { AuthContext } from '../AuthContext';
 import ChatHome from './ChatHome';
 
-export default function ChatHomePage() {
+import { AuthSession, authOptions } from '@/lib/auth';
+import { initialServerData } from '@/lib/db';
+
+export default async function ChatHomePage() {
+  const session = await getServerSession(authOptions);
+  const initialData = await initialServerData((session as AuthSession).user.id);
+
   return (
-    <ChatHome
-      serverSideApiKeyIsSet={false}
-      serverSidePluginKeysSet={false}
-      defaultModelId={OpenAIModelID.GPT_3_5}
-    />
+    <AuthContext session={session}>
+      <ChatHome initialData={initialData} />
+    </AuthContext>
   );
 }
