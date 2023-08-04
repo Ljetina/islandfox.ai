@@ -8,7 +8,15 @@ import {
   IconTrash,
   IconUser,
 } from '@tabler/icons-react';
-import { FC, memo, useContext, useEffect, useRef, useState } from 'react';
+import {
+  FC,
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -35,79 +43,108 @@ export const ChatMessage: FC<Props> = memo(
 
     const {
       state: {
-        // selectedConversation,
+        selectedConversationId,
         conversations,
         currentMessage,
         messageIsStreaming,
       },
       dispatch: homeDispatch,
     } = useContext(ChatContext);
+    const selectedConversation = useMemo(
+      () => conversations?.find((c) => c.id === selectedConversationId),
+      [selectedConversationId, conversations],
+    );
 
-    const [isEditing, setIsEditing] = useState<boolean>(false);
+    // const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
-    const [messageContent, setMessageContent] = useState(message.content);
+    // const [messageContent, setMessageContent] = useState(message.content);
     const [messagedCopied, setMessageCopied] = useState(false);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+    // EDIT RELATED
+    // useEffect(() => {
+    //   if (textareaRef.current) {
+    //     textareaRef.current.style.height = 'inherit';
+    //     textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    //   }
+    // }, [isEditing]);
+
     const toggleEditing = () => {
-      setIsEditing(!isEditing);
+      // TODO
+      // setIsEditing(!isEditing);
     };
 
     const handleInputChange = (
       event: React.ChangeEvent<HTMLTextAreaElement>,
     ) => {
-      setMessageContent(event.target.value);
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'inherit';
-        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-      }
+      // TODO
+      // setMessageContent(event.target.value);
+      // if (textareaRef.current) {
+      //   textareaRef.current.style.height = 'inherit';
+      //   textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      // }
     };
 
     const handleEditMessage = () => {
-      if (message.content != messageContent) {
-        if (selectedConversation && onEdit) {
-          onEdit({ ...message, content: messageContent });
-        }
-      }
-      setIsEditing(false);
+      // TODO
+      // if (message.content != messageContent) {
+      //   if (selectedConversation && onEdit) {
+      //     onEdit({ ...message, content: messageContent });
+      //   }
+      // }
+      // setIsEditing(false);
     };
 
     const handleDeleteMessage = () => {
-      if (!selectedConversation) return;
+      // TODO
+      // if (!selectedConversation) return;
 
-      const { messages } = selectedConversation;
-      const findIndex = messages.findIndex((elm) => elm === message);
+      // const { messages } = selectedConversation;
+      // const findIndex = messages.findIndex((elm) => elm === message);
 
-      if (findIndex < 0) return;
+      // if (findIndex < 0) return;
 
-      if (
-        findIndex < messages.length - 1 &&
-        messages[findIndex + 1].role === 'assistant'
-      ) {
-        messages.splice(findIndex, 2);
-      } else {
-        messages.splice(findIndex, 1);
-      }
-      const updatedConversation = {
-        ...selectedConversation,
-        messages,
-      };
+      // if (
+      //   findIndex < messages.length - 1 &&
+      //   messages[findIndex + 1].role === 'assistant'
+      // ) {
+      //   messages.splice(findIndex, 2);
+      // } else {
+      //   messages.splice(findIndex, 1);
+      // }
+      // const updatedConversation = {
+      //   ...selectedConversation,
+      //   messages,
+      // };
 
-      const { single, all } = updateConversation(
-        updatedConversation,
-        conversations,
-      );
-      homeDispatch({ field: 'selectedConversation', value: single });
-      homeDispatch({ field: 'conversations', value: all });
+      // const { single, all } = updateConversation(
+      //   updatedConversation,
+      //   conversations,
+      // );
+      // homeDispatch({ field: 'selectedConversation', value: single });
+      // homeDispatch({ field: 'conversations', value: all });
     };
 
     const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter' && !isTyping && !e.shiftKey) {
-        e.preventDefault();
-        handleEditMessage();
-      }
+      // TODO
+      // if (e.key === 'Enter' && !isTyping && !e.shiftKey) {
+      //   e.preventDefault();
+      //   handleEditMessage();
+      // }
     };
+
+    // useEffect(() => {
+    //   setMessageContent(message.content);
+    // }, [message.content]);
+
+    
+
+    // if (!messageContent) {
+    //   return null;
+    // }
+
+    // END EDIT RELATED
 
     const copyOnClick = () => {
       if (!navigator.clipboard || !message.content) return;
@@ -119,25 +156,10 @@ export const ChatMessage: FC<Props> = memo(
       });
     };
 
-    useEffect(() => {
-      setMessageContent(message.content);
-    }, [message.content]);
-
-    useEffect(() => {
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'inherit';
-        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-      }
-    }, [isEditing]);
-
-    if (!messageContent) {
-      return null;
-    }
-
     return (
       <div
         className={`group md:px-4 ${
-          message.role === 'assistant'
+          ['assistant', 'function'].includes(message.role)
             ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
             : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
         }`}
@@ -145,7 +167,7 @@ export const ChatMessage: FC<Props> = memo(
       >
         <div className="relative m-auto flex p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
           <div className="min-w-[40px] text-right font-bold">
-            {message.role === 'assistant' ? (
+            {['assistant', 'function'].includes(message.role) ? (
               <IconRobot size={30} />
             ) : (
               <IconUser size={30} />
@@ -155,7 +177,7 @@ export const ChatMessage: FC<Props> = memo(
           <div className="prose mt-[-2px] w-full dark:prose-invert">
             {message.role === 'user' ? (
               <div className="flex w-full">
-                {isEditing ? (
+                {/* {isEditing ? (
                   <div className="flex w-full flex-col">
                     <textarea
                       ref={textareaRef}
@@ -194,13 +216,13 @@ export const ChatMessage: FC<Props> = memo(
                       </button>
                     </div>
                   </div>
-                ) : (
+                ) : ( */}
                   <div className="prose whitespace-pre-wrap dark:prose-invert flex-1">
                     {message.content}
                   </div>
-                )}
+                {/* )} */}
 
-                {!isEditing && (
+                {/* {!isEditing && (
                   <div className="md:-mr-8 ml-1 md:ml-0 flex flex-col md:flex-row gap-4 md:gap-1 items-center md:items-start justify-end md:justify-start">
                     <button
                       className="invisible group-hover:visible focus:visible text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
@@ -215,7 +237,7 @@ export const ChatMessage: FC<Props> = memo(
                       <IconTrash size={20} />
                     </button>
                   </div>
-                )}
+                )} */}
               </div>
             ) : (
               <div className="flex flex-row">
@@ -282,7 +304,7 @@ export const ChatMessage: FC<Props> = memo(
                     },
                   }}
                 >
-                  {`${message.content}${
+                  {`${message.name ? message.name : message.content}${
                     messageIsStreaming &&
                     messageIndex ==
                       (selectedConversation?.messages.length ?? 0) - 1

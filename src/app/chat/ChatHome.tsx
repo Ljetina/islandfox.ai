@@ -55,7 +55,6 @@ const ChatHome = ({ initialData, conversationId }: Props) => {
   //   const { t } = useTranslation('chat');
   //   const { getModels } = useApiService();
   //   const { getModelsError } = useErrorService();
-  console.log({ initialData });
   const [initialRender, setInitialRender] = useState<boolean>(true);
   const defaultModelId = OpenAIModelID.GPT_4;
 
@@ -79,8 +78,6 @@ const ChatHome = ({ initialData, conversationId }: Props) => {
     },
     dispatch,
   } = contextValue;
-
-  const stopConversationRef = useRef<boolean>(false);
 
   const conversation = useMemo(
     () =>
@@ -376,7 +373,7 @@ const ChatHome = ({ initialData, conversationId }: Props) => {
           {/* <Chatbar /> */}
 
           <div className="flex flex-1">
-            <ActiveConversation stopConversationRef={stopConversationRef} />
+            <ActiveConversation />
             {/* <Chat stopConversationRef={stopConversationRef} /> */}
           </div>
 

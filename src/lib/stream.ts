@@ -147,7 +147,6 @@ export const OpenAIStream = async (
           const data = event.data;
 
           try {
-            // This is the event which for some reason is returned after the function_call end. Returning here prevents parsing it as json down the line.
             if (data == '[DONE]') {
               // closeIfDidnt(controller);
               return;

@@ -30,7 +30,7 @@ import { VariableModal } from './VariableModal';
 import ChatContext from '@/app/chat/chat.context';
 
 interface Props {
-  onSend: (message: Message, plugin: Plugin | null) => void;
+  onSend: (content: string) => void;
   onRegenerate: () => void;
   onScrollDownClick: () => void;
   stopConversationRef: MutableRefObject<boolean>;
@@ -103,7 +103,7 @@ export const ChatInput = ({
       return;
     }
 
-    onSend({ role: 'user', content }, plugin);
+    onSend(content);
     setContent('');
     setPlugin(null);
 

@@ -3,6 +3,11 @@ export const getEndpoint = () => {
   return '/api/chat';
 };
 
+export const callCompletions = (messageContent: string) => {
+
+}
+
+
 function makeQueryString(params: { [key: string]: string | number | undefined }) {
   if (Object.values(params).filter((v) => !!v).length > 0) {
     return (

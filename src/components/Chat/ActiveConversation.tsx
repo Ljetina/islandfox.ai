@@ -8,6 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { toast } from 'react-hot-toast';
 
 import { useFetch } from '@/hooks/useFetch';
 
@@ -24,12 +25,10 @@ import { MemoizedChatMessage } from './MemoizedChatMessage';
 import ChatContext from '@/app/chat/chat.context';
 import { getConversationMessages } from '@/lib/api';
 
-interface ActiveConversationProps {
-  stopConversationRef: MutableRefObject<boolean>;
-}
+interface ActiveConversationProps {}
 
 const ActiveConversation: React.FC<ActiveConversationProps> = memo(
-  ({ stopConversationRef }: ActiveConversationProps) => {
+  ({}: ActiveConversationProps) => {
     const modelError = null;
     //   TODO Load from API, add pagination
     // const messages: {
@@ -44,7 +43,8 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       },
     ];
 
-    const selectedConversationId = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0';
+    const selectedConversationId = '9d866b4f-03f3-4d9c-b423-4c0a4f8f11b8';
+    // const selectedConversationId = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0';
     const {
       state: {
         // selectedConversationId,
@@ -71,12 +71,14 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
     const chatContainerRef = useRef<HTMLDivElement>(null);
     // const messagesEndRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const stopConversationRef = useRef<boolean>(false);
 
     const showScrollDownButton = false;
 
     const [loadingNewChatMessage, setLoadingNewChatMessage] = useState(false);
     const [loadingMoreHistoric, setLoadingMoreHistoric] = useState(false);
-    const [currentMessage, setCurrentMessage] = useState<Message>();
+    // edit related
+    // const [currentMessage, setCurrentMessage] = useState<Message>();
     const innerDivRef = useRef<HTMLDivElement>(null);
     const prevInnerDivHeight = useRef<number | undefined>(undefined);
 
@@ -142,9 +144,9 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
             setHasMore(false);
           }
           setTimeout(() => {
-            chatContainerRef.current?.scrollBy({top: 20})
-          }, 2000)
-          
+            chatContainerRef.current?.scrollBy({ top: 20 });
+          }, 2000);
+
           setTimeout(() => {
             setMessages((prev) => {
               const messageMap = new Map();
@@ -153,8 +155,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
               });
               return Array.from(messageMap.values());
             });
-          }, 4000)
-          
+          }, 4000);
         }
       } finally {
         setLoadingMoreHistoric(false);
@@ -163,10 +164,10 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
 
     useEffect(() => {
       isCancelled.current = false;
-      setTimeout(() => {
-        loadMessages();
-      }, 5000);
-
+      // setTimeout(() => {
+      // loadMessages();
+      // }, 5000);
+      loadMessages();
       return () => {
         isCancelled.current = true;
       };
@@ -177,7 +178,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         (entries) => {
           if (!hasMore) return;
           if (entries[0].isIntersecting && !loadingMoreHistoric) {
-            console.log('LOADING FROM OBSERVER')
+            console.log('LOADING FROM OBSERVER');
             loadMessages();
           }
         },
@@ -202,7 +203,95 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       // TODO
     };
 
-    const handleSend = (message: Message) => {
+    const handleSend = async (message: string) => {
+      console.log('SENDING', message);
+      const updatedMessages = [
+        {
+          role: 'assistant',
+          content: '`▍`',
+          id: 'placeholder-response',
+        },
+        {
+          role: 'user',
+          content: message,
+          id: 'placeholder-requests'
+        },
+        ...messages,
+      ]
+      setMessages(updatedMessages);
+      // setMessages([{role: 'assistant', content: 'TESTTEST', id: 'placeholder-response'}, message, ...messages])
+      // selectedConversationId
+
+      const controller = new AbortController();
+      const response = await fetch('/api/chat/v2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          // message_content: message.content,
+          message_content: 'please reply with the text ACK.',
+          conversation_id: selectedConversationId,
+        }),
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        toast.error(response.statusText);
+        return;
+      }
+      const data = response.body;
+      if (!data) {
+        toast.error('missing data on response');
+        return;
+      }
+      setLoadingNewChatMessage(true);
+      const reader = data.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      let isFirst = true;
+      let text = '';
+      while (!done) {
+        if (stopConversationRef.current === true) {
+          controller.abort();
+          done = true;
+          break;
+        }
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        const chunkValue = decoder.decode(value);
+        console.log('cl', chunkValue.slice(0, 6));
+        if (chunkValue.startsWith('data: ')) {
+          console.log({ chunkValue });
+          text += chunkValue.slice(6).trim();
+          console.log({messages})
+          updatedMessages[0].content = text
+          setMessages([...updatedMessages])
+          // setMessages(messages)
+        }
+      }
+      const resp = await getConversationMessages({
+        conversation_id: selectedConversationId,
+        page: 0,
+        limit: 2,
+      });
+
+      console.log({resp})
+      setMessages([
+        ...resp.data,
+        ...messages.slice(2)
+      ])
+      setLoadingNewChatMessage(false);
+
+      
+
+      console.log({ text });
+
+      // await fetch({method: "POST", url: "/api/chat/v2", body: {message_content: message.content, conversation_id: selectedConversationId}})
+      // send a chat completion v2 message
+      // start streaming the response
+      // replace the client side messages for user and assistant with server side messages after this is done
+      // filter out placeholder and incoming_stream
+      //
       // TODO
     };
 
@@ -287,26 +376,28 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
           stopConversationRef={stopConversationRef}
           textareaRef={textareaRef}
           onSend={(message) => {
-            setMessages([
-              {
-                role: 'assistant',
-                content: 'test add',
-                id: '1000000',
-                conversation_id: messages[0].conversation_id,
-                created_at: messages[0].created_at,
-                updated_at: messages[0].updated_at,
-              },
-              ...messages,
-            ]);
-            scrollToBottom();
-            setCurrentMessage(message);
+            // setMessages([
+            //   {
+            //     role: 'user',
+            //     content: 'test add',
+            //     id: 'incoming_message',
+            //     conversation_id: messages[0].conversation_id,
+            //     created_at: messages[0].created_at,
+            //     updated_at: messages[0].updated_at,
+            //   },
+            //   ...messages,
+            // ]);
+            // TODO FIX
+            // scrollToBottom();
+            // edit related
+            // setCurrentMessage(message);
             handleSend(message);
           }}
           onScrollDownClick={handleScrollDown}
           onRegenerate={() => {
-            if (currentMessage) {
-              handleSend(currentMessage);
-            }
+            // if (currentMessage) {
+            //   handleSend(currentMessage);
+            // }
           }}
           showScrollDownButton={showScrollDownButton}
           hasMessages={messages.length > 0}

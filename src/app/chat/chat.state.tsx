@@ -35,6 +35,7 @@ export interface InitialServerData {
     temperature: number;
     model_id: string;
     messages: {
+      id: string,
       role: string,
       content: string,
       conversation_id: string,
