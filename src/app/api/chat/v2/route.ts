@@ -41,7 +41,7 @@ const handler = async (req: Request, res: Response): Promise<Response> => {
       // TODO create the conversation in the db
     }
     return new Response(
-      await PassthroughStream(conversation_id as string, message_content),
+      await PassthroughStream(conversation_id as string, message_content), { headers: { 'Content-Type': 'text/event-stream' } }
     );
   } catch (error) {
     console.error(error);
@@ -115,6 +115,7 @@ export const PassthroughStream = async (
         const decoded = decoder.decode(chunk);
         console.log('writing chunk', decoded);
         parser.feed(decoded);
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
       // const reader = res.body?.getReader();
       // if (!reader) {

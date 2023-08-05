@@ -24,6 +24,11 @@ import { MemoizedChatMessage } from './MemoizedChatMessage';
 
 import ChatContext from '@/app/chat/chat.context';
 import { getConversationMessages } from '@/lib/api';
+import {
+  ParsedEvent,
+  ReconnectInterval,
+  createParser,
+} from 'eventsource-parser';
 
 interface ActiveConversationProps {}
 
@@ -43,7 +48,8 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       },
     ];
 
-    const selectedConversationId = '9d866b4f-03f3-4d9c-b423-4c0a4f8f11b8';
+    // const selectedConversationId = '9d866b4f-03f3-4d9c-b423-4c0a4f8f11b8';
+    const selectedConversationId = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0';
     // const selectedConversationId = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0';
     const {
       state: {
@@ -167,6 +173,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       // setTimeout(() => {
       // loadMessages();
       // }, 5000);
+      console.log('LOADING FROM SELECTED ID EFFECT');
       loadMessages();
       return () => {
         isCancelled.current = true;
@@ -214,11 +221,12 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         {
           role: 'user',
           content: message,
-          id: 'placeholder-requests'
+          id: 'placeholder-requests',
         },
         ...messages,
-      ]
+      ];
       setMessages(updatedMessages);
+      await new Promise((resolve) => setTimeout(resolve, 0));
       // setMessages([{role: 'assistant', content: 'TESTTEST', id: 'placeholder-response'}, message, ...messages])
       // selectedConversationId
 
@@ -229,8 +237,8 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          // message_content: message.content,
-          message_content: 'please reply with the text ACK.',
+          message_content: message,
+          // message_content: 'please reply with the text ACK.',
           conversation_id: selectedConversationId,
         }),
         signal: controller.signal,
@@ -245,54 +253,48 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         return;
       }
       setLoadingNewChatMessage(true);
+      // const parser = createParser(onParse);
       const reader = data.getReader();
       const decoder = new TextDecoder();
       let done = false;
       let isFirst = true;
       let text = '';
+      // const reader = data.getReader();
+      // const decoder = new TextDecoder();
+
+      const onParse = (event: ParsedEvent | ReconnectInterval) => {
+        console.log({ event });
+        if (event.type === 'event') {
+          console.log(event.data);
+          text += event.data;
+          const messageFromChunk = {
+            ...updatedMessages[0],
+            content: text + (done ? '' : '`▍`'),
+          };
+          setMessages([messageFromChunk, ...updatedMessages.slice(1)]);
+        }
+      };
+
+      const parser = createParser(onParse);
+
       while (!done) {
         if (stopConversationRef.current === true) {
           controller.abort();
           done = true;
           break;
         }
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        const chunkValue = decoder.decode(value);
-        console.log('cl', chunkValue.slice(0, 6));
-        if (chunkValue.startsWith('data: ')) {
-          console.log({ chunkValue });
-          text += chunkValue.slice(6).trim();
-          console.log({messages})
-          updatedMessages[0].content = text
-          setMessages([...updatedMessages])
-          // setMessages(messages)
-        }
+        const { done: isDone, value } = await reader.read();
+        const decoded = decoder.decode(value);
+        parser.feed(decoded);
+        done = isDone;
       }
-      const resp = await getConversationMessages({
+      const reloadedTopMessages = await getConversationMessages({
         conversation_id: selectedConversationId,
         page: 0,
         limit: 2,
       });
-
-      console.log({resp})
-      setMessages([
-        ...resp.data,
-        ...messages.slice(2)
-      ])
+      setMessages([...reloadedTopMessages.data, ...updatedMessages.slice(2)]);
       setLoadingNewChatMessage(false);
-
-      
-
-      console.log({ text });
-
-      // await fetch({method: "POST", url: "/api/chat/v2", body: {message_content: message.content, conversation_id: selectedConversationId}})
-      // send a chat completion v2 message
-      // start streaming the response
-      // replace the client side messages for user and assistant with server side messages after this is done
-      // filter out placeholder and incoming_stream
-      //
-      // TODO
     };
 
     const handleEditMessage = () => {
