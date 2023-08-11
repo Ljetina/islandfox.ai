@@ -45,6 +45,7 @@ import { saveFolders } from '@/lib/folders';
 import { savePrompts } from '@/lib/prompts';
 import { getSettings } from '@/lib/settings';
 import { v4 as uuidv4 } from 'uuid';
+import List from '@/components/Chat/Chatlist';
 
 interface Props {
   initialData: InitialServerData;
@@ -373,6 +374,7 @@ const ChatHome = ({ initialData, conversationId }: Props) => {
           {/* <Chatbar /> */}
 
           <div className="flex flex-1">
+            {/* <List /> */}
             <ActiveConversation />
             {/* <Chat stopConversationRef={stopConversationRef} /> */}
           </div>

@@ -34,6 +34,7 @@ export async function initialServerData(tokenId: string) {
                 'prompt', cv.prompt,
                 'temperature', cv.temperature,
                 'model_id', cv.model_id,
+                'message_count', (SELECT COUNT(*) FROM messages WHERE messages.conversation_id = cv.id),
                 'messages', (SELECT json_agg(last_messages.*)
                              FROM (SELECT *
                                    FROM messages

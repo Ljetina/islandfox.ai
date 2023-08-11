@@ -34,14 +34,8 @@ export interface InitialServerData {
     prompt: string;
     temperature: number;
     model_id: string;
-    messages: {
-      id: string,
-      role: string,
-      content: string,
-      conversation_id: string,
-      created_at: string,
-      updated_at: string
-    }[]
+    message_count: number;
+    messages: Message[]
   }[];
   folders?: {
     id: string;

@@ -1,7 +1,11 @@
 import { OpenAIModel } from './openai';
 
 export interface Message {
-  id: string,
+  conversation_id: string;
+  created_at: string;
+  updated_at: string;
+
+  id: string;
   // conversation_id: string,
   role: Role;
   content: string | null;

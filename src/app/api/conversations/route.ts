@@ -18,20 +18,29 @@ export async function GET(req: NextRequest) {
       const { rows } = await client.query(
         `
 SELECT 
-    conversations.name, 
-    conversations.created_at, 
-    conversations.updated_at, 
-    conversations.folder_id, 
-    conversations.name, 
-    conversations.temperature, 
-    conversations.model_id 
+  conversations.name, 
+  conversations.created_at, 
+  conversations.updated_at, 
+  conversations.folder_id, 
+  conversations.temperature, 
+  conversations.model_id,
+  COUNT(messages.id) as message_count
 FROM 
-    conversations
+  conversations
+LEFT JOIN
+  messages ON messages.conversation_id = conversations.id
 WHERE
-    conversations.user_id = $1
-    AND conversations.tenant_id = $2
+  conversations.user_id = $1
+  AND conversations.tenant_id = $2
+GROUP BY
+  conversations.name, 
+  conversations.created_at, 
+  conversations.updated_at, 
+  conversations.folder_id, 
+  conversations.temperature, 
+  conversations.model_id
 ORDER BY
-    conversations.created_at DESC;
+  conversations.created_at DESC;
 `,
         [userId, tenantId],
       );
