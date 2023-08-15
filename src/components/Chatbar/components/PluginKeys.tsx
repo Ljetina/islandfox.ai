@@ -1,6 +1,6 @@
 import { IconKey } from '@tabler/icons-react';
 import { KeyboardEvent, useContext, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 
 import { PluginID, PluginKey } from '@/types/plugin';
 
@@ -11,7 +11,7 @@ import ChatbarContext from '../Chatbar.context';
 import ChatContext from '@/app/chat/chat.context';
 
 export const PluginKeys = () => {
-  const { t } = useTranslation('sidebar');
+  // const { t } = useTranslation('sidebar');
 
   const {
     state: { pluginKeys },

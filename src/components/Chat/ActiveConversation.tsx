@@ -11,18 +11,15 @@ import React, {
 import { toast } from 'react-hot-toast';
 import { Virtuoso } from 'react-virtuoso';
 
-import { useFetch } from '@/hooks/useFetch';
-
-import { Message, Role } from '@/types/chat';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 
 import Spinner from '../Spinner/Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
+import { MessageList } from './Chatlist';
 import ConversationSettings from './ConversationSettings';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
-import { MessageList } from './Chatlist';
 
 import ChatContext from '@/app/chat/chat.context';
 import { getConversationMessages } from '@/lib/api';
@@ -52,6 +49,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
 
     // const selectedConversationId = '9d866b4f-03f3-4d9c-b423-4c0a4f8f11b8';
     const selectedConversationId = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0';
+    // const selectedConversationId = '9d866b4f-03f3-4d9c-b423-4c0a4f8f11b8';
     // const selectedConversationId = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0';
     const {
       state: {
@@ -67,10 +65,9 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       return conversations?.find((c) => c.id === selectedConversationId);
     }, [conversations, selectedConversationId]);
 
-    const [messages, setMessages] = useState(
-      [...selectedConveration?.messages || []].reverse(),
-      //   [],
-    );
+    const [messages, setMessages] = useState(() => {
+      return [...(selectedConveration?.messages || [])].reverse();
+    });
 
     const reversedMessages = useMemo(() => {
       return messages.reverse();
@@ -94,7 +91,13 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
     const innerDivRef = useRef<HTMLDivElement>(null);
     const prevInnerDivHeight = useRef<number | undefined>(undefined);
 
-    const [showMessages, setShowMessages] = useState(false);
+    // const [showMessages, setShowMessages] = useState(false);
+    const [showMessages, setShowMessages] = useState(true);
+
+    const [footer, setFooter] = useState<{
+      userRequest: string;
+      assistantMessage: string;
+    } | null>(null);
 
     const scrollToBottom = useCallback(() => {
       if (messages.length == 0) {
@@ -126,8 +129,12 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       }
     }, [messages]);
 
+    const [totalCount, setTotalCount] = useState(
+      selectedConveration?.message_count,
+    );
+
     // useEffect(() => {
-    //   scrollToBottom();
+    // scrollToBottom();
     // }, [messages]);
 
     // useEffect(() => {
@@ -141,25 +148,17 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
     // }, [messages, messagesEndRef]);
     const isCancelled = useRef(false);
 
-    // Virtuoso related
-    console.log({ selectedConveration });
-    const [totalCount, setTotalCount] = useState(
-      selectedConveration?.message_count,
-    );
-    console.log('totalCount', totalCount);
-    const [firstItemIndex, setFirstItemIndex] = useState(
-      (totalCount as number) -
-        (selectedConveration?.messages?.length as number),
-    );
-
     const loadMoreMessages = useCallback(async () => {
       setLoadingMoreHistoric(true);
       try {
+        console.log('load more', page);
         const resp = await getConversationMessages({
           conversation_id: selectedConversationId,
           page,
           limit: 50,
         });
+        // setHasMore(false);
+
         if (!isCancelled.current) {
           setTotalCount(resp.pagination.total_records);
           if (resp.pagination.current_page < resp.pagination.total_pages) {
@@ -167,66 +166,16 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
           } else {
             setHasMore(false);
           }
+          console.log({ first: resp.data[0].content });
           return resp.data;
         }
         // TODO error handling
         console.log('missed case');
       } finally {
+        console.log('in finally');
         setLoadingMoreHistoric(false);
       }
     }, [page, selectedConversationId]);
-
-    // const loadMessages = useCallback(async () => {
-    //   setLoadingMoreHistoric(true);
-    //   try {
-    //     const resp = await getConversationMessages({
-    //       conversation_id: selectedConversationId,
-    //       page,
-    //       limit: 50,
-    //     });
-    //     if (!isCancelled.current) {
-    //       setTotalCount(resp.pagination.total_records);
-    //       if (resp.pagination.current_page < resp.pagination.total_pages) {
-    //         setPage((prev) => prev + 1);
-    //       } else {
-    //         setHasMore(false);
-    //       }
-    //       // setTimeout(() => {
-    //       //   chatContainerRef.current?.scrollBy({ top: 20 });
-    //       // }, 2000);
-    //       setMessages((prev) => {
-    //         const messageMap = new Map();
-    //         [...resp.data, ...prev].forEach((message) => {
-    //           messageMap.set(message.id, message);
-    //         });
-    //         const newList = Array.from(messageMap.values());
-    //         const newTip = firstItemIndex - (messages.length - newList.length);
-    //         console.log('setting fii', newList.length - prev.length);
-    //         // setFirstItemIndex(newList.length - prev.length);
-    //         return newList;
-    //       });
-    //       // setTimeout(() => {
-
-    //       // }, 4000);
-    //     }
-    //   } finally {
-    //     setLoadingMoreHistoric(false);
-    //   }
-    // }, [setPage, setHasMore, setMessages, setLoadingMoreHistoric, page]);
-
-    useEffect(() => {
-      isCancelled.current = false;
-      setTimeout(() => {
-        // console.log('NOT LOADING FROM SELECTED ID EFFECT');
-        // loadMessages();
-      }, 5000);
-      // console.log('LOADING FROM SELECTED ID EFFECT');
-      // loadMessages();
-      return () => {
-        isCancelled.current = true;
-      };
-    }, [selectedConversationId]);
-
 
     const handleScroll = () => {
       // TODO
@@ -238,21 +187,14 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
 
     const handleSend = async (message: string) => {
       console.log('SENDING', message);
-      const updatedMessages = [
-        {
-          role: 'assistant',
-          content: '`▍`',
-          id: 'placeholder-response',
-        },
-        {
-          role: 'user',
-          content: message,
-          id: 'placeholder-requests',
-        },
-        ...messages,
-      ];
-      setMessages(updatedMessages);
+      // setMessages((list) => [...list, ...fixedMessages]);
+      setFooter({ userRequest: message, assistantMessage: '`▍`' });
+
+      // TODO FIX!!
+
+      // setMessages(list => [...list, fixedMessages])
       await new Promise((resolve) => setTimeout(resolve, 0));
+      scrollToBottom();
       // setMessages([{role: 'assistant', content: 'TESTTEST', id: 'placeholder-response'}, message, ...messages])
       // selectedConversationId
 
@@ -269,6 +211,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         }),
         signal: controller.signal,
       });
+      console.log({ response });
       if (!response.ok) {
         toast.error(response.statusText);
         return;
@@ -279,6 +222,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         return;
       }
       setLoadingNewChatMessage(true);
+      console.log('HERE x');
       // const parser = createParser(onParse);
       const reader = data.getReader();
       const decoder = new TextDecoder();
@@ -293,11 +237,32 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         if (event.type === 'event') {
           console.log(event.data);
           text += event.data;
-          const messageFromChunk = {
-            ...updatedMessages[0],
-            content: text + (done ? '' : '`▍`'),
-          };
-          setMessages([messageFromChunk, ...updatedMessages.slice(1)]);
+          // console.l
+          try {
+            setFooter({
+              userRequest: message,
+              assistantMessage: text + '`▍`',
+            });
+          } catch (e) {
+            console.error(e);
+          }
+
+          // scrollToBottom()
+          // setMessages((list) => {
+          //   const reversed = list;
+          //   const top = reversed[0];
+          //   const messageFromChunk = {
+          //     ...top,
+          //     content: text + (done ? '' : '`▍`'),
+          //   };
+          //   // return [...reversed.slice(1), messageFromChunk];
+          //   // ?.content = text + (done ? '' : '`▍`')
+          //   const placeholder = list.find(i => i.id == 'placeholder-response');
+          //   if (placeholder) {
+          //     placeholder.content = text + (done ? '' : '`▍`')
+          //   }
+          //   return [...list]
+          // });
         }
       };
 
@@ -314,14 +279,20 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         parser.feed(decoded);
         done = isDone;
       }
+      
       const reloadedTopMessages = await getConversationMessages({
         conversation_id: selectedConversationId,
         page: 0,
         limit: 2,
       });
-      setMessages([...reloadedTopMessages.data, ...updatedMessages.slice(2)]);
+      setFooter(null);
+      setMessages(list => [...reloadedTopMessages.data, ...list].reverse());
       setLoadingNewChatMessage(false);
     };
+
+    useEffect(() => {
+      scrollToBottom();
+    }, [footer]);
 
     const handleEditMessage = () => {
       // onEdit={(editedMessage) => {
@@ -346,113 +317,29 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
     const START_INDEX = 1;
     const INITIAL_ITEM_COUNT = 10;
 
-    console.log('on render, ml', messages.length);
-    console.log('on render, first', messages[0]);
-    return (
-      <MessageList
-        totalCount={totalCount as number}
-        hasMore={hasMore}
-        messages={messages}
-        setMessages={setMessages}
-        onLoadMore={loadMoreMessages}
-      />
-    );
+    // console.log('on render, ml', messages.length);
+    // console.log('on render, first', messages[0]);
+    // return (
+
+    // );
     return modelError ? (
       <ErrorMessageDiv error={modelError} />
     ) : (
-      <Virtuoso
-        className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]"
-        totalCount={messages.length}
-        firstItemIndex={firstItemIndex}
-        // firstItemIndex={0}
-        startReached={(s) => console.log({ s })}
-        endReached={(e) => console.log({ e })}
-        initialTopMostItemIndex={INITIAL_ITEM_COUNT - 1}
-        reversed={true}
-        // itemContent={index => <div>Item {messages[messages.length - 1 - index].content}</div>} />
-        itemContent={(index) => {
-          const localIndex = firstItemIndex + messages.length - 1 - index;
-          const reversedIndex = messages.length - 1 - localIndex;
-          // const reverse_index = messages.length - 1 - index + firstItemIndex;
-          const message = messages[localIndex];
-          console.log('ml', messages.length);
-          console.log('ri', reversedIndex);
-          console.log('ni', index);
-          console.log('fii', firstItemIndex);
-          if (!message) {
-            return null;
-          }
-          return (
-            <MemoizedChatMessage
-              key={message.id}
-              message={message}
-              messageIndex={index}
-            />
-          );
-          // const reverse_index = messages.length - 1 - index
-          // return <div>Item {.content} {messages[index].content}</div>
-          // return <div>Item {reverse_index} {index}</div>
-        }}
-      />
-    );
-    return;
-    <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
-      <div
-        className="h-full overflow-auto"
-        // style={{marginBottom: "300px"}}
-        // className="max-h-full overflow-auto flex flex-col-reverse"
-        // className="h-50 overflow-auto flex flex-col-reverse"
-        ref={chatContainerRef}
-        onScroll={handleScroll}
-      >
-        {messages.length === 0 ? (
-          <ConversationSettings
-            currentPrompt={selectedConveration?.prompt}
-            models={models}
-            model_id={selectedConveration?.model_id}
-            onChangeSystemPrompt={updateConversationSettings('prompt')}
-            onModelSelect={updateConversationSettings('model_id')}
-            onChangeTemperature={updateConversationSettings('temperature')}
-          />
-        ) : (
-          <div
-            className="relative transition-all duration-300"
-            style={{ opacity: showMessages ? 1 : 0 }}
-            ref={innerDivRef}
-          >
-            <div
-              ref={topRef}
-              className={`h-10 flex items-center justify-center ${
-                loadingMoreHistoric ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <Spinner />
-            </div>
-            {messages
-              .slice()
-              .reverse()
-              .map((message, index) => (
-                <MemoizedChatMessage
-                  key={message.id}
-                  message={message}
-                  messageIndex={index}
-                />
-              ))}
-
-            {loadingNewChatMessage || (loadingNewChatMessage && <ChatLoader />)}
-          </div>
-        )}
-
-        <div
-          className="h-[162px] bg-white dark:bg-[#343541]"
-          // ref={messagesEndRef}
+      <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
+        <MessageList
+          totalCount={totalCount as number}
+          hasMore={hasMore}
+          messages={messages}
+          setMessages={setMessages}
+          onLoadMore={loadMoreMessages}
+          inProgressFooter={footer}
         />
-      </div>
 
-      <ChatInput
-        stopConversationRef={stopConversationRef}
-        textareaRef={textareaRef}
-        onSend={(message) => {
+        <ChatInput
+          stopConversationRef={stopConversationRef}
+          textareaRef={textareaRef}
+          onSend={handleSend}
+          // onSend={(message) => {
           // setMessages([
           //   {
           //     role: 'user',
@@ -468,27 +355,47 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
           // scrollToBottom();
           // edit related
           // setCurrentMessage(message);
-          handleSend(message);
-        }}
-        onScrollDownClick={handleScrollDown}
-        onRegenerate={() => {
-          // if (currentMessage) {
-          //   handleSend(currentMessage);
-          // }
-        }}
-        showScrollDownButton={showScrollDownButton}
-        hasMessages={messages.length > 0}
-        model={
-          models.find(
-            (m) => m.id == selectedConveration?.model_id || OpenAIModelID.GPT_4,
-          ) as OpenAIModel
-        }
-      />
-    </div>;
+          // (message);
+          // }}
+          onScrollDownClick={handleScrollDown}
+          onRegenerate={() => {
+            // if (currentMessage) {
+            //   handleSend(currentMessage);
+            // }
+          }}
+          showScrollDownButton={showScrollDownButton}
+          hasMessages={messages.length > 0}
+          model={
+            models.find(
+              (m) =>
+                m.id == selectedConveration?.model_id || OpenAIModelID.GPT_4,
+            ) as OpenAIModel
+          }
+        />
+      </div>
+    );
   },
 );
 
 export default ActiveConversation;
+
+{
+  /* <div
+          className="h-full overflow-auto"
+          // style={{marginBottom: "300px"}}
+          // className="max-h-full overflow-auto flex flex-col-reverse"
+          // className="h-50 overflow-auto flex flex-col-reverse"
+          ref={chatContainerRef}
+          onScroll={handleScroll}
+        >
+          
+
+          <div
+            className="h-[162px] bg-white dark:bg-[#343541]"
+            // ref={messagesEndRef}
+          />
+        </div> */
+}
 
 // TODO Show settings part
 
@@ -502,3 +409,35 @@ export default ActiveConversation;
                   </div>
                 )} */
 // }
+
+// Snippet for settings
+// {messages.length === 0 ? (
+//   <ConversationSettings
+//     currentPrompt={selectedConveration?.prompt}
+//     models={models}
+//     model_id={selectedConveration?.model_id}
+//     onChangeSystemPrompt={updateConversationSettings('prompt')}
+//     onModelSelect={updateConversationSettings('model_id')}
+//     onChangeTemperature={updateConversationSettings('temperature')}
+//   />
+// ) : (
+//   <>
+//     <div
+//       className="relative h-full transition-all duration-300 overflow-hidden"
+//       style={{ opacity: showMessages ? 1 : 0 }}
+//       ref={innerDivRef}
+//     >
+//       <div
+//         ref={topRef}
+//         className={`h-10 flex items-center justify-center ${
+//           loadingMoreHistoric ? 'opacity-100' : 'opacity-0'
+//         }`}
+//       >
+//         <Spinner />
+//       </div>
+
+//       {/* {loadingNewChatMessage ||
+//       (loadingNewChatMessage && <ChatLoader />)} */}
+//     </div>
+//   </>
+// )}

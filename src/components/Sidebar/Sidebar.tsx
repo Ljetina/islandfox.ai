@@ -1,6 +1,6 @@
 import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
 import { ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 
 import {
   CloseSidebarButton,
@@ -40,7 +40,7 @@ const Sidebar = <T,>({
   // handleCreateFolder,
   handleDrop,
 }: Props<T>) => {
-  const { t } = useTranslation('promptbar');
+  // const { t } = useTranslation('promptbar');
 
   const allowDrop = (e: any) => {
     e.preventDefault();

@@ -9,12 +9,13 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
+import { OpenAIModel } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
+
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 
 import { DEFAULT_SYSTEM_PROMPT } from '@/lib/const';
-import { OpenAIModel } from '@/types/openai';
 
 interface Props {
   model?: OpenAIModel;
@@ -48,14 +49,11 @@ export const SystemPrompt: FC<Props> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    const maxLength = model?.maxLength;
+    const maxLength = model?.maxLength || 0;
 
     if (value.length > maxLength) {
       alert(
-        t(
-          `Prompt limit is {{maxLength}} characters. You have entered {{valueLength}} characters.`,
-          { maxLength, valueLength: value.length },
-        ),
+        `Prompt limit is ${maxLength} characters. You have entered ${value.length} characters.`,
       );
       return;
     }
@@ -212,7 +210,7 @@ export const SystemPrompt: FC<Props> = ({
           }`,
         }}
         placeholder={
-          t(`Enter a prompt or type "/" to select a prompt...`) || ''
+         `Enter a prompt or type "/" to select a prompt...`
         }
         value={t(value) || ''}
         rows={1}

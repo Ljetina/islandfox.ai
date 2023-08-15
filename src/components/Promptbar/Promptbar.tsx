@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
@@ -19,7 +19,7 @@ import { savePrompts } from '@/lib/prompts';
 import { v4 as uuidv4 } from 'uuid';
 
 const Promptbar = () => {
-  const { t } = useTranslation('promptbar');
+  // const { t } = useTranslation('promptbar');
 
   const promptBarContextValue = useCreateReducer<PromptbarInitialState>({
     initialState,
