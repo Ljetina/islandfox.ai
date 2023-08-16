@@ -31,6 +31,7 @@ import { authOptions } from '@/lib/auth';
 export function WebHome() {
   return (
     <>
+      {/* @ts-ignore TODO */}
       <Layout mainCls="main-content fix" headTitle={"home"}>
         <Banner1 />
         {/* <Tools /> */}

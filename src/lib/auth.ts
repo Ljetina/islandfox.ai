@@ -145,6 +145,7 @@ export async function getTenant(userId: string, tenantId: string) {
   return res.rows[0];
 }
 
+// TODO This is not right?
 // export async function getServerSession(): Promise<Session | null> {
 //   const cookie = nextHeaders().get('cookie');
 //   if (!cookie) {

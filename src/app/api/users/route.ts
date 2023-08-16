@@ -11,7 +11,8 @@ export interface UserPreferences {
   user_id: string;
 }
 
-export async function getUserPreferences(
+// TODO Move out of here, re-use? Not sure
+async function getUserPreferences(
   tokenId: string,
 ): Promise<UserPreferences | undefined> {
   const client = await getDbClient();

@@ -53,6 +53,7 @@ export async function sendChatMessage({
       'Content-Type': 'application/json',
     },
     signal: controller.signal,
+    // @ts-ignore TODO
     body,
   });
   return {

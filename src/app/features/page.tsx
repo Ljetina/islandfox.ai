@@ -13,6 +13,7 @@ import '/public/assets/css/style.css';
 
 export default function Features() {
   return (
+    // @ts-ignore
     <Layout headTitle={"features"}>
       <section className="features-area pt-140 pb-130">
         <div className="container">

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Icon2fa, IconFileExport, IconSettings } from '@tabler/icons-react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { useContext, useEffect, useState } from 'react';

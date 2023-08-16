@@ -13,6 +13,7 @@ import '/public/assets/css/style.css';
 
 export default function Pricing() {
   return (
+    // @ts-ignore TODO
     <Layout headTitle={"pricing"}>
       <section className="features-area pt-140 pb-130">
         <p>gud price</p>

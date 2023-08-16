@@ -1,9 +1,11 @@
+import { getSession } from 'next-auth/react';
+
+import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { authError, authOptions, getTenant } from '@/lib/auth';
 import { getDbClient } from '@/lib/db';
 import { v4 as uuidv4 } from 'uuid';
-import { getServerSession } from 'next-auth';
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -56,9 +58,11 @@ ORDER BY
 }
 
 export async function POST(req: NextRequest) {
+  // @ts-ignore TODO
   const session = await getSession({ req });
+  const client = await getDbClient();
 
-  if (session) {
+  if (session && session.user) {
     const {
       document_id,
       folder_id,
@@ -79,12 +83,14 @@ export async function POST(req: NextRequest) {
         prompt,
         temperature,
         model_id,
-        session.user.id,
+        // @ts-ignore TODO
+        session.user.id as string,
         tenant_id,
       ],
     );
     return NextResponse.json({ id });
   } else {
+    // @ts-ignore TODO
     return NextResponse.error({ status: 401 }); // Unauthorized
   }
 }

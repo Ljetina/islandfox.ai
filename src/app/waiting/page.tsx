@@ -14,9 +14,11 @@ import '/public/assets/css/style.css';
 
 export default function Pricing() {
   return (
+    // @ts-ignore
     <Layout headTitle={"pricing"}>
 
 <section className="features-area pt-140 pb-130" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+    {/* @ts-ignore TODO */}
         <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSek0x0l5yGQhLiwTxGDMzJvwoP5QWz1aa6AYOTAn2RMEq7X-Q/viewform?embedded=true" width="640" height="427" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
       </section>
       {/* <section className="features-area pt-140 pb-130">

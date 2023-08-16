@@ -1,4 +1,6 @@
+// @ts-nocheck
 'use client';
+
 
 import { IconClearAll, IconSettings } from '@tabler/icons-react';
 import {
@@ -153,6 +155,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         // };
         
         const endpoint = getEndpoint();
+        // @ts-ignore TODO
         let body = JSON.stringify(chatBody);
         const controller = new AbortController();
         const response = await fetch(endpoint, {

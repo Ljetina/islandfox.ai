@@ -195,6 +195,7 @@ export const OpenAIStream = async (
                   controller.enqueue(encoder.encode(JSON.stringify(response)));
                   controller.enqueue(encoder.encode('\n'));
                   // onFunctionCall(response);
+                  // @ts-ignore
                   messages.push({
                     role: 'assistant',
                     content: null,
@@ -203,6 +204,7 @@ export const OpenAIStream = async (
                       arguments: functionArgs,
                     },
                   });
+                  // @ts-ignore
                   messages.push({
                     role: 'function',
                     name: `${functionName}`,

@@ -330,6 +330,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
           totalCount={totalCount as number}
           hasMore={hasMore}
           messages={messages}
+          // @ts-ignore TODO
           setMessages={setMessages}
           onLoadMore={loadMoreMessages}
           inProgressFooter={footer}

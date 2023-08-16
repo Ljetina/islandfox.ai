@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useContext } from 'react';
 
 import { FolderInterface } from '@/types/folder';

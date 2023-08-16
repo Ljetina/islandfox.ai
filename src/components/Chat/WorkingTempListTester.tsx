@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
-function makeMessages(count) {
+function makeMessages(count: number) {
   return Array.from({ length: count }, (_, i) => ({
     id: i,
     content: `Message ${i}`,

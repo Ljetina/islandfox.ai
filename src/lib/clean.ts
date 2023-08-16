@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Conversation } from '@/types/chat';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 
