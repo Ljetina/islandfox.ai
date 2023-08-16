@@ -1,10 +1,15 @@
 import { Pool, PoolClient } from 'pg';
+import fs from 'fs';
 
 const pool = new Pool({
   connectionString: process.env.PG_DB_URL,
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
+  ssl: {
+    rejectUnauthorized: false,
+    ca: fs.readFileSync('global-bundle.pem').toString()
+  }
 });
 
 export async function getDbClient(): Promise<PoolClient> {
@@ -63,6 +68,7 @@ WHERE oauth_tokens.id = $1
 GROUP BY users.id;`,
     [tokenId],
   );
+  console.log(resp)
   return resp.rows[0]['user_with_conversations_and_folders'];
 }
 
