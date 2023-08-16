@@ -377,6 +377,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
   },
 );
 
+ActiveConversation.displayName = 'ActiveConversation';
 export default ActiveConversation;
 
 {

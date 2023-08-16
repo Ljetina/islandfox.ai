@@ -57,7 +57,7 @@ export const PassthroughStream = async (
   conversation_id: string,
   message: string,
 ) => {
-  const url = 'http://127.0.0.1:8000/completions/v2'; // Replace with your actual server URL
+  const url = `${process.env.FUNC_URL}/completions/v2`; // Replace with your actual server URL
   const body = {
     conversation_id,
     message: { content: message },

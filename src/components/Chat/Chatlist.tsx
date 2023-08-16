@@ -138,6 +138,7 @@ export function MessageList({
       />
     );
   });
+  Scroller.displayName = 'Scroller';
 
   const virtuoso = useRef(null);
 
@@ -146,7 +147,7 @@ export function MessageList({
   }, [inProgressFooter, messages]);
 
   useEffect(() => {
-    initialTopMostIndexRef.current = messages.length
+    initialTopMostIndexRef.current = messages.length;
     setTimeout(() => {
       console.log('SCROLLING TO BOTTOM');
       scrollToBottom();
@@ -178,10 +179,7 @@ export function MessageList({
         Scroller,
         Footer: () => {
           return (
-            <div
-              ref={footerRef}
-              className="h-[1px] bg-white dark:bg-[#343541]"
-            >
+            <div ref={footerRef} className="h-[1px] bg-white dark:bg-[#343541]">
               {inProgressFooter && (
                 <>
                   <MemoizedChatMessage
@@ -204,7 +202,7 @@ export function MessageList({
           );
         },
       }}
-      followOutput={"smooth"}
+      followOutput={'smooth'}
       initialTopMostItemIndex={initialTopMostIndexRef.current - 1}
       reversed={true}
       itemContent={(index) => {

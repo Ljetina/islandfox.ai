@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { NextScript } from 'next/document';
+
 import { Inter } from 'next/font/google';
 // import { Head, Html, Main, NextScript } from 'next/document'
 
