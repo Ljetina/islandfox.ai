@@ -4,9 +4,7 @@ import { authOptions, getServerSession } from '@/lib/auth';
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/lib/const';
 import { OpenAIError, OpenAIStream } from '@/lib/stream';
 
-export const config = {
-  runtime: 'edge',
-};
+export const runtime = 'edge';
 
 const handler = async (req: Request, res: Response): Promise<Response> => {
   // @ts-ignore
