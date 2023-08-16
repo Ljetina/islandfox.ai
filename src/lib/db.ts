@@ -1,5 +1,6 @@
+import { pem } from './rdsPem';
+
 import { Pool, PoolClient } from 'pg';
-import fs from 'fs';
 
 const pool = new Pool({
   connectionString: process.env.PG_DB_URL,
@@ -8,8 +9,8 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000,
   ssl: {
     rejectUnauthorized: false,
-    ca: fs.readFileSync('global-bundle.pem').toString()
-  }
+    ca: pem,
+  },
 });
 
 export async function getDbClient(): Promise<PoolClient> {
@@ -68,7 +69,7 @@ WHERE oauth_tokens.id = $1
 GROUP BY users.id;`,
     [tokenId],
   );
-  console.log(resp)
+  console.log(resp);
   return resp.rows[0]['user_with_conversations_and_folders'];
 }
 
@@ -89,7 +90,7 @@ export async function getMessages({
 }) {
   const offset = (page - 1) * limit;
 
-    const query = `
+  const query = `
     SELECT id, role, content, conversation_id, created_at, updated_at
     FROM messages
     WHERE user_id = $1 AND tenant_id = $2 AND conversation_id = $3
