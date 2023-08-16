@@ -9,7 +9,7 @@ import {
   createParser,
 } from 'eventsource-parser';
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 interface ChatBodyV2 {
   conversation_id?: string;
