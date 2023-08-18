@@ -12,7 +12,7 @@ export function StaticChatMessage({ message }) {
     <div
       className={`group md:px-4 ${
         ['assistant', 'function'].includes(message.role)
-          ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 bg-[#2e2343] bg-opacity-75 dark:text-gray-100'
+          ? 'border-b border-black/10 text-gray-800 dark:border-gray-900/50 bg-[#2e2343] bg-opacity-75 dark:text-gray-100'
           : 'border-b border-black/10 text-gray-800 dark:border-gray-900/50 bg-[#1d183f] bg-opacity-75 dark:text-gray-100'
       }`}
       style={{ overflowWrap: 'anywhere' }}

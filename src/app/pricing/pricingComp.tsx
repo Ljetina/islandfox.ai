@@ -76,13 +76,13 @@ export function Pricing() {
                   <div className="pricing-list">
                     <ul className="list-wrap">
                       <li>All the plugins, all the time</li>
-                      <li>125.000 tokens</li>
+                      <li>Pricing per api call</li>
+                      <li>125.000 OpenAI gpt-4 tokens / $10</li>
                       <p>or</p>
-                      <li>2200 google search requests</li>
+                      <li>2200 Google search requests / $10</li>
                       <p>or</p>
-                      <li>5000 news queries</li>
-                      <li>pricing per api call</li>
-                      <li>Prepaid bundles in various sizes</li>
+                      <li>5000 news queries / $10</li>
+                      <li>Prepaid bundles are available in various sizes</li>
                     </ul>
                   </div>
                 </div>
