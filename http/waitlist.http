@@ -1,0 +1,7 @@
+POST https://func.islandfox.ai/waitlist
+Content-Type: application/json
+x-auth: xsak68y4zeb$4iXT
+
+{
+    "email": "bartol@ljetina.com"
+}
