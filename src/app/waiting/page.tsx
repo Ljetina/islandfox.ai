@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 
 import Layout from '@/components/layout/Layout';
 
@@ -51,7 +51,7 @@ export default function Waiting() {
   const [email, setEmail] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const handleSubmit = async (event: Event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const response = await fetch('/api/waitinglist', {
@@ -74,6 +74,7 @@ export default function Waiting() {
   };
 
   return (
+    // @ts-ignore
     <Layout mainCls="main-content fix" headTitle={'home'}>
       <section className="login-area">
         <div className="container">
