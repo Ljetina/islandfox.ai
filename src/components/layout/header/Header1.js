@@ -28,9 +28,6 @@ export default function Header1({ scroll, isMobileMenu, handleMobileMenu }) {
                     <div className="navbar-wrap main-menu d-none d-lg-flex">
                       <ul className="navigation">
                         <li>
-                          <Link href="/">Home</Link>
-                        </li>
-                        <li>
                           <Link href="/features2">Features</Link>
                         </li>
                         <li>

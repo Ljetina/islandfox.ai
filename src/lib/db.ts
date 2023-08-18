@@ -40,11 +40,11 @@ export async function initialServerData(tokenId: string) {
                 'prompt', cv.prompt,
                 'temperature', cv.temperature,
                 'model_id', cv.model_id,
-                'message_count', (SELECT COUNT(*) FROM messages WHERE messages.conversation_id = cv.id),
+                'message_count', (SELECT COUNT(*) FROM messages WHERE messages.conversation_id = cv.id AND role != \'system\'),
                 'messages', (SELECT json_agg(last_messages.*)
                              FROM (SELECT *
                                    FROM messages
-                                   WHERE messages.conversation_id = cv.id
+                                   WHERE messages.conversation_id = cv.id AND role != \'system\'
                                    ORDER BY messages.created_at DESC
                                    LIMIT 10) AS last_messages)
             )
@@ -93,7 +93,7 @@ export async function getMessages({
   const query = `
     SELECT id, role, content, conversation_id, created_at, updated_at
     FROM messages
-    WHERE user_id = $1 AND tenant_id = $2 AND conversation_id = $3
+    WHERE user_id = $1 AND tenant_id = $2 AND conversation_id = $3 AND role != 'system'
     ORDER BY created_at DESC
     LIMIT $4 OFFSET $5;
 `;
@@ -101,7 +101,7 @@ export async function getMessages({
   const countQuery = `
       SELECT COUNT(*)
       FROM messages
-      WHERE user_id = $1 AND tenant_id = $2 AND conversation_id = $3;
+      WHERE user_id = $1 AND tenant_id = $2 AND conversation_id = $3 AND role != 'system';
   `;
 
   const [result, countResult] = await Promise.all([
@@ -127,7 +127,17 @@ export async function loadDemoConversation() {
   const client = await getDbClient();
   const conversation_id = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0';
   const resp = await client.query(
-    'SELECT * FROM messages WHERE conversation_id = $1',
+    'SELECT * FROM messages WHERE conversation_id = $1 AND role != \'system\' ORDER BY created_at ASC',
+    [conversation_id],
+  );
+  return resp.rows;
+}
+
+export async function loadPricing() {
+  const client = await getDbClient();
+  const conversation_id = 'ba08401a-4e6c-4b8c-a470-f4cacda7f79f';
+  const resp = await client.query(
+    'SELECT * FROM messages WHERE conversation_id = $1 AND role != \'system\' ORDER BY created_at ASC',
     [conversation_id],
   );
   return resp.rows;

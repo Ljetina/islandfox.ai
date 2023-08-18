@@ -18,7 +18,7 @@ import '/public/assets/css/style.css';
 export default function Features2() {
   return (
     // @ts-ignore
-    <Layout headTitle={'features'}>
+    <Layout mainCls="main-content fix" headTitle={'features'}>
       <FeaturesBox />
     </Layout>
   );
