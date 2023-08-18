@@ -31,7 +31,7 @@ export default function Header1({ scroll, isMobileMenu, handleMobileMenu }) {
                           <Link href="/">Home</Link>
                         </li>
                         <li>
-                          <Link href="/features">Features</Link>
+                          <Link href="/features2">Features</Link>
                         </li>
                         <li>
                           <Link href="/pricing">Pricing</Link>

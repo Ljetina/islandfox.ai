@@ -160,8 +160,8 @@ export const ChatMessage: FC<Props> = memo(
       <div
         className={`group md:px-4 ${
           ['assistant', 'function'].includes(message.role)
-            ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
-            : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
+            ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#2e2343] dark:text-gray-100'
+            : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#1d183f] dark:text-gray-100'
         }`}
         style={{ overflowWrap: 'anywhere' }}
       >
@@ -177,6 +177,9 @@ export const ChatMessage: FC<Props> = memo(
           <div className="prose mt-[-2px] w-full dark:prose-invert">
             {message.role === 'user' ? (
               <div className="flex w-full">
+    
+      
+    
                 {/* {isEditing ? (
                   <div className="flex w-full flex-col">
                     <textarea
@@ -217,9 +220,12 @@ export const ChatMessage: FC<Props> = memo(
                     </div>
                   </div>
                 ) : ( */}
-                  <div className="prose whitespace-pre-wrap dark:prose-invert flex-1">
+                <div className="prose whitespace-pre-wrap dark:prose-invert flex-1">
+                  {message.content}
+                </div>
+                  {/* <div className="prose whitespace-pre-wrap dark:prose-invert flex-1">
                     {message.content}
-                  </div>
+                  </div> */}
                 {/* )} */}
 
                 {/* {!isEditing && (

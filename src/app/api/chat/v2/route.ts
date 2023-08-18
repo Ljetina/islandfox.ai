@@ -38,7 +38,7 @@ const handler = async (req: Request, res: Response): Promise<Response> => {
       // TODO create the conversation in the db
     }
     return new Response(
-      await PassthroughStream(conversation_id as string, message_content), { headers: { 'Content-Type': 'text/event-stream' } }
+      await PassthroughStream(conversation_id as string, message_content), { headers: { 'Content-Type': 'text/event-stream', 'x-auth': process.env.FUNC_AUTH as string } }
     );
   } catch (error) {
     console.error(error);

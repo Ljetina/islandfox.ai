@@ -4,9 +4,9 @@ import { Pool, PoolClient } from 'pg';
 
 const pool = new Pool({
   connectionString: process.env.PG_DB_URL,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  max: 100,
+  idleTimeoutMillis: 1000,
+  connectionTimeoutMillis: 5000,
   ssl: {
     rejectUnauthorized: false,
     ca: pem,
@@ -121,4 +121,14 @@ export async function getMessages({
   };
 
   return responseBody;
+}
+
+export async function loadDemoConversation() {
+  const client = await getDbClient();
+  const conversation_id = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0';
+  const resp = await client.query(
+    'SELECT * FROM messages WHERE conversation_id = $1',
+    [conversation_id],
+  );
+  return resp.rows;
 }

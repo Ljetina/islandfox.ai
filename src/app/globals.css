@@ -3,16 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 255, 255, 255; /* change to the color of your text */
+  --background-start-rgb: 237, 233, 254; /* change to the start color of your gradient */
+  --background-end-rgb: 221, 214, 254; /* change to the end color of your gradient */
+  --scrollbar-color: 107, 114, 128; /* change to the color of your scrollbar */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --foreground-rgb: 255, 255, 255; /* change to the color of your text in dark mode */
+    --background-start-rgb: 0, 0, 0; /* change to the start color of your gradient in dark mode */
+    --background-end-rgb: 0, 0, 0; /* change to the end color of your gradient in dark mode */
   }
 }
 
@@ -40,7 +41,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: rgb(var(--scrollbar-color));
   border-radius: 10px;
 }
 
