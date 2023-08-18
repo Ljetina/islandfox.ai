@@ -1,18 +1,20 @@
 'use client';
 
-import Pricing1 from '@/components/sections/Pricing1';
 import Link from 'next/link';
+
+import Pricing1 from '@/components/sections/Pricing1';
 
 export function Pricing() {
   return (
     <>
-      <section className="pricing-area pb-110" style={{paddingTop: '150px'}}>
+      <section className="pricing-area pb-110" style={{ paddingTop: '150px' }}>
         <div className="container">
           <div className="row">
             <div className="col-lg-12">
               <div className="section-title text-center mb-50">
                 <h2 className="title title-animation">
-                  Pay only for what you use. <br /><span>No&nbsp;commitments.</span>
+                  Pay only for what you use. <br />
+                  <span>No&nbsp;commitments.</span>
                 </h2>
               </div>
             </div>
@@ -73,6 +75,7 @@ export function Pricing() {
                   </div>
                   <div className="pricing-list">
                     <ul className="list-wrap">
+                      <li>All the plugins, all the time</li>
                       <li>125.000 tokens</li>
                       <p>or</p>
                       <li>2200 google search requests</li>
@@ -82,11 +85,6 @@ export function Pricing() {
                       <li>Prepaid bundles in various sizes</li>
                     </ul>
                   </div>
-                  {/* <div className="pricing-btn">
-                    <Link href="/login" className="btn btn-two">
-                      choose plan
-                    </Link>
-                  </div> */}
                 </div>
               </div>
               <div className="col-xl-4 col-lg-6 col-md-9 col-sm-10">

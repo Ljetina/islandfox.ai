@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import Sidebar from '../Sidebar';
+// import Sidebar from '../Sidebar';
 
 export default function Header1({ scroll, isMobileMenu, handleMobileMenu }) {
   return (
@@ -57,9 +57,9 @@ export default function Header1({ scroll, isMobileMenu, handleMobileMenu }) {
                         <img src="/assets/img/logo/logo.png" alt="Logo" />
                       </Link>
                     </div>
-                    <div className="menu-outer">
+                    {/* <div className="menu-outer">
                       <Sidebar />
-                    </div>
+                    </div> */}
                   </nav>
                 </div>
                 <div className="menu-backdrop" onClick={handleMobileMenu} />

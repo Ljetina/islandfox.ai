@@ -1,8 +1,8 @@
 'use client';
 
-import { getServerSession } from 'next-auth';
+// import { getServerSession } from 'next-auth';
 
-import { LoginButton, LogoutButton } from '@/components/buttons.component';
+// import { LoginButton, LogoutButton } from '@/components/buttons.component';
 // Template components
 import Layout from '@/components/layout/Layout';
 import Banner1 from '@/components/sections/Banner1';
