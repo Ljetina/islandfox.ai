@@ -51,7 +51,7 @@ export default function Waiting() {
   const [email, setEmail] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: Event) => {
     event.preventDefault();
 
     const response = await fetch('/api/waitinglist', {
@@ -103,7 +103,9 @@ export default function Waiting() {
                           onChange={(e) => setEmail(e.target.value)}
                         />
                       </div>
-                      <button className="gradient-btn" type="submit">Submit</button>
+                      <button className="gradient-btn" type="submit">
+                        Submit
+                      </button>
                     </form>
                   </>
                 )}
