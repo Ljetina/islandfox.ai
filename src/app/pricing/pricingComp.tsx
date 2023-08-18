@@ -123,7 +123,7 @@ export function Pricing() {
                     <ul className="list-wrap">
                       <li>Custom plugins</li>
                       <li>Enterprise integrations</li>
-                      <li>On-premise or appliance deployments</li>
+                      <li>On-premise or self-hosted deployments</li>
                       <li>Flexible billing</li>
                     </ul>
                   </div>
