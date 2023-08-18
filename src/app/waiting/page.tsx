@@ -16,37 +16,7 @@ import '/public/assets/css/responsive.css';
 import '/public/assets/css/select2.min.css';
 import '/public/assets/css/style.css';
 
-// export default function Pricing() {
-//   return (
-//     // @ts-ignore
-//     <Layout headTitle={'pricing'}>
-//       <section
-//         className="features-area pt-140 pb-130"
-//         style={{
-//           display: 'flex',
-//           justifyContent: 'center',
-//           alignItems: 'center',
-//           height: '100vh',
-//         }}
-//       >
-//         {/* @ts-ignore TODO */}
-//         <iframe
-//           src="https://docs.google.com/forms/d/e/1FAIpQLSek0x0l5yGQhLiwTxGDMzJvwoP5QWz1aa6AYOTAn2RMEq7X-Q/viewform?embedded=true"
-//           width="640"
-//           height="427"
-//           frameborder="0"
-//           marginheight="0"
-//           marginwidth="0"
-//         >
-//           Loading…
-//         </iframe>
-//       </section>
-//       {/* <section className="features-area pt-140 pb-130">
-//         <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSek0x0l5yGQhLiwTxGDMzJvwoP5QWz1aa6AYOTAn2RMEq7X-Q/viewform?embedded=true" width="640" height="427" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
-//       </section> */}
-//     </Layout>
-//   );
-// }
+// @ts-nocheck
 
 export default function Waiting() {
   const [email, setEmail] = useState('');
@@ -64,13 +34,11 @@ export default function Waiting() {
     });
 
     if (!response.ok) {
-      // Handle error...
       console.error('An error occurred while trying to join the waiting list');
     } else {
-      // Handle success...
       console.log('Successfully joined the waiting list');
-      setEmail(''); // Clear the input field
-      setFormSubmitted(true); // Set formSubmitted to true
+      setEmail('');
+      setFormSubmitted(true);
     }
   };
 
@@ -86,14 +54,14 @@ export default function Waiting() {
                   <>
                     <h3 className="title">Thank You!</h3>
                     <span>
-                      We'll let you know as soon as our service is available!
+                      We&apos;ll let you know as soon as our service is available!
                     </span>
                   </>
                 ) : (
                   <>
                     <h3 className="title">Enter the waiting list</h3>
                     <span>
-                      👋 We'll let you know as soon as our service is available!
+                      👋 We&apos;ll let you know as soon as our service is available!
                     </span>
                     <form onSubmit={handleSubmit}>
                       <div className="form-grp">
