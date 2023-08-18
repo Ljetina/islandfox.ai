@@ -7219,3 +7219,18 @@ label {
   padding: 10px 20px;
   height: 50px;
 }
+
+.title.feature-content h2 {
+  margin-left: 16px !important;
+  margin-right: 16px !important;
+  margin-bottom: 60px !important;
+  text-align: center;
+  font-size: 2rem !important;;
+  font-family: var(--tg-heading-font-family) !important;;
+  color: var(--tg-heading-font-color) !important;;
+  margin-top: 0px !important;;
+  font-style: normal !important;;
+  line-height: var(--tg-heading-line-height) !important;;
+  font-weight: var(--tg-heading-font-weight) !important;;
+  text-transform: inherit !important;;
+}

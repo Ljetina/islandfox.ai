@@ -20,13 +20,24 @@ export async function FeaturesBox() {
           </div>
         </div>
       </div> */}
-      <div className="flex flex-column items-center justify-center min-h-screen">
+      <div className="flex flex-column items-center justify-center min-h-screen" style={{
+        paddingTop: '140px'
+      }}>
         <h2
-          className="title ah-headline"
+          className='title feature-content'
           style={{
-            marginTop: '205px',
-            textAlign: 'center',
+            marginLeft: '16px',
+            marginRight: '16px',
             marginBottom: '60px',
+            textAlign: 'center',
+            fontSize: '2rem',
+            fontFamily: 'var(--tg-heading-font-family)',
+            color: 'var(--tg-heading-font-color)',
+            marginTop: '0px',
+            fontStyle: 'normal',
+            lineHeight: 'var(--tg-heading-line-height)',
+            fontWeight: 'var(--tg-heading-font-weight)',
+            textTransform: 'inherit',
           }}
         >
           GPT-4 combined with powerful always-on plugins
@@ -43,3 +54,8 @@ export async function FeaturesBox() {
     </section>
   );
 }
+
+// font-size: 70px;
+// letter-spacing: -0.01em;
+// width: 90%;
+// margin: 0 auto 30px;
