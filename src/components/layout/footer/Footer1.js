@@ -17,7 +17,8 @@ export default function Footer1() {
                   </div>
                 </div>
                 <div className="col-lg-4">
-                  <div className="footer-menu">
+                  {/* TODO Add T&C and Privacy policy back */}
+                  {/* <div className="footer-menu">
                     <ul className="list-wrap">
                       <li>
                         <Link href="/contact">Terms & Conditions</Link>
@@ -26,7 +27,7 @@ export default function Footer1() {
                         <Link href="/contact">Privacy Policy</Link>
                       </li>
                     </ul>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
