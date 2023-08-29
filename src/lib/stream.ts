@@ -33,9 +33,16 @@ interface FunctionConfig {
   };
 }
 
+const headers = {
+  'x-auth': process.env.FUNC_AUTH as string,
+  'Content-Type': 'application/json'
+}
+
 async function fetchAvailableFunctions(): Promise<FunctionConfig[]> {
-  const response = await fetch(`${process.env.FUNC_URL}/functions`);
-  const functions = await response.json();
+  const response = await fetch(`${process.env.FUNC_URL}/functions`, { headers });
+  const responseBody = await response.text();
+  console.log(responseBody)
+  const functions = JSON.parse(responseBody);
   return functions;
 }
 
@@ -56,12 +63,20 @@ async function requestCompletion({
   functions: FunctionConfig[];
   decoder: TextDecoder;
 }) {
-  let url = `${process.env.FUNC_URL}/completions`;
-  // let url = `${OPENAI_API_HOST}/v1/chat/completions`;
+  // let url = `${process.env.FUNC_URL}/completions`;
+  let url = `${process.env.OPENAI_API_HOST}/v1/chat/completions`;
 
+  console.log({systemPrompt, messagesInSystemPrompt: [
+    {
+      role: 'system',
+      content: systemPrompt,
+    },
+    ...messages,
+  ]})
   const res = await fetch(url, {
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
     },
     method: 'POST',
     body: JSON.stringify({
@@ -171,7 +186,7 @@ export const OpenAIStream = async (
             }
             // Default continue case
             else if (!switchToFunctionHandling) {
-              console.log('default case', event);
+              // console.log('default case', event);
               const text = json.choices[0].delta.content;
               const queue = encoder.encode(text);
               controller.enqueue(queue);
@@ -188,12 +203,13 @@ export const OpenAIStream = async (
               // Call the local function and wait for the result
               controller.enqueue(
                 encoder.encode(
-                  `Calling function ${functionName} (${functionArgs}) ... \n`,
+                  `Calling function ${functionName} (${functionArgs}) ... \n \n`,
                 ),
               );
               callLocalFunction(functionName, JSON.parse(functionArgs))
                 .then(async (response) => {
-                  controller.enqueue(encoder.encode(JSON.stringify(response)));
+                  console.log({response})
+                  controller.enqueue(encoder.encode(response));
                   controller.enqueue(encoder.encode('\n'));
                   // onFunctionCall(response);
                   messages.push({
@@ -205,10 +221,14 @@ export const OpenAIStream = async (
                     role: 'function',
                     name: `${functionName}`,
                     
-                    content: `${JSON.stringify(response)}`,
+                    // content: `${JSON.stringify(response)}`,
+                    content: `${response}`,
                   });
                   console.log({ messages });
                   switchToFunctionHandling = false;
+                  controller.enqueue('DONE')
+                  // closeIfDidnt(controller);
+                  return
                   const postFunctionRes = await requestCompletion({
                     model,
                     systemPrompt,
@@ -281,9 +301,7 @@ async function callLocalFunction(
   // Make a POST request to your local API at /functions/<function_name>
   const response = await fetch(`${process.env.FUNC_URL}/functions/${functionName}`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify({ args: functionArgs }),
   });
 
