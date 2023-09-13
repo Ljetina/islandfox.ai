@@ -3,19 +3,18 @@ export const getEndpoint = () => {
   return '/api/chat';
 };
 
-export const callCompletions = (messageContent: string) => {
+export const callCompletions = (messageContent: string) => {};
 
-}
-
-
-function makeQueryString(params: { [key: string]: string | number | undefined }) {
+function makeQueryString(params: {
+  [key: string]: string | number | undefined;
+}) {
   if (Object.values(params).filter((v) => !!v).length > 0) {
     return (
       '?' +
       Object.entries(params)
         .map(([k, v]) => {
-          console.log({k, v})
-          return `${k}=${v}`
+          console.log({ k, v });
+          return `${k}=${v}`;
         })
         .join('&')
     );
@@ -34,8 +33,12 @@ export async function getConversationMessages({
   limit?: number;
 }) {
   let query = makeQueryString({ page, limit });
-  console.log({url: `/api/conversations/${conversation_id}/messages${query}`})
-  const res = await fetch(`/api/conversations/${conversation_id}/messages${query}`);
+  console.log({
+    url: `/api/conversations/${conversation_id}/messages${query}`,
+  });
+  const res = await fetch(
+    `/api/conversations/${conversation_id}/messages${query}`,
+  );
   return await res.json();
 }
 
@@ -61,3 +64,22 @@ export async function sendChatMessage({
     controller,
   };
 }
+
+export const blurFetch = ({
+  pathname,
+  method,
+  body,
+}: {
+  pathname: string;
+  method: 'PUT' | 'GET' | 'DELETE' | 'POST';
+  body?: BodyInit;
+}) => {
+  return fetch(`http://localhost:3001/${pathname}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body,
+  });
+};

@@ -23,6 +23,5 @@ export interface ChatContextProps {
   // ) => void;
 }
 
-const ChatContext = createContext<ChatContextProps>(undefined!);
+export const ChatContext = createContext<ChatContextProps>(undefined!);
 
-export default ChatContext;

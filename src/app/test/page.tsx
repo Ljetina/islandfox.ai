@@ -2,13 +2,23 @@
 
 import React, { useEffect, useState } from 'react';
 
+import { useInitialData } from '@/hooks/useInitialData';
+
 import { LoginButton } from '@/components/Login/LoginButton';
 
 export default function TestPage() {
-  return (
-    <div>
-      <h1>Login Page</h1>
-      <LoginButton />
-    </div>
-  );
+  const { initialData, isLoading } = useInitialData();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return <div>{JSON.stringify(initialData, 2)}</div>;
+  
+  // return (
+  //   <div>
+  //     <h1>Login Page</h1>
+  //     <LoginButton />
+  //   </div>
+  // );
 }

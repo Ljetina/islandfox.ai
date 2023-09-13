@@ -25,7 +25,7 @@ export const LoginButton: React.FC = () => {
   const handleLogout = () => {
     fetch('http://localhost:3001/logout', {
       method: 'POST',
-      credentials: 'include', // Include credentials to send the session cookie
+      credentials: 'include',
     })
       .then((response) => response.json())
       .then((data) => {

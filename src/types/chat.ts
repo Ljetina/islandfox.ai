@@ -25,10 +25,13 @@ export interface ChatBody {
 
 export interface Conversation {
   id: string;
+  created_at: string;
+  updated_at: string;
+  folder_id?: string;
   name: string;
-  messages: Message[];
-  model_id: OpenAIModel;
   prompt: string;
   temperature: number;
-  folder_id: string | null;
+  model_id: string;
+  message_count: number;
+  messages: Message[]
 }

@@ -20,27 +20,33 @@ import { Conversation } from '@/types/chat';
 
 import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
 import ChatbarContext from '@/components/Chatbar/Chatbar.context';
+import { ChatContext } from '@/app/chat/chat.provider';
 
-import ChatContext from '@/app/chat/chat.context';
+// import ChatContext from '@/app/chat/chat.context';
 
 interface Props {
   conversation: Conversation;
 }
 
-export const ConversationComponent = ({ conversation }: Props) => {
+export const ConversationComponent = ({
+  conversation,
+}: Props) => {
   const router = useRouter();
   const {
-    state: { 
-      messageIsStreaming, 
-      // selectedConversationId
+    state: {
+      messageIsStreaming,
+      selectedConversationId
     },
-    // handleSelectConversation,
-    // handleUpdateConversation,
+    handleDeleteConversation,
+    handleSelectConversation,
+    handleEditConversation
   } = useContext(ChatContext);
 
-  const selectedConversationId = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0'
+  console.log({selectedConversationId})
 
-  const { handleDeleteConversation } = useContext(ChatbarContext);
+  // const selectedConversationId = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0';
+
+  // const { handleDeleteConversation } = useContext(ChatbarContext);
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
@@ -130,12 +136,10 @@ export const ConversationComponent = ({ conversation }: Props) => {
           className={`flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200 hover:bg-[#343541]/90 ${
             messageIsStreaming ? 'disabled:cursor-not-allowed' : ''
           } ${
-            selectedConversationId === conversation.id
-              ? 'bg-[#343541]/90'
-              : ''
+            selectedConversationId === conversation.id ? 'bg-[#343541]/90' : ''
           }`}
-          // onClick={() => handleSelectConversation(conversation)}
-          onClick={() => router.push(`/chat/${conversation.id}`)}
+          onClick={() => handleSelectConversation(conversation)}
+          // onClick={() => router.push(`/chat/${conversation.id}`)}
           disabled={messageIsStreaming}
           draggable="true"
           onDragStart={(e) => handleDragStart(e, conversation)}

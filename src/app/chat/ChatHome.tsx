@@ -11,6 +11,7 @@ import { useQuery } from 'react-query';
 import Head from 'next/head';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
+import { useInitialData } from '@/hooks/useInitialData';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
@@ -20,12 +21,14 @@ import { Prompt } from '@/types/prompt';
 
 import ActiveConversation from '@/components/Chat/ActiveConversation';
 import { Chat } from '@/components/Chat/Chat';
-import { Chatbar } from '@/components/Chatbar/Chatbar';
+import List from '@/components/Chat/Chatlist';
+import { Chatbar } from '@/components/Chatbar/ChatbarPlaceholder';
+// import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
+
 import '../globals.css';
 
-import ChatContext from './chat.context';
 import {
   ChatInitialState,
   InitialServerData,
@@ -46,40 +49,54 @@ import { saveFolders } from '@/lib/folders';
 import { savePrompts } from '@/lib/prompts';
 import { getSettings } from '@/lib/settings';
 import { v4 as uuidv4 } from 'uuid';
-import List from '@/components/Chat/Chatlist';
+import { ChatContext, withChatProvider } from './chat.provider';
 
 interface Props {
-  initialData: InitialServerData;
+  // initialData: InitialServerData;
   conversationId?: string;
 }
 
-const ChatHome = ({ initialData, conversationId }: Props) => {
+const ChatHome = ({ conversationId }: Props) => {
+  // const { initialData, isLoading } = useInitialData();
+
   //   const { t } = useTranslation('chat');
   //   const { getModels } = useApiService();
   //   const { getModelsError } = useErrorService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
   const defaultModelId = OpenAIModelID.GPT_4;
 
-  const contextValue = useCreateReducer<ChatInitialState>({
-    initialState: {
-      ...initialData,
-      ...initialState,
-    },
-  });
+  const {state: {
+    conversations, selectedConversationId, messages
 
-  const {
-    state: {
-      //   apiKey,
-      lightMode,
-      folders,
-      conversations,
-      selectedConversationId,
-      // prompts,
-      // temperature,
-      // te
-    },
-    dispatch,
-  } = contextValue;
+  }} = useContext(ChatContext)
+
+  // const contextValue = useCreateReducer<ChatInitialState>({
+  //   initialState: {
+  //     ...initialData,
+  //     ...initialState,
+  //   },
+  // });
+
+  // useEffect(() => {
+  //   contextValue.dispatch({
+  //     field: 'conversations',
+  //     value: initialData.conversations,
+  //   });
+  // }, [initialData]);
+
+  // const {
+  //   state: {
+  //     //   apiKey,
+  //     lightMode,
+  //     folders,
+  //     conversations,
+  //     selectedConversationId,
+  //     // prompts,
+  //     // temperature,
+  //     // te
+  //   },
+  //   dispatch,
+  // } = contextValue;
 
   const conversation = useMemo(
     () =>
@@ -92,10 +109,11 @@ const ChatHome = ({ initialData, conversationId }: Props) => {
   );
 
   const handleSelectConversation = (conversation: Conversation) => {
-    dispatch({
-      field: 'selectedConversationId',
-      value: conversation.id,
-    });
+
+    // dispatch({
+    //   field: 'selectedConversationId',
+    //   value: conversation.id,
+    // });
   };
 
   // FOLDER OPERATIONS  --------------------------------------------
@@ -228,10 +246,10 @@ const ChatHome = ({ initialData, conversationId }: Props) => {
   useEffect(() => {
     const settings = getSettings();
     if (settings.theme) {
-      dispatch({
-        field: 'lightMode',
-        value: settings.theme,
-      });
+      // dispatch({
+      //   field: 'lightMode',
+      //   value: settings.theme,
+      // });
     }
 
     // if (window.innerWidth < 640) {
@@ -336,20 +354,15 @@ const ChatHome = ({ initialData, conversationId }: Props) => {
     //     },
     //   });
     // }
-  }, [dispatch, selectedConversationId]);
+  }, [selectedConversationId]);
+
+  // console.log({ initialData });
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
-    <ChatContext.Provider
-      value={{
-        ...contextValue,
-        // handleNewConversation,
-        // handleCreateFolder,
-        // handleDeleteFolder,
-        // handleUpdateFolder,
-        // handleSelectConversation,
-        // handleUpdateConversation,
-      }}
-    >
+    <>
       <Head>
         <title>IslandFox AI</title>
         <meta name="description" content="Chat assistant for Power Users" />
@@ -360,7 +373,7 @@ const ChatHome = ({ initialData, conversationId }: Props) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main
-        className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
+        className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${'dark'}`}
       >
         <div className="fixed top-0 w-full sm:hidden">
           {/* TODO fix up structure when working on putting the prompts back in conversation */}
@@ -372,18 +385,18 @@ const ChatHome = ({ initialData, conversationId }: Props) => {
         </div>
 
         <div className="flex h-full w-full pt-[48px] sm:pt-0">
-          {/* <Chatbar /> */}
+          <Chatbar />
 
           <div className="flex flex-1">
             {/* <List /> */}
-            <ActiveConversation />
+            {/* <ActiveConversation /> */}
             {/* <Chat stopConversationRef={stopConversationRef} /> */}
           </div>
 
           {/* <Promptbar /> */}
         </div>
       </main>
-    </ChatContext.Provider>
+    </>
   );
 };
 export default ChatHome;
