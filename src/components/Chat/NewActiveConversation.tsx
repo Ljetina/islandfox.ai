@@ -21,13 +21,13 @@ import ConversationSettings from './ConversationSettings';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
 
+import { ChatContext } from '@/app/chat/chat.provider';
 import { getConversationMessages } from '@/lib/api';
 import {
   ParsedEvent,
   ReconnectInterval,
   createParser,
 } from 'eventsource-parser';
-import { ChatContext } from '@/app/chat/chat.provider';
 
 interface ActiveConversationProps {}
 
@@ -48,34 +48,21 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
     ];
 
     const {
-      state: { messageIsStreaming, selectedConversationId, conversations, messages },
+      state: {
+        messageIsStreaming,
+        selectedConversationId,
+        conversations,
+        messages,
+      },
       // handleDeleteConversation,
       // handleSelectConversation,
       // handleEditConversation,
     } = useContext(ChatContext);
-
-    // const selectedConversationId = '9d866b4f-03f3-4d9c-b423-4c0a4f8f11b8';
-    // const selectedConversationId = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0';
-    // const selectedConversationId = 'ba08401a-4e6c-4b8c-a470-f4cacda7f79f';
-    // const selectedConversationId = '9d866b4f-03f3-4d9c-b423-4c0a4f8f11b8';
-    // const selectedConversationId = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0';
-    // const {
-    //   state: {
-    //     // selectedConversationId,
-    //     conversations,
-    //     //   models,
-    //   },
-    //   // handleUpdateConversation,
-    //   dispatch: homeDispatch,
-    // } = useContext(ChatContext);
+    console.log({messages})
 
     const selectedConveration = useMemo(() => {
       return conversations?.find((c) => c.id === selectedConversationId);
     }, [conversations, selectedConversationId]);
-
-    // const [messages, setMessages] = useState(() => {
-    //   return [...(selectedConveration?.messages || [])].reverse();
-    // });
 
     const reversedMessages = useMemo(() => {
       return [...messages].reverse();
@@ -141,19 +128,6 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       selectedConveration?.message_count,
     );
 
-    // useEffect(() => {
-    // scrollToBottom();
-    // }, [messages]);
-
-    // useEffect(() => {
-    //   console.log('USE EFFECT', messages);
-    //   if (initialLoad && messagesEndRef) {
-    //     setInitialLoad(false);
-    //     setTimeout(() => {
-    //       // messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
-    //     });
-    //   }
-    // }, [messages, messagesEndRef]);
     const isCancelled = useRef(false);
 
     const loadMoreMessages = useCallback(async () => {
@@ -161,7 +135,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       try {
         console.log('load more', page);
         const resp = await getConversationMessages({
-          conversation_id: selectedConversationId,
+          conversation_id: selectedConversationId as string,
           page,
           limit: 50,
         });
@@ -184,14 +158,6 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         setLoadingMoreHistoric(false);
       }
     }, [page, selectedConversationId]);
-
-    const handleScroll = () => {
-      // TODO
-    };
-
-    const handleScrollDown = () => {
-      // TODO
-    };
 
     const handleSend = async (message: string) => {
       console.log('SENDING', message);
@@ -254,23 +220,6 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
           } catch (e) {
             console.error(e);
           }
-
-          // scrollToBottom()
-          // setMessages((list) => {
-          //   const reversed = list;
-          //   const top = reversed[0];
-          //   const messageFromChunk = {
-          //     ...top,
-          //     content: text + (done ? '' : '`▍`'),
-          //   };
-          //   // return [...reversed.slice(1), messageFromChunk];
-          //   // ?.content = text + (done ? '' : '`▍`')
-          //   const placeholder = list.find(i => i.id == 'placeholder-response');
-          //   if (placeholder) {
-          //     placeholder.content = text + (done ? '' : '`▍`')
-          //   }
-          //   return [...list]
-          // });
         }
       };
 
@@ -287,14 +236,14 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         parser.feed(decoded);
         done = isDone;
       }
-      
+
       const reloadedTopMessages = await getConversationMessages({
-        conversation_id: selectedConversationId,
+        conversation_id: selectedConversationId as string,
         page: 0,
         limit: 2,
       });
       setFooter(null);
-      setMessages(list => [...reloadedTopMessages.data, ...list].reverse());
+      //   setMessages((list) => [...reloadedTopMessages.data, ...list].reverse());
       setLoadingNewChatMessage(false);
     };
 
@@ -302,34 +251,9 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       scrollToBottom();
     }, [footer]);
 
-    const handleEditMessage = () => {
-      // onEdit={(editedMessage) => {
-      //   setCurrentMessage(editedMessage);
-      //   // discard edited message and the ones that come after then resend
-      //   handleSend(
-      //     editedMessage,
-      //     selectedConversation?.messages.length - index,
-      //   );
-      // }}
-    };
-
-    const updateConversationSettings = useCallback(
-      (field: string) => (value: string | number) => {
-        console.log('TODO implement updateConversationSettings');
-      },
-      [],
-    );
-
-    const handleUpdateConversation = () => {};
-
     const START_INDEX = 1;
     const INITIAL_ITEM_COUNT = 10;
 
-    // console.log('on render, ml', messages.length);
-    // console.log('on render, first', messages[0]);
-    // return (
-
-    // );
     return modelError ? (
       <ErrorMessageDiv error={modelError} />
     ) : (
@@ -337,9 +261,11 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         <MessageList
           totalCount={totalCount as number}
           hasMore={hasMore}
-          messages={messages}
+          messages={reversedMessages}
           // @ts-ignore TODO
-          setMessages={setMessages}
+          setMessages={() => {
+            //todo
+          }}
           onLoadMore={loadMoreMessages}
           inProgressFooter={footer}
         />
@@ -348,25 +274,9 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
           stopConversationRef={stopConversationRef}
           textareaRef={textareaRef}
           onSend={handleSend}
-          // onSend={(message) => {
-          // setMessages([
-          //   {
-          //     role: 'user',
-          //     content: 'test add',
-          //     id: 'incoming_message',
-          //     conversation_id: messages[0].conversation_id,
-          //     created_at: messages[0].created_at,
-          //     updated_at: messages[0].updated_at,
-          //   },
-          //   ...messages,
-          // ]);
-          // TODO FIX
-          // scrollToBottom();
-          // edit related
-          // setCurrentMessage(message);
-          // (message);
-          // }}
-          onScrollDownClick={handleScrollDown}
+          onScrollDownClick={() => {
+            // todo
+          }}
           onRegenerate={() => {
             // if (currentMessage) {
             //   handleSend(currentMessage);
@@ -388,66 +298,3 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
 
 ActiveConversation.displayName = 'ActiveConversation';
 export default ActiveConversation;
-
-{
-  /* <div
-          className="h-full overflow-auto"
-          // style={{marginBottom: "300px"}}
-          // className="max-h-full overflow-auto flex flex-col-reverse"
-          // className="h-50 overflow-auto flex flex-col-reverse"
-          ref={chatContainerRef}
-          onScroll={handleScroll}
-        >
-          
-
-          <div
-            className="h-[162px] bg-white dark:bg-[#343541]"
-            // ref={messagesEndRef}
-          />
-        </div> */
-}
-
-// TODO Show settings part
-
-//                 {/* <Conv /> */}
-// {
-/* {showSettings && (
-                  <div className="flex flex-col space-y-10 md:mx-auto md:max-w-xl md:gap-6 md:py-3 md:pt-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
-                    <div className="flex h-full flex-col space-y-4 border-b border-neutral-200 p-4 dark:border-neutral-600 md:rounded-lg md:border">
-                      <ModelSelect />
-                    </div>
-                  </div>
-                )} */
-// }
-
-// Snippet for settings
-// {messages.length === 0 ? (
-//   <ConversationSettings
-//     currentPrompt={selectedConveration?.prompt}
-//     models={models}
-//     model_id={selectedConveration?.model_id}
-//     onChangeSystemPrompt={updateConversationSettings('prompt')}
-//     onModelSelect={updateConversationSettings('model_id')}
-//     onChangeTemperature={updateConversationSettings('temperature')}
-//   />
-// ) : (
-//   <>
-//     <div
-//       className="relative h-full transition-all duration-300 overflow-hidden"
-//       style={{ opacity: showMessages ? 1 : 0 }}
-//       ref={innerDivRef}
-//     >
-//       <div
-//         ref={topRef}
-//         className={`h-10 flex items-center justify-center ${
-//           loadingMoreHistoric ? 'opacity-100' : 'opacity-0'
-//         }`}
-//       >
-//         <Spinner />
-//       </div>
-
-//       {/* {loadingNewChatMessage ||
-//       (loadingNewChatMessage && <ChatLoader />)} */}
-//     </div>
-//   </>
-// )}

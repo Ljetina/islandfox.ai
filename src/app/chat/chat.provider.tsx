@@ -78,8 +78,9 @@ export const ChatProvider = ({
             ? data.conversations[0]
             : undefined;
         if (selectedConversation) {
+          console.log({selectedConversation})
           setSelectedConversationId(selectedConversation.id);
-          setMessages(selectedConversation.messages);
+          setMessages(selectedConversation.messages || []);
         }
         setLoading(false);
       })

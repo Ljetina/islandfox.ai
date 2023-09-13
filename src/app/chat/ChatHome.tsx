@@ -19,7 +19,7 @@ import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 
-import ActiveConversation from '@/components/Chat/ActiveConversation';
+import ActiveConversation from '@/components/Chat/NewActiveConversation';
 import { Chat } from '@/components/Chat/Chat';
 import List from '@/components/Chat/Chatlist';
 import { Chatbar } from '@/components/Chatbar/ChatbarPlaceholder';
@@ -389,7 +389,7 @@ const ChatHome = ({ conversationId }: Props) => {
 
           <div className="flex flex-1">
             {/* <List /> */}
-            {/* <ActiveConversation /> */}
+            <ActiveConversation />
             {/* <Chat stopConversationRef={stopConversationRef} /> */}
           </div>
 

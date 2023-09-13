@@ -11,10 +11,9 @@ import {
   MouseEventHandler,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
-
-import { useRouter } from 'next/navigation';
 
 import { Conversation } from '@/types/chat';
 
@@ -27,7 +26,6 @@ interface Props {
 }
 
 export const ConversationComponent = ({ conversation }: Props) => {
-  const router = useRouter();
   const {
     state: { messageIsStreaming, selectedConversationId, conversations },
     handleDeleteConversation,
@@ -35,18 +33,9 @@ export const ConversationComponent = ({ conversation }: Props) => {
     handleEditConversation,
   } = useContext(ChatContext);
 
-  const [selectedConversation, setSelectedConversation] = useState<
-    Conversation | undefined
-  >(undefined);
-  useEffect(() => {
-    if (selectedConversationId) {
-      setSelectedConversation(
-        conversations.find((c) => c.id === selectedConversationId),
-      );
-    } else {
-      setSelectedConversation(undefined);
-    }
-  }, [selectedConversationId, setSelectedConversation, conversations]);
+  const selectedConversation = useMemo(() => {
+    return conversations?.find((c) => c.id === selectedConversationId);
+  }, [conversations, selectedConversationId]);
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
@@ -134,7 +123,6 @@ export const ConversationComponent = ({ conversation }: Props) => {
             selectedConversationId === conversation.id ? 'bg-[#343541]/90' : ''
           }`}
           onClick={() => handleSelectConversation(conversation)}
-          // onClick={() => router.push(`/chat/${conversation.id}`)}
           disabled={messageIsStreaming}
           draggable="true"
           onDragStart={(e) => handleDragStart(e, conversation)}

@@ -25,8 +25,7 @@ import { Prompt } from '@/types/prompt';
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
-
-import ChatContext from '@/app/chat/chat.context';
+import { ChatContext } from '@/app/chat/chat.provider';
 
 interface Props {
   onSend: (content: string) => void;
@@ -53,8 +52,6 @@ export const ChatInput = ({
 
   const {
     state: { messageIsStreaming },
-
-    dispatch: homeDispatch,
   } = useContext(ChatContext);
   const prompts: Prompt[] = [];
 
