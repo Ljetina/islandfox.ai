@@ -1,9 +1,10 @@
 'use client';
 
-import React, { MouseEventHandler, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
+import Spinner from '../Spinner/Spinner';
 import styles from './LoginButton.module.css';
 
 export const LoginButton: React.FC = () => {
@@ -56,7 +57,9 @@ const SignInGoogleView: React.FC<{
   return (
     <div className={styles.signIn} onClick={onClick}>
       {isLoading ? (
-        <span>Loading....</span>
+        <div className="mx-auto">
+          <Spinner size="16px" className="mx-auto" />
+        </div>
       ) : (
         <div className={styles.googlebutton} />
       )}
@@ -66,20 +69,30 @@ const SignInGoogleView: React.FC<{
 
 export const UserProfileView: React.FC<{
   onLogout: () => void;
-}> = ({onLogout}) => {
+}> = ({ onLogout }) => {
   // Replace with actual data
-  const userProfilePic = 'https://lh3.googleusercontent.com/a/ACg8ocLExIzTReIVMatGNt1qkaEmw0-CJA_ZYFA3NMugmRfR=s96-c';
-  const tenantName = 'Bartol Karuza';
+  const userProfilePic = localStorage.getItem('pic');
+  const tenantName = localStorage.getItem('name');
+
+  const [showMenu, setShowMenu] = useState(false);
+
+  const toggleMenu = () => {
+    setShowMenu(!showMenu);
+  };
 
   return (
-    // @ts-ignore
-    <div className={styles.profile} onClick={onLogout}>
+    <div className={styles.profile} onClick={toggleMenu}>
       <img
         className={styles.profilePic}
         src={userProfilePic}
         alt="User Profile"
       />
       <span className={styles.tenantName}>{tenantName}</span>
+      {showMenu && (
+        <div className={styles.menu}>
+          <button onClick={onLogout}>Logout</button>
+        </div>
+      )}
     </div>
   );
 };
