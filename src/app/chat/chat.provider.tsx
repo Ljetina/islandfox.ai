@@ -19,6 +19,7 @@ import {
   apiDeleteConversation,
   apiUpdateConversation,
 } from '@/lib/conversation';
+import { apiUpdateUserPreferences } from '@/lib/user';
 
 export interface ClientState {
   conversations: Conversation[];
@@ -138,7 +139,7 @@ export const ChatProvider = ({
         temperature,
       });
     },
-    [],
+    [setConversations, conversations],
   );
 
   const handleSelectConversation = useCallback(
@@ -150,8 +151,10 @@ export const ChatProvider = ({
   );
 
   const toggleShowConversation = useCallback(async () => {
-    // TODO persist to db
     setUiShowConverations(!uiShowConverations);
+    await apiUpdateUserPreferences({
+      ui_show_conversations: !uiShowConverations,
+    });
   }, [uiShowConverations, setUiShowConverations]);
 
   return (

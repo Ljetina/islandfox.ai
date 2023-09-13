@@ -19,34 +19,34 @@ import { useRouter } from 'next/navigation';
 import { Conversation } from '@/types/chat';
 
 import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
-import ChatbarContext from '@/components/Chatbar/Chatbar.context';
-import { ChatContext } from '@/app/chat/chat.provider';
 
-// import ChatContext from '@/app/chat/chat.context';
+import { ChatContext } from '@/app/chat/chat.provider';
 
 interface Props {
   conversation: Conversation;
 }
 
-export const ConversationComponent = ({
-  conversation,
-}: Props) => {
+export const ConversationComponent = ({ conversation }: Props) => {
   const router = useRouter();
   const {
-    state: {
-      messageIsStreaming,
-      selectedConversationId
-    },
+    state: { messageIsStreaming, selectedConversationId, conversations },
     handleDeleteConversation,
     handleSelectConversation,
-    handleEditConversation
+    handleEditConversation,
   } = useContext(ChatContext);
 
-  console.log({selectedConversationId})
-
-  // const selectedConversationId = 'fef6c0e1-78fa-4858-8cd9-f2697c82adc0';
-
-  // const { handleDeleteConversation } = useContext(ChatbarContext);
+  const [selectedConversation, setSelectedConversation] = useState<
+    Conversation | undefined
+  >(undefined);
+  useEffect(() => {
+    if (selectedConversationId) {
+      setSelectedConversation(
+        conversations.find((c) => c.id === selectedConversationId),
+      );
+    } else {
+      setSelectedConversation(undefined);
+    }
+  }, [selectedConversationId, setSelectedConversation, conversations]);
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
@@ -55,8 +55,7 @@ export const ConversationComponent = ({
   const handleEnterDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      // TODO
-      // selectedConversation && handleRename(selectedConversation);
+      selectedConversation && handleRename(selectedConversation);
     }
   };
 
@@ -71,12 +70,8 @@ export const ConversationComponent = ({
 
   const handleRename = (conversation: Conversation) => {
     if (renameValue.trim().length > 0) {
-      // TODO
-      // handleUpdateConversation(conversation, {
-      //   key: 'name',
-      //   value: renameValue,
-      // });
       setRenameValue('');
+      handleEditConversation({ ...conversation, name: renameValue });
       setIsRenaming(false);
     }
   };
@@ -102,7 +97,7 @@ export const ConversationComponent = ({
     e.stopPropagation();
     setIsRenaming(true);
     // TODO
-    // selectedConversation && setRenameValue(selectedConversation.name);
+    selectedConversation && setRenameValue(selectedConversation.name);
   };
   const handleOpenDeleteModal: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
