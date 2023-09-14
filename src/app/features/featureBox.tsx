@@ -1,9 +1,10 @@
 import { StaticChatMessage } from './StaticChatMessage';
 
-import { loadDemoConversation } from '@/lib/db';
+import { loadDemoConversation } from '@/lib/api';
 
 export async function FeaturesBox() {
   const messages = await loadDemoConversation();
+  console.log({messages})
 
   return (
     <section>
@@ -20,11 +21,14 @@ export async function FeaturesBox() {
           </div>
         </div>
       </div> */}
-      <div className="flex flex-column items-center justify-center min-h-screen" style={{
-        paddingTop: '140px'
-      }}>
+      <div
+        className="flex flex-column items-center justify-center min-h-screen"
+        style={{
+          paddingTop: '140px',
+        }}
+      >
         <h2
-          className='title feature-content'
+          className="title feature-content"
           style={{
             marginLeft: '16px',
             marginRight: '16px',

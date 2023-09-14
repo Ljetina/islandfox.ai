@@ -33,5 +33,10 @@ export interface Conversation {
   temperature: number;
   model_id: string;
   message_count: number;
-  messages: Message[]
+  messages: Message[];
+}
+
+export interface ServerMessage {
+  type: 'message_ack' | 'append_to_message' | 'response_done';
+  data?: string | { userUuid: string; assistantUuid: string };
 }

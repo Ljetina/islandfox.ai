@@ -29,40 +29,22 @@ export async function getConversationMessages({
   limit,
 }: {
   conversation_id: string;
-  page?: number;
-  limit?: number;
+  page: number;
+  limit: number;
 }) {
-  let query = makeQueryString({ page, limit });
-  console.log({
-    url: `/api/conversations/${conversation_id}/messages${query}`,
+  const resp = await blurFetch({
+    pathname: `conversation/${conversation_id}?${makeQueryString({
+      page,
+      limit,
+    })}`,
+    method: 'GET',
   });
-  const res = await fetch(
-    `/api/conversations/${conversation_id}/messages${query}`,
-  );
-  return await res.json();
+  return await resp.json();
 }
 
-export async function sendChatMessage({
-  conversationId,
-  content,
-}: {
-  conversationId: string;
-  content: string;
-}) {
-  const controller = new AbortController();
-  const response = await fetch('/api/chat', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    signal: controller.signal,
-    // @ts-ignore TODO
-    body,
-  });
-  return {
-    response,
-    controller,
-  };
+export async function loadDemoConversation() {
+  const resp = await blurFetch({ pathname: 'demo/main', method: 'GET' });
+  return await resp.json();
 }
 
 export const blurFetch = ({

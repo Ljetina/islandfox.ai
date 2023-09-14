@@ -21,7 +21,7 @@ function makeMessages(count: number) {
   }));
 }
 
-const INITIAL_ITEM_COUNT = 5;
+const INITIAL_ITEM_COUNT = 50;
 const TOTAL_ITEM_COUNT = 100;
 const mockMessages = makeMessages(TOTAL_ITEM_COUNT);
 // console.log('first', mockMessages[0]);
@@ -29,15 +29,23 @@ const mockMessages = makeMessages(TOTAL_ITEM_COUNT);
 
 interface Props {
   totalCount: number;
-  //   initialMessages: Message[];
   messages: Partial<Message>[];
-  setMessages: Dispatch<SetStateAction<{ id: string; content: string }[]>>;
   hasMore: boolean;
-  onLoadMore: () => Promise<Partial<Message>[]>;
-  inProgressFooter: { userRequest: string; assistantMessage: string } | null;
+  onLoadMore: () => void;
 }
 
-export default function MockedList({}) {
+export function SimpleList({ messages }: any) {
+  console.log({ messages });
+  return (
+    <ul>
+      {messages.map((m) => (
+        <li key={m.id}>{m.content}</li>
+      ))}
+    </ul>
+  );
+}
+
+export function MockedList({}) {
   const totalCount = TOTAL_ITEM_COUNT * 1000;
   function makeInitialMessages(count: number) {
     const initialMessages = [];
@@ -59,17 +67,17 @@ export default function MockedList({}) {
     }
     return moreMessages;
   }
-  const [hasMore, setHasMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [messages, setMessages] = useState(
     makeInitialMessages(INITIAL_ITEM_COUNT),
   );
 
-  //   useEffect(() => {
-  //     setTimeout(() => {
-  //       console.log('appending');
-  //       setMessages([...messages, { content: 'test', id: 'asdf' }]);
-  //     }, 6000);
-  //   }, []);
+    // useEffect(() => {
+    //   setTimeout(() => {
+    //     console.log('appending');
+    //     setMessages([...messages, { content: 'test', id: 'asdf' }]);
+    //   }, 6000);
+    // }, []);
 
   async function loadMore() {
     console.log('LOADING MORE');
@@ -77,7 +85,7 @@ export default function MockedList({}) {
       setHasMore(false);
     }
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    return makeMoreMessages(20, messages.length);
+    setMessages(makeMoreMessages(20, messages.length).concat(messages));
   }
 
   console.log('wrapped messages.length', messages.length);
@@ -85,8 +93,7 @@ export default function MockedList({}) {
     <MessageList
       totalCount={totalCount}
       messages={messages}
-      setMessages={setMessages}
-      hasMore={true}
+      hasMore={hasMore}
       onLoadMore={loadMore}
     />
   );
@@ -96,9 +103,7 @@ export function MessageList({
   totalCount,
   hasMore,
   messages,
-  setMessages,
   onLoadMore,
-  inProgressFooter,
 }: Props) {
   // This value represents total_messages - currently_loaded_messages.
   // It's the index in the absolute list of messages relative to the
@@ -109,18 +114,18 @@ export function MessageList({
   const loadingMoreRef = useRef<boolean>(false);
   const initialTopMostIndexRef = useRef<number>(messages.length);
   const footerRef = useRef<HTMLDivElement>(null);
-  const prependItems = useCallback(async () => {
-    const moreMessages = await onLoadMore();
-    const mIds = messages.map((m) => m.id);
-    const filteredMoreMessages = moreMessages.filter((message) => {
-      return !mIds.includes(message.id);
-    });
-    const newTip = firstItemIndex - filteredMoreMessages.length;
-    setFirstItemIndex(newTip);
-    setMessages((list) => [...list, ...filteredMoreMessages].reverse());
-    loadingMoreRef.current = false;
-    return false;
-  }, [firstItemIndex, messages]);
+  // const prependItems = useCallback(async () => {
+  //   const moreMessages = await onLoadMore();
+  //   const mIds = messages.map((m) => m.id);
+  //   const filteredMoreMessages = moreMessages.filter((message) => {
+  //     return !mIds.includes(message.id);
+  //   });
+  //   const newTip = firstItemIndex - filteredMoreMessages.length;
+  //   setFirstItemIndex(newTip);
+  //   setMessages((list) => [...list, ...filteredMoreMessages].reverse());
+  //   loadingMoreRef.current = false;
+  //   return false;
+  // }, [firstItemIndex, messages]);
 
   // const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -143,19 +148,18 @@ export function MessageList({
 
   const virtuoso = useRef(null);
 
-  const scrollToBottom = useCallback(() => {
-    footerRef.current?.scrollIntoView({ behavior: 'instant' });
-  }, [inProgressFooter, messages]);
+  // const scrollToBottom = useCallback(() => {
+  //   footerRef.current?.scrollIntoView({ behavior: 'instant' });
+  // }, [inProgressFooter, messages]);
 
-  useEffect(() => {
-    initialTopMostIndexRef.current = messages.length;
-    setTimeout(() => {
-      console.log('SCROLLING TO BOTTOM');
-      scrollToBottom();
-    }, 0);
-  }, [inProgressFooter]);
+  // useEffect(() => {
+  //   initialTopMostIndexRef.current = messages.length;
+  //   setTimeout(() => {
+  //     console.log('SCROLLING TO BOTTOM');
+  //     scrollToBottom();
+  //   }, 0);
+  // }, [inProgressFooter]);
 
-  console.log({ inProgressFooter });
   /* <div
                 className="h-[162px] bg-white dark:bg-[#343541]"
                 ref={messagesEndRef}
@@ -170,38 +174,14 @@ export function MessageList({
       firstItemIndex={firstItemIndex}
       endReached={(e) => console.log({ e })}
       startReached={(s) => {
-        console.log({ s });
+        console.log({ s, hasMore, lmref: loadingMoreRef.current });
         if (hasMore && !loadingMoreRef.current) {
           loadingMoreRef.current = true;
-          prependItems();
+          onLoadMore();
         }
       }}
       components={{
         Scroller,
-        Footer: () => {
-          return (
-            <div ref={footerRef} className="h-[1px] bg-white dark:bg-[#343541]">
-              {inProgressFooter && (
-                <>
-                  <MemoizedChatMessage
-                    key="active-user-request"
-                    message={{
-                      content: inProgressFooter.userRequest,
-                      role: 'user',
-                    }}
-                  />
-                  <MemoizedChatMessage
-                    key="active-assistant-response"
-                    message={{
-                      content: inProgressFooter.assistantMessage,
-                      role: 'assistant',
-                    }}
-                  />
-                </>
-              )}
-            </div>
-          );
-        },
       }}
       followOutput={'smooth'}
       initialTopMostItemIndex={initialTopMostIndexRef.current - 1}

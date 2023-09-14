@@ -38,8 +38,18 @@ export interface ChatContextProps {
   handleDeleteConversation: (conversation: Conversation) => void;
   handleEditConversation: (conversation: Conversation) => void;
   handleSelectConversation: (conversation: Conversation) => void;
-  //   handleAddMessage: (message: string) => void;
-  //   handleDeleteMessage: (messageId: string) => void;
+  handleUpdateMessageContent: (
+    messageId: string,
+    content: string,
+    append?: boolean,
+  ) => void;
+  handleAddMessage: (
+    userUuid: string,
+    assistantUuid: string,
+    query: string,
+  ) => void;
+  handleDeleteMessage: (messageId: string) => void;
+  setIsMessageStreaming: (isStreaming: boolean) => void;
 }
 
 export const ChatContext = createContext<ChatContextProps>(undefined!);
@@ -68,8 +78,6 @@ export const ChatProvider = ({
     })
       .then((response) => response.json())
       .then((data: InitialServerData) => {
-        // setInitialData(data);
-        console.log({ data });
         setUiShowConverations(data.ui_show_conversations);
         setUiShowPrompts(data.ui_show_prompts);
         setConversations(data.conversations || []);
@@ -78,7 +86,7 @@ export const ChatProvider = ({
             ? data.conversations[0]
             : undefined;
         if (selectedConversation) {
-          console.log({selectedConversation})
+          console.log({ data });
           setSelectedConversationId(selectedConversation.id);
           setMessages(selectedConversation.messages || []);
         }
@@ -91,8 +99,12 @@ export const ChatProvider = ({
   }, []);
 
   useEffect(() => {
-    // Fetch initial conversations here
-    // You might also fetch messages for the selected conversation here
+    const selectedConversation = conversations.find(
+      (c) => c.id === selectedConversationId,
+    );
+    if (selectedConversation) {
+      setMessages(selectedConversation.messages || []);
+    }
   }, [selectedConversationId]);
 
   const handleNewConversation = useCallback(async () => {
@@ -158,6 +170,68 @@ export const ChatProvider = ({
     });
   }, [uiShowConverations, setUiShowConverations]);
 
+  const handleUpdateMessageContent = useCallback(
+    (messageId: string, content: string, append = false) => {
+      setMessages(
+        messages.map((m) => {
+          if (m.id === messageId) {
+            if (append) {
+              m.content += content;
+            } else {
+              m.content = content;
+            }
+          }
+          return m;
+        }),
+      );
+    },
+    [messages, setMessages],
+  );
+
+  const handleAddMessage = useCallback(
+    (userUuid: string, assistantUuid: string, query: string) => {
+      if (!selectedConversationId) {
+        return;
+      }
+      const now = new Date().toString();
+      setMessages(
+        messages.concat([
+          {
+            role: 'user',
+            content: query,
+            id: userUuid,
+            conversation_id: selectedConversationId,
+            created_at: now,
+            updated_at: now,
+          },
+          {
+            role: 'assistant',
+            content: '',
+            id: assistantUuid,
+            conversation_id: selectedConversationId,
+            created_at: now,
+            updated_at: now,
+          },
+        ]),
+      );
+    },
+    [selectedConversationId, setMessages, messages],
+  );
+
+  const handleDeleteMessage = useCallback(
+    (messageId: string) => {
+      setMessages(messages.filter((m) => m.id !== messageId));
+    },
+    [messages, setMessages],
+  );
+
+  const setIsMessageStreaming = useCallback(
+    (isStreaming: boolean) => {
+      setMessageIsStreaming(isStreaming);
+    },
+    [messageIsStreaming, setMessageIsStreaming],
+  );
+
   return (
     <ChatContext.Provider
       value={{
@@ -175,6 +249,10 @@ export const ChatProvider = ({
         toggleShowConversation,
         handleEditConversation,
         handleSelectConversation,
+        handleUpdateMessageContent,
+        handleAddMessage,
+        handleDeleteMessage,
+        setIsMessageStreaming,
       }}
     >
       {children}

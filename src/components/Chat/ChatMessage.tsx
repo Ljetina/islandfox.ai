@@ -1,22 +1,7 @@
 'use client';
 
-import {
-  IconCheck,
-  IconCopy,
-  IconEdit,
-  IconRobot,
-  IconTrash,
-  IconUser,
-} from '@tabler/icons-react';
-import {
-  FC,
-  memo,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { IconCheck, IconCopy, IconRobot, IconUser } from '@tabler/icons-react';
+import { FC, memo, useContext, useMemo, useRef, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -25,8 +10,9 @@ import { Message } from '@/types/chat';
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 
-import ChatContext from '@/app/chat/chat.context';
-import { updateConversation } from '@/lib/conversation';
+import { ChatContext } from '@/app/chat/chat.provider';
+// import ChatContext from '@/app/chat/chat.context';
+// import { updateConversation } from '@/lib/conversation';
 // import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -39,16 +25,9 @@ export interface Props {
 
 export const ChatMessage: FC<Props> = memo(
   ({ message, messageIndex, onEdit }) => {
-    const { t } = useTranslation('chat');
 
     const {
-      state: {
-        selectedConversationId,
-        conversations,
-        currentMessage,
-        messageIsStreaming,
-      },
-      dispatch: homeDispatch,
+      state: { selectedConversationId, conversations, messageIsStreaming },
     } = useContext(ChatContext);
     const selectedConversation = useMemo(
       () => conversations?.find((c) => c.id === selectedConversationId),
@@ -99,12 +78,9 @@ export const ChatMessage: FC<Props> = memo(
     const handleDeleteMessage = () => {
       // TODO
       // if (!selectedConversation) return;
-
       // const { messages } = selectedConversation;
       // const findIndex = messages.findIndex((elm) => elm === message);
-
       // if (findIndex < 0) return;
-
       // if (
       //   findIndex < messages.length - 1 &&
       //   messages[findIndex + 1].role === 'assistant'
@@ -117,7 +93,6 @@ export const ChatMessage: FC<Props> = memo(
       //   ...selectedConversation,
       //   messages,
       // };
-
       // const { single, all } = updateConversation(
       //   updatedConversation,
       //   conversations,
@@ -137,8 +112,6 @@ export const ChatMessage: FC<Props> = memo(
     // useEffect(() => {
     //   setMessageContent(message.content);
     // }, [message.content]);
-
-    
 
     // if (!messageContent) {
     //   return null;
@@ -177,9 +150,6 @@ export const ChatMessage: FC<Props> = memo(
           <div className="prose mt-[-2px] w-full dark:prose-invert">
             {message.role === 'user' ? (
               <div className="flex w-full">
-    
-      
-    
                 {/* {isEditing ? (
                   <div className="flex w-full flex-col">
                     <textarea
@@ -223,7 +193,7 @@ export const ChatMessage: FC<Props> = memo(
                 <div className="prose whitespace-pre-wrap dark:prose-invert flex-1">
                   {message.content}
                 </div>
-                  {/* <div className="prose whitespace-pre-wrap dark:prose-invert flex-1">
+                {/* <div className="prose whitespace-pre-wrap dark:prose-invert flex-1">
                     {message.content}
                   </div> */}
                 {/* )} */}

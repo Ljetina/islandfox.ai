@@ -16,10 +16,10 @@ import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import Spinner from '../Spinner/Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
-import { MessageList } from './Chatlist';
+import { SimpleList } from './Chatlist';
 import ConversationSettings from './ConversationSettings';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
-import { MemoizedChatMessage } from './MemoizedChatMessage';
+// import { MemoizedChatMessage } from './MemoizedChatMessage';
 
 import { getConversationMessages } from '@/lib/api';
 import {
@@ -334,7 +334,9 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       <ErrorMessageDiv error={modelError} />
     ) : (
       <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
-        <MessageList
+        {/* <MockedList /> */}
+        <SimpleList />
+        {/* <MessageList
           totalCount={totalCount as number}
           hasMore={hasMore}
           messages={messages}
@@ -342,7 +344,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
           setMessages={setMessages}
           onLoadMore={loadMoreMessages}
           inProgressFooter={footer}
-        />
+        /> */}
 
         <ChatInput
           stopConversationRef={stopConversationRef}
