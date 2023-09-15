@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 
-import { MessageList } from './Chatlist';
+import { MessageVirtuoso } from './MessageVirtuoso';
 
 function makeMessages(count: number) {
   return Array.from({ length: count }, (_, i) => ({
@@ -9,8 +9,8 @@ function makeMessages(count: number) {
   }));
 }
 
-const INITIAL_ITEM_COUNT = 50;
-const TOTAL_ITEM_COUNT = 1000;
+const INITIAL_ITEM_COUNT = 10;
+const TOTAL_ITEM_COUNT = 10;
 const mockMessages = makeMessages(TOTAL_ITEM_COUNT);
 
 export const ListTest = () => {
@@ -40,6 +40,7 @@ export function MockedList({}) {
     makeInitialMessages(INITIAL_ITEM_COUNT),
   );
   const [firstItemIndex, setFirstItemIndex] = useState(totalCount);
+  const [atBottom, setAtBottom] = useState(true);
   const virtuoso = useRef(null);
 
   const loadMore = useCallback(async () => {
@@ -72,30 +73,37 @@ export function MockedList({}) {
       ].concat(messages),
     );
     setFirstItemIndex(firstItemIndex - 1);
-    if (virtuoso.current) {
-      // virtuoso.current.
-    }
     setTotalCount(totalCount + 1);
+
+    setTimeout(() => {
+      if (virtuoso.current && !atBottom) {
+        virtuoso.current.scrollToIndex({
+          // messages.length instead of -1, because the m
+          index: messages.length,
+          align: 'end',
+          behavior: 'smooth',
+        });
+      }
+    }, 100);
   }, [
     messages,
     setMessages,
     firstItemIndex,
     totalCount,
     setFirstItemIndex,
-    setTotalCount,
+    setTotalCount
   ]);
-
-  
 
   return (
     <div style={{ height: '100%', width: '100%' }}>
-      <MessageList
+      <MessageVirtuoso
         virtuoso={virtuoso}
         messages={messages}
         hasMore={hasMore}
         isLoadingMore={isLoadingMore}
         onLoadMore={loadMore}
         firstItemIndex={firstItemIndex}
+        setAtBottom={setAtBottom}
       />
       <button style={buttonStyle} onClick={addMessage}>
         Click me

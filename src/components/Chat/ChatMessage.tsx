@@ -25,9 +25,13 @@ export interface Props {
 
 export const ChatMessage: FC<Props> = memo(
   ({ message, messageIndex, onEdit }) => {
-
     const {
-      state: { selectedConversationId, conversations, messageIsStreaming },
+      state: {
+        selectedConversationId,
+        conversations,
+        messageIsStreaming,
+        messages,
+      },
     } = useContext(ChatContext);
     const selectedConversation = useMemo(
       () => conversations?.find((c) => c.id === selectedConversationId),
@@ -281,9 +285,7 @@ export const ChatMessage: FC<Props> = memo(
                   }}
                 >
                   {`${message.name ? message.name : message.content}${
-                    messageIsStreaming &&
-                    messageIndex ==
-                      (selectedConversation?.messages.length ?? 0) - 1
+                    messageIsStreaming && messageIndex == 0
                       ? '`▍`'
                       : ''
                   }`}

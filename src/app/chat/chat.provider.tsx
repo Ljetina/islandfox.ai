@@ -9,7 +9,7 @@ import { createContext } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Conversation, Message } from '@/types/chat';
+import { Conversation, Message, Role } from '@/types/chat';
 import { OpenAIModelID } from '@/types/openai';
 
 import { InitialServerData } from './chat.state';
@@ -195,24 +195,26 @@ export const ChatProvider = ({
       }
       const now = new Date().toString();
       setMessages(
-        messages.concat([
+        [
           {
-            role: 'user',
-            content: query,
-            id: userUuid,
-            conversation_id: selectedConversationId,
-            created_at: now,
-            updated_at: now,
-          },
-          {
-            role: 'assistant',
+            role: 'assistant' as Role,
             content: '',
             id: assistantUuid,
             conversation_id: selectedConversationId,
             created_at: now,
             updated_at: now,
           },
-        ]),
+          {
+            role: 'user' as Role,
+            content: query,
+            id: userUuid,
+            conversation_id: selectedConversationId,
+            created_at: now,
+            updated_at: now,
+          },
+
+          // @ts-ignore
+        ].concat(messages),
       );
     },
     [selectedConversationId, setMessages, messages],

@@ -22,19 +22,19 @@ interface Props {
   messages: Partial<Message>[];
   hasMore: boolean;
   isLoadingMore: boolean;
+  setAtBottom: Dispatch<SetStateAction<boolean>>;
   onLoadMore: () => void;
 }
 
-export function MessageList({
+export function MessageVirtuoso({
   virtuoso,
   firstItemIndex,
   hasMore,
   isLoadingMore,
   messages,
   onLoadMore,
+  setAtBottom,
 }: Props) {
-  // This value represents total_messages - currently_loaded_messages.
-  // It's the index in the absolute list of messages relative to the
   const initialTopMostIndexRef = useRef<number>(messages.length);
 
   const Header = React.forwardRef(({ style, ...props }, ref) => {
@@ -52,13 +52,41 @@ export function MessageList({
     );
   });
 
-  useEffect(() => {
-    // virtuoso.current.scrollToIndex({
-    //   index: messages.length - 1,
-    //   align: 'end',
-    //   behavior: 'smooth',
-    // });
-  }, [messages]);
+  const itemContent = useCallback(
+    (index) => {
+      const localIndex = firstItemIndex + messages.length - 1 - index;
+      // const reversedIndex = messages.length - 1 - localIndex;
+      // console.log({ index, localIndex, firstItemIndex, mlen: messages.length });
+      if (localIndex < 0) {
+        return <span>'&nbsp;</span>;
+      } else {
+        const message = messages[localIndex];
+        return (
+          <MemoizedChatMessage
+            key={message.id}
+            message={message as Message}
+            messageIndex={localIndex}
+          />
+        );
+      }
+    },
+    [messages],
+  );
+
+  const startReached = useCallback(async () => {}, [
+    hasMore,
+    isLoadingMore,
+    onLoadMore,
+  ]);
+
+  if (messages.length == 0) {
+    // Unmount to reset state
+    console.log('unmounting');
+    return;
+  }
+  initialTopMostIndexRef.current = messages.length;
+  console.log('mountoing');
+  console.log({ firstItemIndex });
 
   return (
     <Virtuoso
@@ -66,38 +94,17 @@ export function MessageList({
       ref={virtuoso}
       totalCount={messages.length}
       firstItemIndex={firstItemIndex}
-      endReached={(e) => {
-        console.log({ e });
-      }}
-      startReached={async (s) => {
-        console.log({ s, hasMore, lmref: isLoadingMore });
-        if (hasMore && !isLoadingMore) {
-          onLoadMore();
-        }
-      }}
+      startReached={startReached}
       components={{
         Scroller,
         Footer,
         Header,
       }}
-      initialTopMostItemIndex={initialTopMostIndexRef.current - 1}
-      reversed={true}
-      itemContent={(index) => {
-        const localIndex = firstItemIndex + messages.length - 1 - index;
-        const reversedIndex = messages.length - 1 - localIndex;
-        if (localIndex < 0) {
-          return <span>'&nbsp;</span>;
-        } else {
-          const message = messages[localIndex];
-          return (
-            <MemoizedChatMessage
-              key={message.id}
-              message={message as Message}
-              messageIndex={index}
-            />
-          );
-        }
-      }}
+      atBottomStateChange={setAtBottom}
+      // initialTopMostItemIndex={initialTopMostIndexRef.current - 1}
+      initialTopMostItemIndex={0}
+      reversed={false}
+      itemContent={itemContent}
     />
   );
 }
@@ -128,20 +135,3 @@ const Footer = React.forwardRef(({ style, ...props }, ref) => {
     ></div>
   );
 });
-
-// function indexToMessageIndex(
-//   index: number,
-//   firstItemIndex: number,
-//   messagesLength: number,
-// ) {}
-
-// const scrollToBottom = useCallback(() => {
-//   virtuoso.current.scrollToIndex({
-//     align: 'end',
-//     behavior: 'smooth',
-//     index: messages.length - 1,
-//   });
-//   // footerRef.current?.scrollIntoView({ behavior: 'instant' });
-// }, [messages, virtuoso]);
-
-// const [atBottom, setAtBottom] = useState(true);

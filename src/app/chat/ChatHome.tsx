@@ -21,7 +21,7 @@ import { Prompt } from '@/types/prompt';
 
 import ActiveConversation from '@/components/Chat/NewActiveConversation';
 import { Chat } from '@/components/Chat/Chat';
-import List from '@/components/Chat/Chatlist';
+import List from '@/components/Chat/MessageVirtuoso';
 import { Chatbar } from '@/components/Chatbar/ChatbarPlaceholder';
 // import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';

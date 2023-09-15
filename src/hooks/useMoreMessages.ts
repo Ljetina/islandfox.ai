@@ -1,13 +1,9 @@
-import { useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { ChatContext } from '@/app/chat/chat.provider';
 import { getConversationMessages } from '@/lib/api';
 
 export const useMoreMessages = () => {
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-
   const {
     state: {
       messageIsStreaming,
@@ -17,9 +13,27 @@ export const useMoreMessages = () => {
     },
   } = useContext(ChatContext);
 
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const selectedConveration = useMemo(() => {
     return conversations?.find((c) => c.id === selectedConversationId);
   }, [conversations, selectedConversationId]);
+  const [totalCount, setTotalCount] = useState(
+    selectedConveration?.message_count || 0,
+  );
+
+  // useEffect(() => {
+  //   console.log('HERE');
+  //   if (selectedConveration) {
+  //     setTotalCount(
+  //       Math.max(selectedConveration?.message_count, messages.length),
+  //     );
+  //   }
+  // }, [selectedConveration, messages, setTotalCount]);
+
+  console.log({ selectedConveration });
+  console.log({ messages });
 
   const loadMoreMessages = useCallback(async () => {
     setIsLoadingMore(true);
@@ -31,7 +45,7 @@ export const useMoreMessages = () => {
         page,
         limit: 50,
       });
-      console.log({ resp });
+      // console.log({ resp });
       // setHasMore(false);
 
       //   if (!isCancelled.current) {
@@ -48,9 +62,12 @@ export const useMoreMessages = () => {
     }
   }, [page, selectedConversationId]);
 
-  const [totalCount, setTotalCount] = useState(
-    selectedConveration?.message_count,
-  );
-
-  return { loadMoreMessages, hasMore, totalCount };
+  return {
+    loadMoreMessages,
+    hasMore,
+    isLoadingMore,
+    totalCount,
+    setTotalCount,
+    messages,
+  };
 };

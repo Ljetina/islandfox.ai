@@ -16,7 +16,7 @@ import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import Spinner from '../Spinner/Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
-import { SimpleList } from './Chatlist';
+import { SimpleList } from './MessageVirtuoso';
 import ConversationSettings from './ConversationSettings';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 // import { MemoizedChatMessage } from './MemoizedChatMessage';
