@@ -6,9 +6,10 @@ import { useMoreMessages } from '@/hooks/useMoreMessages';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 
 import { ChatInput } from './ChatInput';
-import { MessageList, MockedList } from './Chatlist';
+import { MessageList } from './Chatlist';
 
 import { ChatContext } from '@/app/chat/chat.provider';
+import { MockedList } from './ListTest';
 
 interface ActiveConversationProps {}
 
@@ -29,7 +30,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const stopConversationRef = useRef<boolean>(false);
-    const showScrollDownButton = false;
+    const showScrollDownButton = true;
     const { sendQuery } = useChatter();
     const { loadMoreMessages, hasMore, totalCount } = useMoreMessages();
 
