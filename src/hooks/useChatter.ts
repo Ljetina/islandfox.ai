@@ -36,7 +36,6 @@ export const useChatter = () => {
     if (lastMessage && lastHandledMessage !== lastMessage) {
       setLastHandledMessage(lastMessage);
       const serverMessage: ServerMessage = JSON.parse(lastMessage?.data);
-      // console.log({ serverMessage });
       if (serverMessage.type === 'message_ack') {
         const { userUuid, assistantUuid } = serverMessage.data as {
           userUuid: string;

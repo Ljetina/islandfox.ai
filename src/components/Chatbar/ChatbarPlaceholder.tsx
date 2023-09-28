@@ -27,10 +27,18 @@ export const Chatbar = () => {
       side={'left'}
       isOpen={uiShowConverations}
       toggleOpen={toggleShowConversation}
-    >
-      <NewConversationButton onNewConversation={handleNewConversation} />
+    ><div className="sticky top-0">
+    <NewConversationButton onNewConversation={handleNewConversation} />
+  </div>
+  <div className="overflow-y-auto flex-grow">
+    <Conversations conversations={conversations as Conversation[]} />
+  </div>
+  <div className="sticky bottom-0">
+    <LoginButton />
+  </div>
+      {/* <NewConversationButton onNewConversation={handleNewConversation} />
       <Conversations conversations={conversations as Conversation[]} />
-      <LoginButton />
+      <LoginButton /> */}
     </Sidebar>
   );
 };

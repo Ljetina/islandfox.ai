@@ -2,7 +2,7 @@ import { FC, useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import ChatContext from '@/app/chat/chat.context';
+import { ChatContext } from '@/app/chat/chat.provider';
 import { DEFAULT_TEMPERATURE } from '@/lib/const';
 
 interface Props {

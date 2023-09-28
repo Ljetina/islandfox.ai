@@ -19,16 +19,16 @@ import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 
-import ActiveConversation from '@/components/Chat/NewActiveConversation';
 import { Chat } from '@/components/Chat/Chat';
 import List from '@/components/Chat/MessageVirtuoso';
+import ActiveConversation from '@/components/Chat/NewActiveConversation';
 import { Chatbar } from '@/components/Chatbar/ChatbarPlaceholder';
 // import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
 
 import '../globals.css';
-
+import { ChatContext, withChatProvider } from './chat.provider';
 import {
   ChatInitialState,
   InitialServerData,
@@ -49,7 +49,6 @@ import { saveFolders } from '@/lib/folders';
 import { savePrompts } from '@/lib/prompts';
 import { getSettings } from '@/lib/settings';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatContext, withChatProvider } from './chat.provider';
 
 interface Props {
   // initialData: InitialServerData;
@@ -65,38 +64,9 @@ const ChatHome = ({ conversationId }: Props) => {
   const [initialRender, setInitialRender] = useState<boolean>(true);
   const defaultModelId = OpenAIModelID.GPT_4;
 
-  const {state: {
-    conversations, selectedConversationId, messages
-
-  }} = useContext(ChatContext)
-
-  // const contextValue = useCreateReducer<ChatInitialState>({
-  //   initialState: {
-  //     ...initialData,
-  //     ...initialState,
-  //   },
-  // });
-
-  // useEffect(() => {
-  //   contextValue.dispatch({
-  //     field: 'conversations',
-  //     value: initialData.conversations,
-  //   });
-  // }, [initialData]);
-
-  // const {
-  //   state: {
-  //     //   apiKey,
-  //     lightMode,
-  //     folders,
-  //     conversations,
-  //     selectedConversationId,
-  //     // prompts,
-  //     // temperature,
-  //     // te
-  //   },
-  //   dispatch,
-  // } = contextValue;
+  const {
+    state: { conversations, selectedConversationId, messages },
+  } = useContext(ChatContext);
 
   const conversation = useMemo(
     () =>
@@ -109,7 +79,6 @@ const ChatHome = ({ conversationId }: Props) => {
   );
 
   const handleSelectConversation = (conversation: Conversation) => {
-
     // dispatch({
     //   field: 'selectedConversationId',
     //   value: conversation.id,

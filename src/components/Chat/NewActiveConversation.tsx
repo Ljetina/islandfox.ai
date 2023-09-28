@@ -12,6 +12,7 @@ import { MessageListContainer } from './MessageListContainer';
 import { MessageVirtuoso } from './MessageVirtuoso';
 
 import { ChatContext } from '@/app/chat/chat.provider';
+import ConversationSettings from './ConversationSettings';
 
 interface ActiveConversationProps {}
 
@@ -42,14 +43,8 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
 
     return (
       <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
+        {/* {messages.length > 0 ? <MessageListContainer /> : <ConversationSettings models={Object.values(OpenAIModelID)} />} */}
         <MessageListContainer />
-        {/* <MockedList /> */}
-        {/* <MessageList
-          totalCount={totalCount as number}
-          hasMore={hasMore}
-          messages={messages}
-          onLoadMore={loadMoreMessages}
-        /> */}
 
         <ChatInput
           stopConversationRef={stopConversationRef}

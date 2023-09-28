@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { createContext } from 'react';
 
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import { Conversation, Message, Role } from '@/types/chat';
 import { OpenAIModelID } from '@/types/openai';
@@ -65,11 +65,12 @@ export const ChatProvider = ({
 }: {
   children: ReactNode | ReactNode[];
 }) => {
+  const params = useParams();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedConversationId, setSelectedConversationId] = useState<
     string | undefined
-  >(undefined);
+  >(params && params.convid ? (params?.convid as string) : undefined);
   const [uiShowConverations, setUiShowConverations] = useState(true);
   const [uiShowPrompts, setUiShowPrompts] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -89,10 +90,17 @@ export const ChatProvider = ({
         setUiShowConverations(data.ui_show_conversations);
         setUiShowPrompts(data.ui_show_prompts);
         setConversations(data.conversations || []);
-        const selectedConversation =
-          data.conversations && data.conversations.length > 0
-            ? data.conversations[0]
-            : undefined;
+        let selectedConversation = null;
+        if (data.conversations && data.conversations.length > 0) {
+          if (selectedConversationId) {
+            selectedConversation = data.conversations.find(
+              (c) => c.id === selectedConversationId,
+            );
+          } else {
+            selectedConversation =
+              data.conversations[data.conversations.length - 1];
+          }
+        }
         if (selectedConversation) {
           setSelectedConversationId(selectedConversation.id);
           setTotalCount(selectedConversation.message_count);
@@ -112,7 +120,7 @@ export const ChatProvider = ({
     setTotalCount(0);
     setFirstItemIndex(0);
     const conversation = await apiCreateConversation({
-      model_id: OpenAIModelID.GPT_4,
+      model_id: OpenAIModelID.GPT_3_5,
       prompt: 'test',
       name: 'test',
       temperature: 0.5,

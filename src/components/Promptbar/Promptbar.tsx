@@ -15,7 +15,7 @@ import Sidebar from '../Sidebar';
 import PromptbarContext from './PromptBar.context';
 import { PromptbarInitialState, initialState } from './Promptbar.state';
 
-import ChatContext from '@/app/chat/chat.context';
+import { ChatContext } from '@/app/chat/chat.provider';
 import { savePrompts } from '@/lib/prompts';
 import { v4 as uuidv4 } from 'uuid';
 

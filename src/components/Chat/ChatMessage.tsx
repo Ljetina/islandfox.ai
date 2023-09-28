@@ -31,6 +31,7 @@ export const ChatMessage: FC<Props> = memo(
         conversations,
         messageIsStreaming,
         messages,
+        
       },
     } = useContext(ChatContext);
     const selectedConversation = useMemo(
