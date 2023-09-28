@@ -333,7 +333,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   }, [selectedConversation, throttledScrollDown]);
 
   useEffect(() => {
-    console.log({ selectedConversation });
     const observer = new IntersectionObserver(
       ([entry]) => {
         setAutoScrollEnabled(entry.isIntersecting);

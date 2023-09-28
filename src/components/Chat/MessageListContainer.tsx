@@ -1,62 +1,32 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { VirtuosoHandle } from 'react-virtuoso';
 
+import { useEvent } from '@/hooks/useEvents';
 import { useMoreMessages } from '@/hooks/useMoreMessages';
 
 import { MessageVirtuoso } from './MessageVirtuoso';
 
+import { ChatContext } from '@/app/chat/chat.provider';
+
 export function MessageListContainer() {
-  const { loadMoreMessages, hasMore, totalCount, setTotalCount, messages } =
-    useMoreMessages();
-
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [firstItemIndex, setFirstItemIndex] = useState(totalCount);
+  const { loadMoreMessages, hasMore, totalCount, messages, isLoadingMore } = useMoreMessages();
+  
   const [atBottom, setAtBottom] = useState(true);
-  const virtuoso = useRef(null);
+  const virtuoso = useRef<VirtuosoHandle>(null);
 
-  console.log({messages, firstItemIndex, totalCount})
+  useEvent('scrollDownClicked', () => {
+    if (virtuoso) {
+      virtuoso.current?.scrollToIndex({
+        index: totalCount - 1,
+        align: 'end',
+        behavior: 'smooth',
+      });
+    }
+  });
 
-  const loadMore = useCallback(async () => {
-    await loadMoreMessages();
-    setFirstItemIndex(firstItemIndex - 20);
-  }, [
-    setIsLoadingMore,
-    messages,
-    firstItemIndex,
-    totalCount,
-    setFirstItemIndex,
-    setIsLoadingMore,
-  ]);
-
-  // const addMessage = useCallback(() => {
-  //   // Add one
-  //   // setMessages(
-  //   // [
-  //   //     {
-  //   //     id: '12312',
-  //   //     content: 'new message ' + getRandomInt(0, 100000),
-  //   //     },
-  //   // ].concat(messages),
-  //   // );
-  //   setFirstItemIndex(firstItemIndex - 1);
-  //   setTotalCount(totalCount + 1);
-
-  //   setTimeout(() => {
-  //     if (virtuoso.current) {
-  //       virtuoso.current.scrollToIndex({
-  //         index: messages.length - 1,
-  //         align: 'end',
-  //         behavior: 'smooth',
-  //       });
-  //     }
-  //   }, 0);
-  // }, [
-  //   messages,
-  //   setMessages,
-  //   firstItemIndex,
-  //   totalCount,
-  //   setFirstItemIndex,
-  //   setTotalCount,
-  // ]);
+  const {
+    state: { firstItemIndex },
+  } = useContext(ChatContext);
 
   return (
     <div style={{ height: '100%', width: '100%' }}>
@@ -65,7 +35,7 @@ export function MessageListContainer() {
         messages={messages}
         hasMore={hasMore}
         isLoadingMore={isLoadingMore}
-        onLoadMore={loadMore}
+        onLoadMore={loadMoreMessages}
         firstItemIndex={firstItemIndex}
         setAtBottom={setAtBottom}
       />

@@ -16,6 +16,8 @@ import {
   useState,
 } from 'react';
 
+import { useEmitter } from '@/hooks/useEvents';
+
 // import { useTranslation } from 'next-i18next';
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
@@ -25,6 +27,7 @@ import { Prompt } from '@/types/prompt';
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+
 import { ChatContext } from '@/app/chat/chat.provider';
 
 interface Props {
@@ -64,6 +67,8 @@ export const ChatInput = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPluginSelect, setShowPluginSelect] = useState(false);
   const [plugin, setPlugin] = useState<Plugin | null>(null);
+
+  const emit = useEmitter();
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -291,9 +296,7 @@ export const ChatInput = ({
                   : 'hidden'
               }`,
             }}
-            placeholder={
-              'Type a message or type "/" to select a prompt...'
-            }
+            placeholder={'Type a message or type "/" to select a prompt...'}
             value={content}
             rows={1}
             onCompositionStart={() => setIsTyping(true)}

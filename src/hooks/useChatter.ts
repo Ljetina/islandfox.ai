@@ -3,6 +3,8 @@ import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
 
 import { ServerMessage } from '@/types/chat';
 
+import { useEmitter } from './useEvents';
+
 import { ChatContext } from '@/app/chat/chat.provider';
 
 export const useChatter = () => {
@@ -28,11 +30,13 @@ export const useChatter = () => {
     null,
   );
 
+  const emit = useEmitter();
+
   useEffect(() => {
     if (lastMessage && lastHandledMessage !== lastMessage) {
       setLastHandledMessage(lastMessage);
       const serverMessage: ServerMessage = JSON.parse(lastMessage?.data);
-      console.log({serverMessage});
+      // console.log({ serverMessage });
       if (serverMessage.type === 'message_ack') {
         const { userUuid, assistantUuid } = serverMessage.data as {
           userUuid: string;
@@ -41,15 +45,20 @@ export const useChatter = () => {
         handleAddMessage(userUuid, assistantUuid, query);
         setCurrentAssisstantId(assistantUuid);
         setQuery('');
+        setTimeout(() => {
+          emit('scrollDownClicked', null);
+        }, 100);
       } else if (serverMessage.type === 'append_to_message') {
         handleUpdateMessageContent(
           currentAssisstantId as string,
           serverMessage.data as string,
-          true
+          true,
         );
+        emit('scrollDownClicked', null);
       } else if (serverMessage.type === 'response_done') {
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
+        emit('scrollDownClicked', null);
       }
     }
   }, [
@@ -58,6 +67,8 @@ export const useChatter = () => {
     lastHandledMessage,
     query,
     handleAddMessage,
+    currentAssisstantId,
+    setCurrentAssisstantId,
   ]);
 
   const sendQuery = useCallback(

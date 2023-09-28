@@ -211,7 +211,6 @@ export const OpenAIStream = async (
 
                     content: `${JSON.stringify(response)}`,
                   });
-                  console.log({ messages });
                   switchToFunctionHandling = false;
                   const postFunctionRes = await requestCompletion({
                     model,

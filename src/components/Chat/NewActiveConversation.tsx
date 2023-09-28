@@ -1,14 +1,15 @@
-import React, { memo, useContext, useMemo, useRef } from 'react';
+import React, { memo, useCallback, useContext, useMemo, useRef } from 'react';
 
 import { useChatter } from '@/hooks/useChatter';
+import { useEmitter } from '@/hooks/useEvents';
 import { useMoreMessages } from '@/hooks/useMoreMessages';
 
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 
 import { ChatInput } from './ChatInput';
-import { MessageVirtuoso } from './MessageVirtuoso';
 import { MockedList } from './ListTest';
 import { MessageListContainer } from './MessageListContainer';
+import { MessageVirtuoso } from './MessageVirtuoso';
 
 import { ChatContext } from '@/app/chat/chat.provider';
 
@@ -24,6 +25,11 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         messages,
       },
     } = useContext(ChatContext);
+
+    const emit = useEmitter();
+    const onScrollDown = useCallback(() => {
+      emit('scrollDownClicked', null);
+    }, [emit])
 
     const selectedConveration = useMemo(() => {
       return conversations?.find((c) => c.id === selectedConversationId);
@@ -49,9 +55,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
           stopConversationRef={stopConversationRef}
           textareaRef={textareaRef}
           onSend={sendQuery}
-          onScrollDownClick={() => {
-            // todo
-          }}
+          onScrollDownClick={onScrollDown}
           onRegenerate={() => {
             // if (currentMessage) {
             //   handleSend(currentMessage);

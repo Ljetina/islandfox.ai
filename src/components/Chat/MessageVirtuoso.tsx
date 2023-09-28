@@ -9,7 +9,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Virtuoso, constant } from 'react-virtuoso';
+import { Virtuoso, VirtuosoHandle, constant } from 'react-virtuoso';
 
 // import { constant } from 'react-virtuoso'
 import { Message } from '@/types/chat';
@@ -17,7 +17,7 @@ import { Message } from '@/types/chat';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
 
 interface Props {
-  virtuoso: RefObject;
+  virtuoso: RefObject<VirtuosoHandle>;
   firstItemIndex: number;
   messages: Partial<Message>[];
   hasMore: boolean;
@@ -58,7 +58,7 @@ export function MessageVirtuoso({
       // const reversedIndex = messages.length - 1 - localIndex;
       // console.log({ index, localIndex, firstItemIndex, mlen: messages.length });
       if (localIndex < 0) {
-        return <span>'&nbsp;</span>;
+        return <span>EMPTY&nbsp;</span>;
       } else {
         const message = messages[localIndex];
         return (
@@ -73,20 +73,18 @@ export function MessageVirtuoso({
     [messages],
   );
 
-  const startReached = useCallback(async () => {}, [
-    hasMore,
-    isLoadingMore,
-    onLoadMore,
-  ]);
+  const startReached = useCallback(async () => {
+    if (!isLoadingMore && hasMore) {
+      onLoadMore();
+    }
+  }, [hasMore, isLoadingMore, onLoadMore]);
 
   if (messages.length == 0) {
     // Unmount to reset state
-    console.log('unmounting');
     return;
   }
+  // console.log({messages})
   initialTopMostIndexRef.current = messages.length;
-  console.log('mountoing');
-  console.log({ firstItemIndex });
 
   return (
     <Virtuoso
@@ -100,9 +98,10 @@ export function MessageVirtuoso({
         Footer,
         Header,
       }}
+      // atTopStateChange={}
       atBottomStateChange={setAtBottom}
-      // initialTopMostItemIndex={initialTopMostIndexRef.current - 1}
-      initialTopMostItemIndex={0}
+      initialTopMostItemIndex={initialTopMostIndexRef.current - 1}
+      // initialTopMostItemIndex={0}
       reversed={false}
       itemContent={itemContent}
     />

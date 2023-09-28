@@ -14,6 +14,7 @@ import { OpenAIModelID } from '@/types/openai';
 
 import { InitialServerData } from './chat.state';
 
+import { getConversationMessages } from '@/lib/api';
 import {
   apiCreateConversation,
   apiDeleteConversation,
@@ -29,6 +30,8 @@ export interface ClientState {
   selectedConversationId?: string;
   loading: boolean;
   messageIsStreaming: boolean;
+  totalCount: number;
+  firstItemIndex: number;
 }
 
 export interface ChatContextProps {
@@ -38,6 +41,7 @@ export interface ChatContextProps {
   handleDeleteConversation: (conversation: Conversation) => void;
   handleEditConversation: (conversation: Conversation) => void;
   handleSelectConversation: (conversation: Conversation) => void;
+  handleAddMessagePage: (pageMessages: Message[]) => number;
   handleUpdateMessageContent: (
     messageId: string,
     content: string,
@@ -50,6 +54,8 @@ export interface ChatContextProps {
   ) => void;
   handleDeleteMessage: (messageId: string) => void;
   setIsMessageStreaming: (isStreaming: boolean) => void;
+  setTotalCount: React.Dispatch<React.SetStateAction<number>>;
+  setFirstItemIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const ChatContext = createContext<ChatContextProps>(undefined!);
@@ -68,6 +74,8 @@ export const ChatProvider = ({
   const [uiShowPrompts, setUiShowPrompts] = useState(true);
   const [loading, setLoading] = useState(true);
   const [messageIsStreaming, setMessageIsStreaming] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+  const [firstItemIndex, setFirstItemIndex] = useState(totalCount);
   const router = useRouter();
 
   // Initial Load
@@ -86,9 +94,9 @@ export const ChatProvider = ({
             ? data.conversations[0]
             : undefined;
         if (selectedConversation) {
-          console.log({ data });
           setSelectedConversationId(selectedConversation.id);
-          setMessages(selectedConversation.messages || []);
+          setTotalCount(selectedConversation.message_count);
+          setFirstItemIndex(selectedConversation.message_count);
         }
         setLoading(false);
       })
@@ -98,24 +106,19 @@ export const ChatProvider = ({
       });
   }, []);
 
-  useEffect(() => {
-    const selectedConversation = conversations.find(
-      (c) => c.id === selectedConversationId,
-    );
-    if (selectedConversation) {
-      setMessages(selectedConversation.messages || []);
-    }
-  }, [selectedConversationId]);
-
   const handleNewConversation = useCallback(async () => {
+    setMessages([]);
+    setSelectedConversationId(undefined);
+    setTotalCount(0);
+    setFirstItemIndex(0);
     const conversation = await apiCreateConversation({
       model_id: OpenAIModelID.GPT_4,
       prompt: 'test',
       name: 'test',
       temperature: 0.5,
     });
-    setConversations([...conversations, conversation]);
     setSelectedConversationId(conversation.id);
+    setConversations([...conversations, conversation]);
   }, [conversations, setConversations]);
 
   const handleDeleteConversation = useCallback(
@@ -157,7 +160,10 @@ export const ChatProvider = ({
 
   const handleSelectConversation = useCallback(
     async (conversation: Conversation) => {
+      setMessages([]);
       setSelectedConversationId(conversation.id);
+      setTotalCount(conversation.message_count);
+      setFirstItemIndex(conversation.message_count);
       router.push('/chat/' + conversation.id);
     },
     [],
@@ -188,6 +194,24 @@ export const ChatProvider = ({
     [messages, setMessages],
   );
 
+  const handleAddMessagePage = useCallback(
+    (pageMessages: Message[]) => {
+      const originalLength = messages.length;
+      const newMessages = [...messages, ...pageMessages];
+
+      const deduplicatedMessages = newMessages.reduce(
+        (acc: Message[], current: Message) => {
+          const duplicate = acc.find((message) => message.id === current.id);
+          return duplicate ? acc : [...acc, current];
+        },
+        [],
+      );
+      setMessages(deduplicatedMessages);
+      return deduplicatedMessages.length - originalLength;
+    },
+    [messages, setMessages, selectedConversationId],
+  );
+
   const handleAddMessage = useCallback(
     (userUuid: string, assistantUuid: string, query: string) => {
       if (!selectedConversationId) {
@@ -212,12 +236,19 @@ export const ChatProvider = ({
             created_at: now,
             updated_at: now,
           },
-
           // @ts-ignore
         ].concat(messages),
       );
+      setFirstItemIndex((fii) => Math.max(fii - 2, 0));
+      setTotalCount((tc) => tc + 2);
     },
-    [selectedConversationId, setMessages, messages],
+    [
+      selectedConversationId,
+      setMessages,
+      setTotalCount,
+      setFirstItemIndex,
+      messages,
+    ],
   );
 
   const handleDeleteMessage = useCallback(
@@ -245,6 +276,8 @@ export const ChatProvider = ({
           uiShowConverations,
           uiShowPrompts,
           messageIsStreaming,
+          totalCount,
+          firstItemIndex,
         },
         handleNewConversation,
         handleDeleteConversation,
@@ -252,9 +285,12 @@ export const ChatProvider = ({
         handleEditConversation,
         handleSelectConversation,
         handleUpdateMessageContent,
+        handleAddMessagePage,
         handleAddMessage,
         handleDeleteMessage,
         setIsMessageStreaming,
+        setTotalCount,
+        setFirstItemIndex,
       }}
     >
       {children}

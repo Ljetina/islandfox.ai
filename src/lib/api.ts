@@ -13,7 +13,6 @@ function makeQueryString(params: {
       '?' +
       Object.entries(params)
         .map(([k, v]) => {
-          console.log({ k, v });
           return `${k}=${v}`;
         })
         .join('&')
@@ -33,7 +32,7 @@ export async function getConversationMessages({
   limit: number;
 }) {
   const resp = await blurFetch({
-    pathname: `conversation/${conversation_id}?${makeQueryString({
+    pathname: `conversation/${conversation_id}/message${makeQueryString({
       page,
       limit,
     })}`,
