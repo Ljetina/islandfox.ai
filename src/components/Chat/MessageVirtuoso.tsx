@@ -113,7 +113,6 @@ const Scroller = React.forwardRef(({ style, ...props }, ref) => {
     <div
       style={{
         ...style,
-        border: '5px solid gray',
         '&::WebkitScrollbar': { width: 2 },
       }}
       ref={ref}

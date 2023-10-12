@@ -21,7 +21,7 @@ import { Prompt } from '@/types/prompt';
 
 import { Chat } from '@/components/Chat/Chat';
 import List from '@/components/Chat/MessageVirtuoso';
-import ActiveConversation from '@/components/Chat/NewActiveConversation';
+import ActiveConversation from '@/components/Chat/ActiveConversation';
 import { Chatbar } from '@/components/Chatbar/ChatbarPlaceholder';
 // import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
@@ -369,38 +369,3 @@ const ChatHome = ({ conversationId }: Props) => {
   );
 };
 export default ChatHome;
-
-// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-//   const defaultModelId =
-//     (process.env.DEFAULT_MODEL &&
-//       Object.values(OpenAIModelID).includes(
-//         process.env.DEFAULT_MODEL as OpenAIModelID,
-//       ) &&
-//       process.env.DEFAULT_MODEL) ||
-//     fallbackModelID;
-
-//   let serverSidePluginKeysSet = false;
-
-//   const googleApiKey = process.env.GOOGLE_API_KEY;
-//   const googleCSEId = process.env.GOOGLE_CSE_ID;
-
-//   if (googleApiKey && googleCSEId) {
-//     serverSidePluginKeysSet = true;
-//   }
-
-//   return {
-//     props: {
-//       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
-//       defaultModelId,
-//       serverSidePluginKeysSet,
-//       ...(await serverSideTranslations(locale ?? 'en', [
-//         'common',
-//         'chat',
-//         'sidebar',
-//         'markdown',
-//         'promptbar',
-//         'settings',
-//       ])),
-//     },
-//   };
-// };

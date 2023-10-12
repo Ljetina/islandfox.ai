@@ -168,13 +168,16 @@ export const ChatProvider = ({
 
   const handleSelectConversation = useCallback(
     async (conversation: Conversation) => {
+      if (conversation.id === selectedConversationId) {
+        return;
+      }
       setMessages([]);
       setSelectedConversationId(conversation.id);
       setTotalCount(conversation.message_count);
       setFirstItemIndex(conversation.message_count);
       router.push('/chat/' + conversation.id);
     },
-    [],
+    [selectedConversationId],
   );
 
   const toggleShowConversation = useCallback(async () => {

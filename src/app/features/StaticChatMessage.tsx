@@ -54,19 +54,9 @@ export function StaticChatMessage({ message }) {
 
                     const match = /language-(\w+)/.exec(className || '');
 
-                    // return !inline ? (
-                    //   <CodeBlock
-                    //     key={Math.random()}
-                    //     language={(match && match[1]) || ''}
-                    //     value={String(children).replace(/\n$/, '')}
-                    //     {...props}
-                    //   />
                     return <code className={className} {...props}>
                         {children}
                       </code>
-                    // ) : (
-                      
-                    // );
                   },
                   table({ children }) {
                     return (
