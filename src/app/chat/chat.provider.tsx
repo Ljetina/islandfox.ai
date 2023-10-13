@@ -14,12 +14,13 @@ import { OpenAIModelID } from '@/types/openai';
 
 import { InitialServerData } from './chat.state';
 
-import { getConversationMessages } from '@/lib/api';
 import {
   apiCreateConversation,
   apiDeleteConversation,
+  apiSaveNotebookSettings,
   apiUpdateConversation,
 } from '@/lib/conversation';
+import { JupyterGlobalSettings, testConnection } from '@/lib/jupyter';
 import { apiUpdateUserPreferences } from '@/lib/user';
 
 export interface ClientState {
@@ -32,6 +33,7 @@ export interface ClientState {
   messageIsStreaming: boolean;
   totalCount: number;
   firstItemIndex: number;
+  jupyterSettings: JupyterGlobalSettings;
 }
 
 export interface ChatContextProps {
@@ -56,6 +58,7 @@ export interface ChatContextProps {
   setIsMessageStreaming: (isStreaming: boolean) => void;
   setTotalCount: React.Dispatch<React.SetStateAction<number>>;
   setFirstItemIndex: React.Dispatch<React.SetStateAction<number>>;
+  setNotebookSettings: (props: JupyterGlobalSettings) => Promise<boolean>;
 }
 
 export const ChatContext = createContext<ChatContextProps>(undefined!);
@@ -77,6 +80,12 @@ export const ChatProvider = ({
   const [messageIsStreaming, setMessageIsStreaming] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [firstItemIndex, setFirstItemIndex] = useState(totalCount);
+  const [jupyterSettings, setJupyterSettings] = useState({
+    host: '',
+    port: '',
+    serverToken: '',
+    notebookFolderPath: '',
+  });
   const router = useRouter();
 
   // Initial Load
@@ -90,6 +99,12 @@ export const ChatProvider = ({
         setUiShowConverations(data.ui_show_conversations);
         setUiShowPrompts(data.ui_show_prompts);
         setConversations(data.conversations || []);
+        setJupyterSettings({
+          host: data.jupyter_settings.host,
+          port: data.jupyter_settings.port,
+          serverToken: data.jupyter_settings.token,
+          notebookFolderPath: data.jupyter_settings.notebooks_folder_path,
+        });
         let selectedConversation = null;
         if (data.conversations && data.conversations.length > 0) {
           if (selectedConversationId) {
@@ -276,6 +291,17 @@ export const ChatProvider = ({
     [messageIsStreaming, setMessageIsStreaming],
   );
 
+  const setNotebookSettings = useCallback(async (settings: any) => {
+    const savedSettings = await apiSaveNotebookSettings(settings);
+    setJupyterSettings({
+      host: savedSettings.host,
+      port: savedSettings.port,
+      serverToken: savedSettings.token,
+      notebookFolderPath: savedSettings.notebooks_folder_path,
+    });
+    return await testConnection(settings);
+  }, []);
+
   return (
     <ChatContext.Provider
       value={{
@@ -289,6 +315,7 @@ export const ChatProvider = ({
           messageIsStreaming,
           totalCount,
           firstItemIndex,
+          jupyterSettings,
         },
         handleNewConversation,
         handleDeleteConversation,
@@ -302,6 +329,7 @@ export const ChatProvider = ({
         setIsMessageStreaming,
         setTotalCount,
         setFirstItemIndex,
+        setNotebookSettings,
       }}
     >
       {children}

@@ -1,6 +1,7 @@
 import { Conversation } from '@/types/chat';
 
 import { blurFetch } from './api';
+import { JupyterConversationSettings, JupyterGlobalSettings } from './jupyter';
 
 export const updateConversation = (
   updatedConversation: Conversation,
@@ -58,6 +59,66 @@ export const apiCreateConversation = async (
   }
 };
 
+export const apiGetConversationNotebookSettings = async (
+  conversationId: string,
+): Promise<{
+  notebook_path: string | undefined;
+  notebook_name: string | undefined;
+  session_id: string | undefined;
+  kernel_id: string | undefined;
+}> => {
+  try {
+    const response = await blurFetch({
+      pathname: `conversation/${conversationId}/notebook`,
+      method: 'GET',
+    });
+    const data = await response.json();
+    console.log({ data });
+    return data;
+  } catch (error) {
+    console.error('Error: ', error);
+  }
+  return {
+    notebook_path: undefined,
+    notebook_name: undefined,
+    session_id: undefined,
+    kernel_id: undefined,
+  };
+};
+
+export const apiSaveConversationNotebookSettings = async (
+  conversationSettings: Partial<JupyterConversationSettings>,
+) => {
+  try {
+    await blurFetch({
+      pathname: `conversation/${conversationSettings.conversation_id}/notebook`,
+      method: 'POST',
+      body: JSON.stringify(conversationSettings),
+    });
+  } catch (error) {
+    console.error('Error: ', error);
+  }
+};
+
+export const apiSaveNotebookSettings = async (
+  settings: JupyterGlobalSettings,
+) => {
+  try {
+    const response = await blurFetch({
+      pathname: `user/notebook`,
+      method: 'POST',
+      body: JSON.stringify(settings),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error: ', error);
+  }
+};
+
 export const apiUpdateConversation = async (
   conversationId: string,
   updatedData: Partial<ConversationData>,
@@ -72,7 +133,6 @@ export const apiUpdateConversation = async (
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    console.log(data);
   } catch (error) {
     console.error('Error:', error);
   }

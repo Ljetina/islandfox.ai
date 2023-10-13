@@ -27,7 +27,6 @@ export interface ClientState {
 //   // searchTerm: string;
 // }
 
-
 export const initialState: ClientState = {
   conversations: [],
   messages: [],
@@ -50,6 +49,12 @@ export interface InitialServerData {
   ui_show_prompts: boolean;
   ui_show_conversations: boolean;
   selected_tenant_id: string;
+  jupyter_settings: {
+    host: string;
+    port: string;
+    token: string;
+    notebooks_folder_path: string;
+  };
   conversations?: Conversation[];
   folders?: {
     id: string;

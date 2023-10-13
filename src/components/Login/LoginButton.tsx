@@ -81,18 +81,23 @@ export const UserProfileView: React.FC<{
   };
 
   return (
-    <div className={styles.profile} onClick={toggleMenu}>
-      <img
-        className={styles.profilePic}
-        src={userProfilePic}
-        alt="User Profile"
-      />
-      <span className={styles.tenantName}>{tenantName}</span>
+    <div className={`flex flex-col ${showMenu ? 'flex-col-reverse' : ''}`}>
       {showMenu && (
-        <div className={styles.menu}>
-          <button onClick={onLogout}>Logout</button>
-        </div>
+        <button
+          className="w-full text-left px-4 py-2 text-sm text-white bg-blue-500 hover:bg-blue-700 mt-2 rounded-lg"
+          onClick={onLogout}
+        >
+          Logout
+        </button>
       )}
+      <div className="flex items-center cursor-pointer" onClick={toggleMenu}>
+        <img
+          className="h-8 w-8 rounded-full"
+          src={userProfilePic ? userProfilePic : undefined}
+          alt="User Profile"
+        />
+        <span className="ml-2 text-sm font-semibold">{tenantName}</span>
+      </div>
     </div>
   );
 };

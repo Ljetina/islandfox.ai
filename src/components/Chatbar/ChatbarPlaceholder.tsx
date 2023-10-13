@@ -9,6 +9,7 @@ import { Conversations } from './components/Conversations';
 import { NewConversationButton } from './components/NewConversationButton';
 
 import { LoginButton } from '../Login/LoginButton';
+import SettingDialog from '../Settings/GlobalSettings';
 import Sidebar from '../Sidebar/NewSidebar';
 import { ChatbarInitialState, initialState } from './Chatbar.state';
 
@@ -21,6 +22,15 @@ export const Chatbar = () => {
     handleNewConversation,
     toggleShowConversation,
   } = useContext(ChatContext);
+
+  const [isSettingsOpen, setSettingsOpen] = useState(false);
+  const onOpen = useCallback(() => {
+    setSettingsOpen(true);
+  }, [setSettingsOpen]);
+  const onClose = useCallback(() => {
+    setSettingsOpen(false);
+  }, [setSettingsOpen]);
+  const onSave = useCallback(() => {}, []);
 
   return (
     <Sidebar
@@ -35,8 +45,17 @@ export const Chatbar = () => {
         <Conversations conversations={conversations as Conversation[]} />
       </div>
       <div className="sticky bottom-0">
-        <LoginButton />
+        <div className="flex flex-col gap-4 px-4 py-2">
+          <button
+            onClick={onOpen}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+          >
+            Settings
+          </button>
+          <LoginButton />
+        </div>
       </div>
+      <SettingDialog onClose={onClose} onSave={onSave} open={isSettingsOpen} />
     </Sidebar>
   );
 };

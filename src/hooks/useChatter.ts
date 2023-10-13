@@ -3,6 +3,7 @@ import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
 
 import { ServerMessage } from '@/types/chat';
 
+import { useDebounce } from './useDebounce';
 import { useEmitter } from './useEvents';
 
 import { ChatContext } from '@/app/chat/chat.provider';
@@ -32,6 +33,10 @@ export const useChatter = () => {
 
   const emit = useEmitter();
 
+  const debouncedScrollDownClick = useDebounce(() => {
+    emit('scrollDownClicked', null);
+  }, 1000);
+
   useEffect(() => {
     if (lastMessage && lastHandledMessage !== lastMessage) {
       setLastHandledMessage(lastMessage);
@@ -45,7 +50,7 @@ export const useChatter = () => {
         setCurrentAssisstantId(assistantUuid);
         setQuery('');
         setTimeout(() => {
-          emit('scrollDownClicked', null);
+          debouncedScrollDownClick();
         }, 100);
       } else if (serverMessage.type === 'append_to_message') {
         handleUpdateMessageContent(
