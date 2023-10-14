@@ -9,12 +9,13 @@ import { MessageVirtuoso } from './MessageVirtuoso';
 import { ChatContext } from '@/app/chat/chat.provider';
 
 export function MessageListContainer() {
-  const { loadMoreMessages, hasMore, totalCount, messages, isLoadingMore } = useMoreMessages();
-  
+  const { loadMoreMessages, hasMore, totalCount, messages, isLoadingMore } =
+    useMoreMessages();
+
   const [atBottom, setAtBottom] = useState(true);
   const virtuoso = useRef<VirtuosoHandle>(null);
 
-  useEvent('scrollDownClicked', () => {
+  const onDown = useCallback(() => {
     if (virtuoso) {
       virtuoso.current?.scrollToIndex({
         index: totalCount - 1,
@@ -22,11 +23,25 @@ export function MessageListContainer() {
         behavior: 'smooth',
       });
     }
-  });
+  }, [virtuoso, totalCount]);
+
+  useEvent('scrollDownClicked', onDown);
 
   const {
-    state: { firstItemIndex },
+    state: { firstItemIndex, selectedConversationId },
   } = useContext(ChatContext);
+
+  const [shouldRender, setShouldRender] = useState(true);
+
+  useEffect(() => {
+    setShouldRender(false);
+    setTimeout(() => setShouldRender(true), 0);
+  }, [selectedConversationId]);
+
+  // If shouldRender is false, return null
+  if (!shouldRender) {
+    return null;
+  }
 
   return (
     <div style={{ height: '100%', width: '100%' }}>

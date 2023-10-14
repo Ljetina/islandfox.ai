@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 
 import { useChatter } from '@/hooks/useChatter';
@@ -18,7 +19,6 @@ import ConversationSettings from './ConversationSettings';
 import { MessageListContainer } from './MessageListContainer';
 
 import { ChatContext } from '@/app/chat/chat.provider';
-import { getAvailableNotebookOptions } from '@/lib/jupyter';
 
 interface ActiveConversationProps {}
 
@@ -30,21 +30,12 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         selectedConversationId,
         conversations,
         messages,
-        jupyterSettings,
       },
       handleEditConversation,
     } = useContext(ChatContext);
 
-    useEffect(() => {
-      (async () => {
-        if (jupyterSettings.host !== '') {
-          const resp = await getAvailableNotebookOptions(jupyterSettings);
-          console.log({ resp });
-        }
-      })();
-    }, [jupyterSettings, selectedConversationId]);
-
     const emit = useEmitter();
+    const { sendQuery } = useChatter();
     const onScrollDown = useCallback(() => {
       emit('scrollDownClicked', null);
     }, [emit]);
@@ -56,7 +47,6 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const stopConversationRef = useRef<boolean>(false);
     const showScrollDownButton = true;
-    const { sendQuery } = useChatter();
 
     const onModelSelect = useCallback(
       (model_id: string) => {
@@ -79,9 +69,8 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
 
     return (
       <div className="relative flex-1 overflow-hidden dark:bg-[#343541]">
-        {messages.length > 0 ? (
-          <MessageListContainer />
-        ) : !!selectedConversationId ? (
+        
+        {messages.length == 0 && selectedConversationId && (
           <ConversationSettings
             models={[OpenAIModels['gpt-3.5-turbo'], OpenAIModels['gpt-4']]}
             model_id={selectedConveration?.model_id as string}
@@ -89,9 +78,9 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
             onChangeTemperature={onChangeTemperature}
             onModelSelect={onModelSelect}
           />
-        ) : null}
+          // ''
+        )}
         <MessageListContainer />
-
         <ChatInput
           stopConversationRef={stopConversationRef}
           textareaRef={textareaRef}

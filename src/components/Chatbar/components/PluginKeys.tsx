@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { IconKey } from '@tabler/icons-react';
 import { KeyboardEvent, useContext, useEffect, useRef, useState } from 'react';
-// import { useTranslation } from 'react-i18next';
 
 import { PluginID, PluginKey } from '@/types/plugin';
 

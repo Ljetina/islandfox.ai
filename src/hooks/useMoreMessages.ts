@@ -5,13 +5,7 @@ import { getConversationMessages } from '@/lib/api';
 
 export const useMoreMessages = () => {
   const {
-    state: {
-      messageIsStreaming,
-      selectedConversationId,
-      conversations,
-      messages,
-      totalCount,
-    },
+    state: { selectedConversationId, messages, totalCount },
     handleAddMessagePage,
     setTotalCount,
     setFirstItemIndex,
@@ -20,68 +14,60 @@ export const useMoreMessages = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
-  const selectedConversation = useMemo(() => {
-    return conversations?.find((c) => c.id === selectedConversationId);
-  }, [conversations, selectedConversationId]);
+  const [lastInitConvId, setLastInitConvId] = useState<string | null>(null);
 
   const loadPage = useCallback(
-    async ({
-      page,
-      limit,
-    }: {
-      page: number;
-      limit: number;
-    }): Promise<undefined> => {
-      setIsLoadingMore(true);
+    async (
+      {
+        page,
+        limit,
+      }: {
+        page: number;
+        limit: number;
+      },
+      replace?: boolean,
+    ): Promise<undefined> => {
       try {
-        if (selectedConversation && !isLoadingMore) {
+        if (selectedConversationId) {
+          setIsLoadingMore(true);
           const resp = await getConversationMessages({
-            conversation_id: selectedConversationId as string,
+            conversation_id: selectedConversationId,
             page: page,
             limit: limit,
           });
           setTotalCount(resp.pagination.total_records);
-          // setFirstItemIndex()
           if (resp.pagination.current_page < resp.pagination.total_pages) {
-            setPage((prev) => prev + 1);
+            setPage(page);
             setHasMore(true);
           } else {
             setHasMore(false);
           }
-          const numAdded = handleAddMessagePage(resp.data);
-          setFirstItemIndex((fii) => Math.max(fii - numAdded, 0));
+          const numAdded = handleAddMessagePage(resp.data, replace);
+          if (!replace) {
+            setFirstItemIndex((fii) => Math.max(fii - numAdded, 0));
+          }
         }
       } finally {
         setIsLoadingMore(false);
       }
     },
-    [
-      selectedConversation,
-      setIsLoadingMore,
-      isLoadingMore,
-      setPage,
-      setHasMore,
-      handleAddMessagePage,
-      setFirstItemIndex
-    ],
+    [selectedConversationId, handleAddMessagePage],
   );
 
   useEffect(() => {
     async function loadFirstPage() {
-      await loadPage({ page: 1, limit: 50 });
+      await loadPage({ page: 1, limit: 50 }, true);
     }
-    if (selectedConversation) {
+    if (selectedConversationId && lastInitConvId !== selectedConversationId) {
+      setLastInitConvId(selectedConversationId);
       setHasMore(false);
-      setTotalCount(selectedConversation?.message_count);
-      setFirstItemIndex(selectedConversation?.message_count);
-      setPage(1);
       loadFirstPage();
     }
-  }, [selectedConversation, setTotalCount, setPage]);
+  }, [selectedConversationId]);
 
   const loadMoreMessages = useCallback(async () => {
     return await loadPage({ page: page + 1, limit: 50 });
-  }, [loadPage]);
+  }, [loadPage, page]);
 
   return {
     loadMoreMessages,

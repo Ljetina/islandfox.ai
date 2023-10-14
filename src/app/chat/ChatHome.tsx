@@ -357,9 +357,8 @@ const ChatHome = ({ conversationId }: Props) => {
           <Chatbar />
 
           <div className="flex flex-1">
-            {/* <List /> */}
-            <ActiveConversation />
-            {/* <Chat stopConversationRef={stopConversationRef} /> */}
+            { selectedConversationId &&  <ActiveConversation /> }
+
           </div>
 
           {/* <Promptbar /> */}

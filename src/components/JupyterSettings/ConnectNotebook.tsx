@@ -3,10 +3,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import Spinner from '../Spinner/Spinner';
 
 import { ChatContext } from '@/app/chat/chat.provider';
-import {
-  apiGetConversationNotebookSettings,
-  apiSaveConversationNotebookSettings,
-} from '@/lib/conversation';
+
 import {
   getAvailableKernels,
   getAvailableNotebooks,
@@ -36,8 +33,8 @@ const ConnectNotebook: React.FC<ConversationSettingsProps> = ({
   conversationId,
 }) => {
   const {
-    state: { jupyterSettings },
-    handleEditConversation,
+    state: { jupyterSettings, notebookSettings },
+    saveNotebookSettings,
   } = useContext(ChatContext);
 
   const [isConnectingNotebook, setIsConnectingNotebook] = useState(false);
@@ -57,25 +54,26 @@ const ConnectNotebook: React.FC<ConversationSettingsProps> = ({
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    setSelectedKernel(undefined);
-    setSelectedNotebook(undefined);
-    setSelectedSession(undefined);
-    apiGetConversationNotebookSettings(conversationId).then((data) => {
-      setSelectedKernel(kernels.find((k) => k.id === data.kernel_id));
-      setSelectedNotebook(notebooks.find((n) => n.path === data.notebook_path));
-      setSelectedSession(sessions.find((s) => s.id === data.session_id));
-    });
-  }, [conversationId, kernels, notebooks, sessions]);
+    setSelectedKernel(
+      kernels.find((k) => k.id === notebookSettings?.kernel_id),
+    );
+    setSelectedNotebook(
+      notebooks.find((n) => n.path === notebookSettings?.notebook_path),
+    );
+    setSelectedSession(
+      sessions.find((s) => s.id === notebookSettings?.session_id),
+    );
+  }, [notebookSettings, kernels, notebooks, sessions]);
 
   useEffect(() => {
-    if (jupyterSettings.host !== '') {
+    if (jupyterSettings.host !== '' && isConnectingNotebook) {
       const settings = jupyterSettings;
 
       getAvailableNotebooks(settings).then(setNotebooks);
       getAvailableKernels(settings).then(setKernels);
       getAvailableSessions(settings).then(setSessions);
     }
-  }, [jupyterSettings]);
+  }, [jupyterSettings, isConnectingNotebook]);
 
   const handleNotebookChange = useCallback(
     (event: any) => {
@@ -105,27 +103,28 @@ const ConnectNotebook: React.FC<ConversationSettingsProps> = ({
     [sessions, setSelectedSession],
   );
 
-  const saveNotebookSettings = useCallback(() => {
-    setIsSaving(true);
-    apiSaveConversationNotebookSettings({
-      conversation_id: conversationId,
-      kernel_id: selectedKernel?.id,
-      session_id: selectedSession?.id,
-      notebook_name: selectedNotebook?.name,
-      notebook_path: selectedNotebook?.path,
-    })
-      .then(() => {
-        setIsConnectingNotebook(false);
-        setIsSaving(false);
-      })
-      .catch(() => setIsSaving(false));
+  const onSave = useCallback(async () => {
+    try {
+      setIsSaving(true);
+      await saveNotebookSettings({
+        kernelId: selectedKernel?.id || '',
+        sessionId: selectedSession?.id || '',
+        notebookName: selectedNotebook?.name || '',
+        notebookPath: selectedNotebook?.path || '',
+      });
+      setIsConnectingNotebook(false);
+    } catch (e) {
+      console.error('error saving notebook settings');
+    } finally {
+      setIsSaving(false);
+    }
   }, [selectedKernel, selectedNotebook, selectedSession, setIsSaving]);
 
   return (
     <>
       {isConnectingNotebook ? (
         <>
-          <p>Connect conersation to a notebook on a Jupyter server</p>
+          <p>Connect this conversation to a notebook on a Jupyter server</p>
           <div>
             <label className="block text-sm font-medium text-gray-300">
               Notebook
@@ -198,7 +197,7 @@ const ConnectNotebook: React.FC<ConversationSettingsProps> = ({
                   Cancel
                 </button>
                 <button
-                  onClick={saveNotebookSettings}
+                  onClick={onSave}
                   className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   Save Notebook Settings

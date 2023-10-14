@@ -1,6 +1,5 @@
 import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
 import { ReactNode } from 'react';
-// import { useTranslation } from 'react-i18next';
 
 import {
   CloseSidebarButton,

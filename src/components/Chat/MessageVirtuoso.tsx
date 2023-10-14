@@ -1,5 +1,5 @@
-// @ts-nocheck
 import React, {
+  Component,
   Dispatch,
   RefObject,
   SetStateAction,
@@ -9,9 +9,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Virtuoso, VirtuosoHandle, constant } from 'react-virtuoso';
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
-// import { constant } from 'react-virtuoso'
 import { Message } from '@/types/chat';
 
 import { MemoizedChatMessage } from './MemoizedChatMessage';
@@ -37,6 +36,16 @@ export function MessageVirtuoso({
 }: Props) {
   const initialTopMostIndexRef = useRef<number>(messages.length);
 
+  const [atTop, setAtTop] = useState(false);
+  const [loadMoreDelayPassed, setLoadMoreDelayPassed] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoadMoreDelayPassed(true);
+    }, 1000);
+  }, []);
+
+  // @ts-ignore
   const Header = React.forwardRef(({ style, ...props }, ref) => {
     return (
       <div
@@ -44,6 +53,7 @@ export function MessageVirtuoso({
           ...style,
           textAlign: 'center',
         }}
+        // @ts-ignore
         ref={ref}
         {...props}
       >
@@ -53,7 +63,7 @@ export function MessageVirtuoso({
   });
 
   const itemContent = useCallback(
-    (index) => {
+    (index: number) => {
       const localIndex = firstItemIndex + messages.length - 1 - index;
       // const reversedIndex = messages.length - 1 - localIndex;
       // console.log({ index, localIndex, firstItemIndex, mlen: messages.length });
@@ -61,6 +71,9 @@ export function MessageVirtuoso({
         return <span>EMPTY&nbsp;</span>;
       } else {
         const message = messages[localIndex];
+        if (!message) {
+          return '';
+        }
         return (
           <MemoizedChatMessage
             key={message.id}
@@ -79,11 +92,18 @@ export function MessageVirtuoso({
     }
   }, [hasMore, isLoadingMore, onLoadMore]);
 
-  if (messages.length == 0) {
-    // Unmount to reset state
-    return;
-  }
-  // console.log({messages})
+  const atTopStateChange = useCallback(
+    (state: boolean) => {
+      if (state !== atTop && messages.length > 0 && loadMoreDelayPassed) {
+        setAtTop(state);
+        if (state) {
+          startReached();
+        }
+      }
+    },
+    [atTop, setAtTop, startReached, messages, loadMoreDelayPassed],
+  );
+
   initialTopMostIndexRef.current = messages.length;
 
   return (
@@ -92,44 +112,52 @@ export function MessageVirtuoso({
       ref={virtuoso}
       totalCount={messages.length}
       firstItemIndex={firstItemIndex}
-      startReached={startReached}
       components={{
+        // @ts-ignore
         Scroller,
+        // @ts-ignore
         Footer,
+        // @ts-ignore
         Header,
       }}
-      // atTopStateChange={}
+      atTopStateChange={atTopStateChange}
       atBottomStateChange={setAtBottom}
       initialTopMostItemIndex={initialTopMostIndexRef.current - 1}
-      // initialTopMostItemIndex={0}
       reversed={false}
       itemContent={itemContent}
     />
   );
 }
 
-const Scroller = React.forwardRef(({ style, ...props }, ref) => {
-  return (
-    <div
-      style={{
-        ...style,
-        '&::WebkitScrollbar': { width: 2 },
-      }}
-      ref={ref}
-      {...props}
-    />
-  );
-});
+const Scroller = React.forwardRef<HTMLDivElement | null>(
+  // @ts-ignore
+  ({ style, ...props }, ref) => {
+    return (
+      <div
+        style={{
+          ...style,
+          '&::WebkitScrollbar': { width: 2 },
+        }}
+        ref={ref}
+        {...props}
+      />
+    );
+  },
+);
 Scroller.displayName = 'Scroller';
-const Footer = React.forwardRef(({ style, ...props }, ref) => {
-  return (
-    <div
-      style={{
-        ...style,
-        textAlign: 'center',
-      }}
-      ref={ref}
-      {...props}
-    ></div>
-  );
-});
+
+const Footer = React.forwardRef<HTMLDivElement | null>(
+  // @ts-ignore
+  ({ style, ...props }, ref) => {
+    return (
+      <div
+        style={{
+          ...style,
+          textAlign: 'center',
+        }}
+        ref={ref}
+        {...props}
+      ></div>
+    );
+  },
+);

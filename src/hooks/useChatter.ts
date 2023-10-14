@@ -1,10 +1,11 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
 
 import { ServerMessage } from '@/types/chat';
 
 import { useDebounce } from './useDebounce';
 import { useEmitter } from './useEvents';
+import { useFunctions } from './useFunctions';
 
 import { ChatContext } from '@/app/chat/chat.provider';
 
@@ -16,6 +17,7 @@ export const useChatter = () => {
     handleUpdateMessageContent,
     setIsMessageStreaming,
   } = useContext(ChatContext);
+
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     `ws://localhost:8080/conversation/${selectedConversationId}`,
     {
@@ -30,17 +32,34 @@ export const useChatter = () => {
   const [currentAssisstantId, setCurrentAssisstantId] = useState<string | null>(
     null,
   );
+  const { functions } = useFunctions();
 
   const emit = useEmitter();
 
-  const debouncedScrollDownClick = useDebounce(() => {
+  const callCount = useRef(0)
+
+  const onRateLimitScrollDown = useCallback(() => {
+    callCount.current++;
+
+    if (callCount.current % 20 === 0) {
+      emit('scrollDownClicked', null);
+    }
+  }, [emit]);
+
+  const onScrollDown = useCallback(() => {
     emit('scrollDownClicked', null);
-  }, 1000);
+  }, [emit]);
+
+  const debouncedScrollDownClick = useDebounce(onScrollDown, 1000);
 
   useEffect(() => {
+    if (lastMessage !== null) {
+      console.log(lastMessage && lastMessage.type);
+    }
     if (lastMessage && lastHandledMessage !== lastMessage) {
       setLastHandledMessage(lastMessage);
       const serverMessage: ServerMessage = JSON.parse(lastMessage?.data);
+      console.log(serverMessage.type);
       if (serverMessage.type === 'message_ack') {
         const { userUuid, assistantUuid } = serverMessage.data as {
           userUuid: string;
@@ -58,7 +77,55 @@ export const useChatter = () => {
           serverMessage.data as string,
           true,
         );
-        emit('scrollDownClicked', null);
+        onRateLimitScrollDown()
+      } else if (serverMessage.type === 'start_frontend_function') {
+        console.log({ serverMessage });
+        if (
+          typeof serverMessage.data == 'object' &&
+          'functionName' in serverMessage.data
+        ) {
+          console.log(serverMessage?.data?.functionArguments);
+          const funcArgs = JSON.parse(serverMessage?.data?.functionArguments);
+          console.log({ funcArgs });
+          const functionName = serverMessage?.data?.functionName as string;
+          handleUpdateMessageContent(
+            currentAssisstantId as string,
+            `using function ${functionName} \n\n`,
+            true,
+          );
+          functions[functionName](funcArgs)
+            .then((response) => {
+              sendMessage(
+                JSON.stringify({
+                  action: 'frontend_function_result',
+                  text: JSON.stringify({
+                    assistantUuid: currentAssisstantId,
+                    name: functionName,
+                    content: response,
+                  }),
+                }),
+              );
+              // handleUpdateMessageContent(
+              //   currentAssisstantId as string,
+              //   `\n result \n\n ${response}`,
+              //   true,
+              // );
+              // setIsMessageStreaming(false);
+              // setCurrentAssisstantId(null);
+            })
+            .catch((e) => {
+              console.error('FAILEd', e);
+              setIsMessageStreaming(false);
+              setCurrentAssisstantId(null);
+            });
+        }
+        // setIsMessageStreaming(false);
+        // setCurrentAssisstantId(null);
+        // emit('scrollDownClicked', null);
+      } else if (serverMessage.type === 'start_function') {
+        setIsMessageStreaming(false);
+        setCurrentAssisstantId(null);
+        // TODO fix up back-end functions
       } else if (serverMessage.type === 'response_done') {
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
@@ -86,7 +153,7 @@ export const useChatter = () => {
         }),
       );
     },
-    [sendMessage, setIsMessageStreaming],
+    [sendMessage],
   );
 
   return {

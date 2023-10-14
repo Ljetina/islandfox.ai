@@ -17,10 +17,16 @@ import { InitialServerData } from './chat.state';
 import {
   apiCreateConversation,
   apiDeleteConversation,
+  apiGetConversationNotebookSettings,
+  apiSaveConversationNotebookSettings,
   apiSaveNotebookSettings,
   apiUpdateConversation,
 } from '@/lib/conversation';
-import { JupyterGlobalSettings, testConnection } from '@/lib/jupyter';
+import {
+  JupyterConversationSettings,
+  JupyterGlobalSettings,
+  testConnection,
+} from '@/lib/jupyter';
 import { apiUpdateUserPreferences } from '@/lib/user';
 
 export interface ClientState {
@@ -34,6 +40,7 @@ export interface ClientState {
   totalCount: number;
   firstItemIndex: number;
   jupyterSettings: JupyterGlobalSettings;
+  notebookSettings: JupyterConversationSettings | null;
 }
 
 export interface ChatContextProps {
@@ -43,7 +50,7 @@ export interface ChatContextProps {
   handleDeleteConversation: (conversation: Conversation) => void;
   handleEditConversation: (conversation: Conversation) => void;
   handleSelectConversation: (conversation: Conversation) => void;
-  handleAddMessagePage: (pageMessages: Message[]) => number;
+  handleAddMessagePage: (pageMessages: Message[], replace?: boolean) => number;
   handleUpdateMessageContent: (
     messageId: string,
     content: string,
@@ -58,7 +65,16 @@ export interface ChatContextProps {
   setIsMessageStreaming: (isStreaming: boolean) => void;
   setTotalCount: React.Dispatch<React.SetStateAction<number>>;
   setFirstItemIndex: React.Dispatch<React.SetStateAction<number>>;
-  setNotebookSettings: (props: JupyterGlobalSettings) => Promise<boolean>;
+  handleUpdateGlobalNotebookSettings: (
+    props: JupyterGlobalSettings,
+  ) => Promise<boolean>;
+  updateNotebookSettings: () => Promise<void>;
+  saveNotebookSettings: (props: {
+    kernelId: string;
+    sessionId: string;
+    notebookPath: string;
+    notebookName: string;
+  }) => Promise<Partial<JupyterConversationSettings> | undefined>;
 }
 
 export const ChatContext = createContext<ChatContextProps>(undefined!);
@@ -86,6 +102,8 @@ export const ChatProvider = ({
     serverToken: '',
     notebookFolderPath: '',
   });
+  const [notebookSettings, setNotebookSettings] =
+    useState<JupyterConversationSettings | null>(null);
   const router = useRouter();
 
   // Initial Load
@@ -129,6 +147,62 @@ export const ChatProvider = ({
       });
   }, []);
 
+  // change conversation useEffect
+  useEffect(() => {
+    if (selectedConversationId) {
+      updateNotebookSettings();
+    }
+  }, [selectedConversationId, setNotebookSettings]);
+
+  const updateNotebookSettings = useCallback(async () => {
+    if (selectedConversationId) {
+      const notebookSettings: Partial<JupyterConversationSettings> =
+        await apiGetConversationNotebookSettings(selectedConversationId);
+      setNotebookSettings({
+        conversation_id: selectedConversationId,
+        kernel_id: notebookSettings.kernel_id as string,
+        notebook_name: notebookSettings.notebook_name as string,
+        notebook_path: notebookSettings.notebook_path as string,
+        session_id: notebookSettings.session_id as string,
+      });
+    }
+  }, [selectedConversationId, setNotebookSettings]);
+
+  const saveNotebookSettings = useCallback(
+    async ({
+      kernelId,
+      sessionId,
+      notebookPath,
+      notebookName,
+    }: {
+      kernelId: string;
+      sessionId: string;
+      notebookPath: string;
+      notebookName: string;
+    }) => {
+      if (selectedConversationId) {
+        await apiSaveConversationNotebookSettings({
+          conversation_id: selectedConversationId,
+          kernel_id: kernelId,
+          session_id: sessionId,
+          notebook_name: notebookName,
+          notebook_path: notebookPath,
+        });
+        const notebookSettings: Partial<JupyterConversationSettings> =
+          await apiGetConversationNotebookSettings(selectedConversationId);
+        setNotebookSettings({
+          conversation_id: selectedConversationId,
+          kernel_id: notebookSettings.kernel_id as string,
+          notebook_name: notebookSettings.notebook_name as string,
+          notebook_path: notebookSettings.notebook_path as string,
+          session_id: notebookSettings.session_id as string,
+        });
+        return notebookSettings;
+      }
+    },
+    [selectedConversationId, setNotebookSettings],
+  );
+
   const handleNewConversation = useCallback(async () => {
     setMessages([]);
     setSelectedConversationId(undefined);
@@ -137,12 +211,20 @@ export const ChatProvider = ({
     const conversation = await apiCreateConversation({
       model_id: OpenAIModelID.GPT_3_5,
       prompt: 'test',
-      name: 'test',
+      name: 'New',
       temperature: 0.5,
     });
     setSelectedConversationId(conversation.id);
     setConversations([...conversations, conversation]);
-  }, [conversations, setConversations]);
+    router.push('/chat/' + conversation.id);
+  }, [
+    conversations,
+    setConversations,
+    setSelectedConversationId,
+    setTotalCount,
+    setFirstItemIndex,
+    setMessages,
+  ]);
 
   const handleDeleteConversation = useCallback(
     async (conversation: Conversation) => {
@@ -186,10 +268,7 @@ export const ChatProvider = ({
       if (conversation.id === selectedConversationId) {
         return;
       }
-      setMessages([]);
       setSelectedConversationId(conversation.id);
-      setTotalCount(conversation.message_count);
-      setFirstItemIndex(conversation.message_count);
       router.push('/chat/' + conversation.id);
     },
     [selectedConversationId],
@@ -221,19 +300,23 @@ export const ChatProvider = ({
   );
 
   const handleAddMessagePage = useCallback(
-    (pageMessages: Message[]) => {
-      const originalLength = messages.length;
-      const newMessages = [...messages, ...pageMessages];
-
-      const deduplicatedMessages = newMessages.reduce(
-        (acc: Message[], current: Message) => {
-          const duplicate = acc.find((message) => message.id === current.id);
-          return duplicate ? acc : [...acc, current];
-        },
-        [],
-      );
-      setMessages(deduplicatedMessages);
-      return deduplicatedMessages.length - originalLength;
+    (pageMessages: Message[], replace = false) => {
+      if (replace) {
+        setMessages(pageMessages);
+        return pageMessages.length;
+      } else {
+        const originalLength = messages.length;
+        const newMessages = [...messages, ...pageMessages];
+        const deduplicatedMessages = newMessages.reduce(
+          (acc: Message[], current: Message) => {
+            const duplicate = acc.find((message) => message.id === current.id);
+            return duplicate ? acc : [...acc, current];
+          },
+          [],
+        );
+        setMessages(deduplicatedMessages);
+        return deduplicatedMessages.length - originalLength;
+      }
     },
     [messages, setMessages, selectedConversationId],
   );
@@ -291,16 +374,19 @@ export const ChatProvider = ({
     [messageIsStreaming, setMessageIsStreaming],
   );
 
-  const setNotebookSettings = useCallback(async (settings: any) => {
-    const savedSettings = await apiSaveNotebookSettings(settings);
-    setJupyterSettings({
-      host: savedSettings.host,
-      port: savedSettings.port,
-      serverToken: savedSettings.token,
-      notebookFolderPath: savedSettings.notebooks_folder_path,
-    });
-    return await testConnection(settings);
-  }, []);
+  const handleUpdateGlobalNotebookSettings = useCallback(
+    async (settings: any) => {
+      const savedSettings = await apiSaveNotebookSettings(settings);
+      setJupyterSettings({
+        host: savedSettings.host,
+        port: savedSettings.port,
+        serverToken: savedSettings.token,
+        notebookFolderPath: savedSettings.notebooks_folder_path,
+      });
+      return await testConnection(settings);
+    },
+    [],
+  );
 
   return (
     <ChatContext.Provider
@@ -316,6 +402,7 @@ export const ChatProvider = ({
           totalCount,
           firstItemIndex,
           jupyterSettings,
+          notebookSettings,
         },
         handleNewConversation,
         handleDeleteConversation,
@@ -329,7 +416,9 @@ export const ChatProvider = ({
         setIsMessageStreaming,
         setTotalCount,
         setFirstItemIndex,
-        setNotebookSettings,
+        handleUpdateGlobalNotebookSettings,
+        updateNotebookSettings,
+        saveNotebookSettings,
       }}
     >
       {children}

@@ -24,18 +24,6 @@ const ConversationSettings: React.FC<ConversationSettingsProps> = ({
   onChangeTemperature,
   conversationId,
 }) => {
-  const [firstRender, setFirstRender] = useState(true);
-
-  useEffect(() => {
-    if (firstRender) {
-      setTimeout(() => {
-        setFirstRender(false);
-      }, 500);
-    }
-  }, [firstRender, setFirstRender]);
-  if (!conversationId || firstRender) {
-    return;
-  }
   return (
     <>
       <div className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">

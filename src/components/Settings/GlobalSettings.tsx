@@ -13,7 +13,7 @@ interface Props {
 
 const SettingDialog: FC<Props> = ({ open, onClose, onSave }) => {
   const {
-    setNotebookSettings,
+    handleUpdateGlobalNotebookSettings: setNotebookSettings,
     state: { jupyterSettings },
   } = useContext(ChatContext);
   const [settings, setSettings] =

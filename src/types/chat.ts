@@ -37,6 +37,14 @@ export interface Conversation {
 }
 
 export interface ServerMessage {
-  type: 'message_ack' | 'append_to_message' | 'response_done';
-  data?: string | { userUuid: string; assistantUuid: string };
+  type:
+    | 'message_ack'
+    | 'append_to_message'
+    | 'response_done'
+    | 'start_function'
+    | 'start_frontend_function';
+  data?:
+    | string
+    | { userUuid: string; assistantUuid: string }
+    | { functionName: string; functionArguments: string };
 }
