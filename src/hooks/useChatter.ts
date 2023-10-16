@@ -16,16 +16,19 @@ export const useChatter = () => {
     handleDeleteMessage,
     handleUpdateMessageContent,
     setIsMessageStreaming,
+    setRemainingCredits,
   } = useContext(ChatContext);
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(
-    `ws://localhost:8080/conversation/${selectedConversationId}`,
+    `ws://localhost:3001/conversation/${selectedConversationId}`,
     {
       onOpen: () => console.log('opened'),
       //Will attempt to reconnect on all close events, such as server shutting down
       shouldReconnect: (closeEvent) => true,
     },
   );
+
+  const [outOfCredits, setOutOfCredits] = useState(false);
 
   const [query, setQuery] = useState('');
   const [lastHandledMessage, setLastHandledMessage] = useState(lastMessage);
@@ -62,6 +65,7 @@ export const useChatter = () => {
         console.error('failed to parse server message', e, lastMessage.data);
         return;
       }
+      console.log(serverMessage);
       if (serverMessage.type === 'message_ack') {
         const { userUuid, assistantUuid } = serverMessage.data as {
           userUuid: string;
@@ -138,6 +142,12 @@ export const useChatter = () => {
         );
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
+      } else if (serverMessage.type === 'out_of_credits') {
+        setOutOfCredits(true);
+        setIsMessageStreaming(false);
+        setCurrentAssisstantId(null);
+      } else if (serverMessage.type === 'remaining_credits') {
+        setRemainingCredits(serverMessage.data.remainingCredits);
       }
     }
   }, [
@@ -166,5 +176,7 @@ export const useChatter = () => {
 
   return {
     sendQuery,
+    outOfCredits,
+    setOutOfCredits,
   };
 };

@@ -18,17 +18,17 @@ import { MessageListContainer } from './MessageListContainer';
 import { ChatContext } from '@/app/chat/chat.provider';
 
 interface ActiveConversationProps {
-  onOpenSettings: () => void
+  onOpenSettings: () => void;
 }
 
 const ActiveConversation: React.FC<ActiveConversationProps> = memo(
-  ({onOpenSettings}: ActiveConversationProps) => {
+  ({ onOpenSettings }: ActiveConversationProps) => {
     const {
       state: { selectedConversationId, conversations, messages },
     } = useContext(ChatContext);
 
     const emit = useEmitter();
-    const { sendQuery } = useChatter();
+    const { sendQuery, outOfCredits } = useChatter();
     const onScrollDown = useCallback(() => {
       emit('scrollDownClicked', null);
     }, [emit]);
@@ -54,8 +54,10 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
             <ConversationSettings />
           )}
           <MessageListContainer />
+          
           <ChatInput
             stopConversationRef={stopConversationRef}
+            outOfCredits={outOfCredits}
             textareaRef={textareaRef}
             onSend={sendQuery}
             onScrollDownClick={onScrollDown}

@@ -17,6 +17,7 @@ import { useQuery } from 'react-query';
 // import useApiService from '@/services/useApiService';
 import Head from 'next/head';
 
+import { useChatter } from '@/hooks/useChatter';
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 import { useInitialData } from '@/hooks/useInitialData';
 
@@ -28,6 +29,7 @@ import { Prompt } from '@/types/prompt';
 
 import ActiveConversation from '@/components/Chat/ActiveConversation';
 import { ActiveSettingsDialog } from '@/components/Chat/ActiveSettingsDialog';
+import { BillingDialog } from '@/components/Chat/BillingDialog';
 import { Chat } from '@/components/Chat/Chat';
 import List from '@/components/Chat/MessageVirtuoso';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
@@ -128,6 +130,8 @@ const ChatHome = ({ conversationId }: Props) => {
   // }, [conversation]);
 
   // ON LOAD --------------------------------------------
+
+  const { outOfCredits } = useChatter();
 
   useEffect(() => {
     const settings = getSettings();
@@ -247,9 +251,13 @@ const ChatHome = ({ conversationId }: Props) => {
   //   return <div>Loading...</div>;
   // }
 
-  console.log('conversation', selectedConversation);
 
   const [areSettingsOpen, setSettingsOpen] = useState(false);
+  const [hasClosedBilling, setHasClosedBilling] = useState(false);
+
+  const onCloseBilling = useCallback(() => {
+    setHasClosedBilling(true);
+  }, []);
 
   const onOpenSettings = useCallback(() => {
     setSettingsOpen(true);
@@ -294,6 +302,9 @@ const ChatHome = ({ conversationId }: Props) => {
           {/* <Promptbar /> */}
         </div>
         {areSettingsOpen && <ActiveSettingsDialog onClose={onCloseSettings} />}
+        {outOfCredits && !hasClosedBilling && (
+          <BillingDialog onClose={onCloseBilling} />
+        )}
       </div>
     </>
   );

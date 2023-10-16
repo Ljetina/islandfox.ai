@@ -41,6 +41,7 @@ export interface ClientState {
   firstItemIndex: number;
   jupyterSettings: JupyterGlobalSettings;
   notebookSettings: JupyterConversationSettings | null;
+  remainingCredits: number;
 }
 
 export interface ChatContextProps {
@@ -75,6 +76,7 @@ export interface ChatContextProps {
     notebookPath: string;
     notebookName: string;
   }) => Promise<Partial<JupyterConversationSettings> | undefined>;
+  setRemainingCredits: (credits: number) => void;
 }
 
 export const ChatContext = createContext<ChatContextProps>(undefined!);
@@ -87,6 +89,7 @@ export const ChatProvider = ({
   const params = useParams();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [remainingCredits, setRemainingCredits] = useState(0);
   const [selectedConversationId, setSelectedConversationId] = useState<
     string | undefined
   >(params && params.convid ? (params?.convid as string) : undefined);
@@ -117,6 +120,7 @@ export const ChatProvider = ({
         setUiShowConverations(data.ui_show_conversations);
         setUiShowPrompts(data.ui_show_prompts);
         setConversations(data.conversations || []);
+        setRemainingCredits(data.tenant_credits);
         setJupyterSettings({
           host: data.jupyter_settings.host,
           port: data.jupyter_settings.port,
@@ -403,7 +407,9 @@ export const ChatProvider = ({
           firstItemIndex,
           jupyterSettings,
           notebookSettings,
+          remainingCredits,
         },
+        setRemainingCredits,
         handleNewConversation,
         handleDeleteConversation,
         toggleShowConversation,

@@ -5,6 +5,7 @@ import {
   IconPlayerStop,
   IconRepeat,
   IconSend,
+  IconSendOff,
 } from '@tabler/icons-react';
 import {
   KeyboardEvent,
@@ -39,6 +40,7 @@ interface Props {
   showScrollDownButton: boolean;
   model?: OpenAIModel;
   hasMessages: boolean;
+  outOfCredits: boolean;
 }
 
 export const ChatInput = ({
@@ -50,6 +52,7 @@ export const ChatInput = ({
   showScrollDownButton,
   model,
   hasMessages,
+  outOfCredits,
 }: Props) => {
   // const { t } = useTranslation('chat');
 
@@ -273,7 +276,7 @@ export const ChatInput = ({
           </button>
         )}
 
-{/* TODO regenerate response */}
+        {/* TODO regenerate response */}
         {/* {!messageIsStreaming && hasMessages && (
           <button
             className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
@@ -297,7 +300,11 @@ export const ChatInput = ({
                   : 'hidden'
               }`,
             }}
-            placeholder={'Type a message or type "/" to select a prompt...'}
+            placeholder={
+              outOfCredits
+                ? 'Please top-up your balance before proceeding'
+                : 'Type a message'
+            }
             value={content}
             rows={1}
             onCompositionStart={() => setIsTyping(true)}
@@ -313,8 +320,10 @@ export const ChatInput = ({
             {messageIsStreaming ? (
               <div className="h-4 w-4 animate-spin rounded-full border-t-2 border-neutral-800 opacity-60 dark:border-neutral-100"></div>
             ) : (
-              <IconSend size={18} />
+              // <IconSend size={18} />
+              ''
             )}
+            {outOfCredits ? <IconSendOff size={18} /> : <IconSend size={18} />}
           </button>
 
           {showScrollDownButton && (

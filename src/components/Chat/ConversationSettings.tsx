@@ -50,12 +50,11 @@ const ConversationSettings: React.FC<ConversationSettingsProps> = ({}) => {
     },
     [selectedConveration],
   );
-  const models = [OpenAIModels['gpt-3.5-turbo'], OpenAIModels['gpt-4']];
+  const models = [OpenAIModels['gpt-4'], OpenAIModels['gpt-3.5-turbo']];
 
   return (
     <>
       <div className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
-
         {models.length > 0 && (
           <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
             <ModelSelect
@@ -69,9 +68,7 @@ const ConversationSettings: React.FC<ConversationSettingsProps> = ({}) => {
               label={'Temperature'}
               onChangeTemperature={onChangeTemperature}
             />
-            <ConnectNotebook
-              selectedNotebookName={selectedConveration?.notebook?.name}
-            />
+            <ConnectNotebook />
           </div>
         )}
       </div>

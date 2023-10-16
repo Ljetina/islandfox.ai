@@ -15,10 +15,11 @@ import { ChatbarInitialState, initialState } from './Chatbar.state';
 
 import { ChatContext } from '@/app/chat/chat.provider';
 import { apiCreateConversation } from '@/lib/conversation';
+import { creditsToDollars } from '@/lib/billing';
 
 export const Chatbar = () => {
   const {
-    state: { conversations, uiShowConverations },
+    state: { conversations, uiShowConverations, remainingCredits },
     handleNewConversation,
     toggleShowConversation,
   } = useContext(ChatContext);
@@ -44,6 +45,7 @@ export const Chatbar = () => {
       <div className="overflow-y-auto flex-grow">
         <Conversations conversations={conversations as Conversation[]} />
       </div>
+      <p>remaining credits: {creditsToDollars(remainingCredits)}</p>
       <div className="sticky bottom-0">
         <div className="flex flex-col gap-4 px-4 py-2">
           <button

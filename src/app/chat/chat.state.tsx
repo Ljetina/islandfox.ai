@@ -60,4 +60,5 @@ export interface InitialServerData {
     id: string;
     name: string;
   }[];
+  tenant_credits: number;
 }
