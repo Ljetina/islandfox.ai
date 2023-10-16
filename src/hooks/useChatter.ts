@@ -36,7 +36,7 @@ export const useChatter = () => {
 
   const emit = useEmitter();
 
-  const callCount = useRef(0)
+  const callCount = useRef(0);
 
   const onRateLimitScrollDown = useCallback(() => {
     callCount.current++;
@@ -53,13 +53,15 @@ export const useChatter = () => {
   const debouncedScrollDownClick = useDebounce(onScrollDown, 1000);
 
   useEffect(() => {
-    if (lastMessage !== null) {
-      console.log(lastMessage && lastMessage.type);
-    }
     if (lastMessage && lastHandledMessage !== lastMessage) {
       setLastHandledMessage(lastMessage);
-      const serverMessage: ServerMessage = JSON.parse(lastMessage?.data);
-      console.log(serverMessage.type);
+      let serverMessage;
+      try {
+        serverMessage = JSON.parse(lastMessage?.data);
+      } catch (e) {
+        console.error('failed to parse server message', e, lastMessage.data);
+        return;
+      }
       if (serverMessage.type === 'message_ack') {
         const { userUuid, assistantUuid } = serverMessage.data as {
           userUuid: string;
@@ -77,51 +79,48 @@ export const useChatter = () => {
           serverMessage.data as string,
           true,
         );
-        onRateLimitScrollDown()
+        onRateLimitScrollDown();
       } else if (serverMessage.type === 'start_frontend_function') {
-        console.log({ serverMessage });
         if (
           typeof serverMessage.data == 'object' &&
           'functionName' in serverMessage.data
         ) {
           console.log(serverMessage?.data?.functionArguments);
-          const funcArgs = JSON.parse(serverMessage?.data?.functionArguments);
-          console.log({ funcArgs });
-          const functionName = serverMessage?.data?.functionName as string;
-          handleUpdateMessageContent(
-            currentAssisstantId as string,
-            `using function ${functionName} \n\n`,
-            true,
-          );
-          functions[functionName](funcArgs)
-            .then((response) => {
-              sendMessage(
-                JSON.stringify({
-                  action: 'frontend_function_result',
-                  text: JSON.stringify({
-                    assistantUuid: currentAssisstantId,
-                    name: functionName,
-                    content: response,
+          try {
+            const funcArgs = JSON.parse(serverMessage?.data?.functionArguments);
+            console.log({ funcArgs });
+            const functionName = serverMessage?.data?.functionName as string;
+            handleUpdateMessageContent(
+              currentAssisstantId as string,
+              `using function ${functionName} \n\n`,
+              true,
+            );
+            functions[functionName]({ ...funcArgs, sendMessage })
+              .then((response) => {
+                sendMessage(
+                  JSON.stringify({
+                    action: 'frontend_function_result',
+                    text: JSON.stringify({
+                      assistantUuid: currentAssisstantId,
+                      name: functionName,
+                      content: response,
+                    }),
                   }),
-                }),
-              );
-              // handleUpdateMessageContent(
-              //   currentAssisstantId as string,
-              //   `\n result \n\n ${response}`,
-              //   true,
-              // );
-              // setIsMessageStreaming(false);
-              // setCurrentAssisstantId(null);
-            })
-            .catch((e) => {
-              console.error('FAILEd', e);
-              setIsMessageStreaming(false);
-              setCurrentAssisstantId(null);
-            });
+                );
+              })
+              .catch((e) => {
+                console.error('Failed', e);
+                setIsMessageStreaming(false);
+                setCurrentAssisstantId(null);
+              });
+          } catch (e) {
+            console.error(
+              'failed to handle start frontend function',
+              e,
+              serverMessage,
+            );
+          }
         }
-        // setIsMessageStreaming(false);
-        // setCurrentAssisstantId(null);
-        // emit('scrollDownClicked', null);
       } else if (serverMessage.type === 'start_function') {
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
@@ -130,6 +129,15 @@ export const useChatter = () => {
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
         emit('scrollDownClicked', null);
+      } else if (serverMessage.type === 'response_error') {
+        console.log('error handling response');
+        handleUpdateMessageContent(
+          currentAssisstantId as string,
+          `Error from OpenAI API '${serverMessage.data.message}' \n\n Please try again later.`,
+          true,
+        );
+        setIsMessageStreaming(false);
+        setCurrentAssisstantId(null);
       }
     }
   }, [

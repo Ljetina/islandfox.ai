@@ -3,16 +3,13 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import Spinner from '../Spinner/Spinner';
 
 import { ChatContext } from '@/app/chat/chat.provider';
-
 import {
   getAvailableKernels,
   getAvailableNotebooks,
   getAvailableSessions,
 } from '@/lib/jupyter';
 
-interface ConversationSettingsProps {
-  conversationId: string;
-}
+interface ConversationSettingsProps {}
 
 interface Notebook {
   path: string;
@@ -29,9 +26,7 @@ interface Session {
   name: string;
 }
 
-const ConnectNotebook: React.FC<ConversationSettingsProps> = ({
-  conversationId,
-}) => {
+const ConnectNotebook: React.FC<ConversationSettingsProps> = ({}) => {
   const {
     state: { jupyterSettings, notebookSettings },
     saveNotebookSettings,
@@ -218,7 +213,9 @@ const ConnectNotebook: React.FC<ConversationSettingsProps> = ({
             alt="Jupyter Icon"
             className="inline-block mr-2"
           />
-          {selectedNotebook ? selectedNotebook.name : 'Connect to notebook'}
+          {notebookSettings?.notebook_name
+            ? notebookSettings.notebook_name
+            : 'Connect to notebook'}
         </button>
       )}
     </>

@@ -11,6 +11,8 @@ export interface Message {
   content: string | null;
   name?: string;
   function_call?: { name: string; arguments: string };
+  function_name?: string;
+  function_arguments?: string;
 }
 
 export type Role = 'assistant' | 'user' | 'function';

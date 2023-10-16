@@ -1,6 +1,13 @@
 'use client';
 
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useQuery } from 'react-query';
 
 // import { GetServerSideProps } from 'next';
@@ -19,10 +26,11 @@ import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 
+import ActiveConversation from '@/components/Chat/ActiveConversation';
+import { ActiveSettingsDialog } from '@/components/Chat/ActiveSettingsDialog';
 import { Chat } from '@/components/Chat/Chat';
 import List from '@/components/Chat/MessageVirtuoso';
-import ActiveConversation from '@/components/Chat/ActiveConversation';
-import { Chatbar } from '@/components/Chatbar/ChatbarPlaceholder';
+import { Chatbar } from '@/components/Chatbar/Chatbar';
 // import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
@@ -68,22 +76,10 @@ const ChatHome = ({ conversationId }: Props) => {
     state: { conversations, selectedConversationId, messages },
   } = useContext(ChatContext);
 
-  const conversation = useMemo(
-    () =>
-      conversations &&
-      selectedConversationId &&
-      selectedConversationId in conversations
-        ? conversations.find((c) => c.id == selectedConversationId)
-        : undefined,
-    [conversations, selectedConversationId],
+  const selectedConversation = useMemo(
+    () => conversations?.find((c) => c.id === selectedConversationId),
+    [selectedConversationId, conversations],
   );
-
-  const handleSelectConversation = (conversation: Conversation) => {
-    // dispatch({
-    //   field: 'selectedConversationId',
-    //   value: conversation.id,
-    // });
-  };
 
   // FOLDER OPERATIONS  --------------------------------------------
 
@@ -105,35 +101,6 @@ const ChatHome = ({ conversationId }: Props) => {
   //   dispatch({ field: 'folders', value: updatedFolders });
   //   saveFolders(updatedFolders);
 
-  //   const updatedConversations: Conversation[] = conversations.map((c) => {
-  //     if (c.folderId === folderId) {
-  //       return {
-  //         ...c,
-  //         folderId: null,
-  //       };
-  //     }
-
-  //     return c;
-  //   });
-
-  //   dispatch({ field: 'conversations', value: updatedConversations });
-  //   saveConversations(updatedConversations);
-
-  //   const updatedPrompts: Prompt[] = prompts.map((p) => {
-  //     if (p.folderId === folderId) {
-  //       return {
-  //         ...p,
-  //         folderId: null,
-  //       };
-  //     }
-
-  //     return p;
-  //   });
-
-  //   dispatch({ field: 'prompts', value: updatedPrompts });
-  //   savePrompts(updatedPrompts);
-  // };
-
   // const handleUpdateFolder = (folderId: string, name: string) => {
   //   const updatedFolders = folders.map((f) => {
   //     if (f.id === folderId) {
@@ -149,56 +116,6 @@ const ChatHome = ({ conversationId }: Props) => {
   //   dispatch({ field: 'folders', value: updatedFolders });
 
   //   saveFolders(updatedFolders);
-  // };
-
-  // CONVERSATION OPERATIONS  --------------------------------------------
-
-  // const handleNewConversation = () => {
-  //   const lastConversation = conversations[conversations.length - 1];
-  //   console.log(defaultModelId);
-
-  //   const newConversation: Conversation = {
-  //     id: uuidv4(),
-  //     name: 'New Conversation',
-  //     messages: [],
-  //     model: lastConversation?.model || {
-  //       id: OpenAIModels[defaultModelId].id,
-  //       name: OpenAIModels[defaultModelId].name,
-  //       maxLength: OpenAIModels[defaultModelId].maxLength,
-  //       tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
-  //     },
-  //     prompt: DEFAULT_SYSTEM_PROMPT,
-  //     temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
-  //     folderId: null,
-  //   };
-
-  //   const updatedConversations = [...conversations, newConversation];
-
-  //   dispatch({ field: 'selectedConversation', value: newConversation });
-  //   dispatch({ field: 'conversations', value: updatedConversations });
-
-  //   saveConversation(newConversation);
-  //   saveConversations(updatedConversations);
-
-  //   dispatch({ field: 'loading', value: false });
-  // };
-
-  // const handleUpdateConversation = (
-  //   conversation: Conversation,
-  //   data: KeyValuePair,
-  // ) => {
-  //   const updatedConversation = {
-  //     ...conversation,
-  //     [data.key]: data.value,
-  //   };
-
-  //   const { single, all } = updateConversation(
-  //     updatedConversation,
-  //     conversations,
-  //   );
-
-  //   dispatch({ field: 'selectedConversation', value: single });
-  //   dispatch({ field: 'conversations', value: all });
   // };
 
   // EFFECTS  --------------------------------------------
@@ -330,6 +247,18 @@ const ChatHome = ({ conversationId }: Props) => {
   //   return <div>Loading...</div>;
   // }
 
+  console.log('conversation', selectedConversation);
+
+  const [areSettingsOpen, setSettingsOpen] = useState(false);
+
+  const onOpenSettings = useCallback(() => {
+    setSettingsOpen(true);
+  }, []);
+
+  const onCloseSettings = useCallback(() => {
+    setSettingsOpen(false);
+  }, []);
+
   return (
     <>
       <Head>
@@ -341,29 +270,31 @@ const ChatHome = ({ conversationId }: Props) => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main
+      <div
         className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${'dark'}`}
       >
         <div className="fixed top-0 w-full sm:hidden">
-          {/* TODO fix up structure when working on putting the prompts back in conversation */}
-
-          {/* <Navbar
-              selectedConversation={conversation}
-              onNewConversation={handleNewConversation}
-            /> */}
+          {selectedConversation && (
+            <Navbar
+              selectedConversation={selectedConversation as Conversation}
+              onNewConversation={() => null}
+            />
+          )}
         </div>
 
         <div className="flex h-full w-full pt-[48px] sm:pt-0">
           <Chatbar />
 
           <div className="flex flex-1">
-            { selectedConversationId &&  <ActiveConversation /> }
-
+            {selectedConversationId && (
+              <ActiveConversation onOpenSettings={onOpenSettings} />
+            )}
           </div>
 
           {/* <Promptbar /> */}
         </div>
-      </main>
+        {areSettingsOpen && <ActiveSettingsDialog onClose={onCloseSettings} />}
+      </div>
     </>
   );
 };

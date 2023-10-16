@@ -49,6 +49,15 @@ export async function getAvailableNotebooks(settings: JupyterGlobalSettings) {
     );
     const data = await notebooksResponse.json();
     console.log({ notebooks: data });
+    data.content.sort((a, b) => {
+      if (a.name < b.name) {
+        return -1;
+      } else if (a.name > b.name) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
     return data.content;
   } catch (error) {
     console.error('Error fetching notebooks:', error);
@@ -185,7 +194,7 @@ export async function executeCell(
         parent_header: {
           session: convSettings.session_id,
         },
-        metadata: {},
+        metadata: { trusted: true },
         content: {
           code: content.cells[cellIndex].source,
           silent: false,
@@ -202,6 +211,10 @@ export async function executeCell(
       console.log('END');
     });
 
+    ws.addEventListener('error', function incoming(err) {
+      console.log('jupyter ws ERROR');
+    });
+
     ws.addEventListener('message', function incoming(event) {
       console.log({ event });
       // data.
@@ -209,9 +222,12 @@ export async function executeCell(
       // console.log('MESSAGE', m);
       if (m.msg_type == 'execute_result') {
         content.cells[cellIndex].outputs.push({
-          name: 'stdout',
-          output_type: 'result',
-          text: m.content.data['text/html'],
+          output_type: 'execute_result',
+          metadata: {},
+          execution_count: 1,
+          data: {
+            ...m.content.data,
+          },
         });
         queueTask(
           updateNotebookContent(convSettings.notebook_path, content, settings),
@@ -230,6 +246,9 @@ export async function executeCell(
       } else if (m.msg_type == 'execute_reply') {
         resolve(responseCache.result);
         ws.close();
+      } else {
+        console.log('unknown message type');
+        console.log({ m });
       }
     });
   });

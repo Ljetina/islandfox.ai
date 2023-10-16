@@ -1,6 +1,13 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
-import { OpenAIModel } from '@/types/openai';
+import { Conversation } from '@/types/chat';
+import { OpenAIModel, OpenAIModels } from '@/types/openai';
 
 import ConnectNotebook from '../JupyterSettings/ConnectNotebook';
 import { ModelSelect } from './ModelSelect';
@@ -8,35 +15,53 @@ import { TemperatureSlider } from './Temperature';
 
 import { ChatContext } from '@/app/chat/chat.provider';
 
-interface ConversationSettingsProps {
-  models: Array<OpenAIModel>;
-  model_id: string;
-  conversationId: string;
-  currentPrompt?: string;
-  onModelSelect: (model_id: string) => void;
-  onChangeTemperature: (temperature: number) => void;
-}
+interface ConversationSettingsProps {}
 
-const ConversationSettings: React.FC<ConversationSettingsProps> = ({
-  models,
-  model_id,
-  onModelSelect,
-  onChangeTemperature,
-  conversationId,
-}) => {
+const ConversationSettings: React.FC<ConversationSettingsProps> = ({}) => {
+  const {
+    state: {
+      messageIsStreaming,
+      selectedConversationId,
+      conversations,
+      messages,
+    },
+    handleEditConversation,
+  } = useContext(ChatContext);
+
+  const selectedConveration = useMemo(() => {
+    return conversations?.find((c) => c.id === selectedConversationId);
+  }, [conversations, selectedConversationId]);
+
+  const onModelSelect = useCallback(
+    (model_id: string) => {
+      handleEditConversation({
+        ...(selectedConveration as Conversation),
+        model_id: model_id,
+      });
+    },
+    [selectedConveration],
+  );
+  const onChangeTemperature = useCallback(
+    (temperature: number) => {
+      handleEditConversation({
+        ...(selectedConveration as Conversation),
+        temperature: temperature,
+      });
+    },
+    [selectedConveration],
+  );
+  const models = [OpenAIModels['gpt-3.5-turbo'], OpenAIModels['gpt-4']];
+
   return (
     <>
       <div className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
-        <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
-          IslandFox.ai
-        </div>
 
         {models.length > 0 && (
           <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
             <ModelSelect
               models={models}
-              defaultModelId={model_id}
-              model_id={model_id}
+              defaultModelId={OpenAIModels['gpt-4'].id}
+              model_id={selectedConveration?.model_id}
               onModelSelect={onModelSelect}
             />
 
@@ -44,7 +69,9 @@ const ConversationSettings: React.FC<ConversationSettingsProps> = ({
               label={'Temperature'}
               onChangeTemperature={onChangeTemperature}
             />
-            <ConnectNotebook conversationId={conversationId} />
+            <ConnectNotebook
+              selectedNotebookName={selectedConveration?.notebook?.name}
+            />
           </div>
         )}
       </div>

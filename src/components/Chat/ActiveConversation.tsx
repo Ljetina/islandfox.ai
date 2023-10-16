@@ -2,7 +2,6 @@ import React, {
   memo,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -11,27 +10,21 @@ import React, {
 import { useChatter } from '@/hooks/useChatter';
 import { useEmitter } from '@/hooks/useEvents';
 
-import { Conversation } from '@/types/chat';
-import { OpenAIModelID, OpenAIModels } from '@/types/openai';
-
+import ActiveConversationHeader from './ActiveConverationHeader';
 import { ChatInput } from './ChatInput';
 import ConversationSettings from './ConversationSettings';
 import { MessageListContainer } from './MessageListContainer';
 
 import { ChatContext } from '@/app/chat/chat.provider';
 
-interface ActiveConversationProps {}
+interface ActiveConversationProps {
+  onOpenSettings: () => void
+}
 
 const ActiveConversation: React.FC<ActiveConversationProps> = memo(
-  ({}: ActiveConversationProps) => {
+  ({onOpenSettings}: ActiveConversationProps) => {
     const {
-      state: {
-        messageIsStreaming,
-        selectedConversationId,
-        conversations,
-        messages,
-      },
-      handleEditConversation,
+      state: { selectedConversationId, conversations, messages },
     } = useContext(ChatContext);
 
     const emit = useEmitter();
@@ -48,53 +41,34 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
     const stopConversationRef = useRef<boolean>(false);
     const showScrollDownButton = true;
 
-    const onModelSelect = useCallback(
-      (model_id: string) => {
-        handleEditConversation({
-          ...(selectedConveration as Conversation),
-          model_id: model_id,
-        });
-      },
-      [selectedConveration],
-    );
-    const onChangeTemperature = useCallback(
-      (temperature: number) => {
-        handleEditConversation({
-          ...(selectedConveration as Conversation),
-          temperature: temperature,
-        });
-      },
-      [selectedConveration],
-    );
-
     return (
-      <div className="relative flex-1 overflow-hidden dark:bg-[#343541]">
-        
-        {messages.length == 0 && selectedConversationId && (
-          <ConversationSettings
-            models={[OpenAIModels['gpt-3.5-turbo'], OpenAIModels['gpt-4']]}
-            model_id={selectedConveration?.model_id as string}
-            conversationId={selectedConversationId}
-            onChangeTemperature={onChangeTemperature}
-            onModelSelect={onModelSelect}
+      <>
+        <div className="relative flex-1 overflow-hidden dark:bg-[#343541]">
+          <ActiveConversationHeader
+            selectedConversation={selectedConveration}
+            handleSettings={onOpenSettings}
+            onClearAll={() => console.log('clear all?')}
           />
-          // ''
-        )}
-        <MessageListContainer />
-        <ChatInput
-          stopConversationRef={stopConversationRef}
-          textareaRef={textareaRef}
-          onSend={sendQuery}
-          onScrollDownClick={onScrollDown}
-          onRegenerate={() => {
-            // if (currentMessage) {
-            //   handleSend(currentMessage);
-            // }
-          }}
-          showScrollDownButton={showScrollDownButton}
-          hasMessages={messages.length > 0}
-        />
-      </div>
+
+          {messages.length == 0 && selectedConversationId && (
+            <ConversationSettings />
+          )}
+          <MessageListContainer />
+          <ChatInput
+            stopConversationRef={stopConversationRef}
+            textareaRef={textareaRef}
+            onSend={sendQuery}
+            onScrollDownClick={onScrollDown}
+            onRegenerate={() => {
+              // if (currentMessage) {
+              //   handleSend(currentMessage);
+              // }
+            }}
+            showScrollDownButton={showScrollDownButton}
+            hasMessages={messages.length > 0}
+          />
+        </div>
+      </>
     );
   },
 );

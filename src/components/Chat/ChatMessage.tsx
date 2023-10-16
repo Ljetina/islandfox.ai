@@ -1,7 +1,22 @@
 'use client';
 
-import { IconCheck, IconCopy, IconRobot, IconUser } from '@tabler/icons-react';
-import { FC, memo, useContext, useMemo, useRef, useState } from 'react';
+import {
+  IconAbacus,
+  IconCheck,
+  IconCopy,
+  IconGauge,
+  IconRobot,
+  IconUser,
+} from '@tabler/icons-react';
+import {
+  FC,
+  memo,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -31,7 +46,6 @@ export const ChatMessage: FC<Props> = memo(
         conversations,
         messageIsStreaming,
         messages,
-        
       },
     } = useContext(ChatContext);
     const selectedConversation = useMemo(
@@ -134,6 +148,19 @@ export const ChatMessage: FC<Props> = memo(
       });
     };
 
+    const getIcon = useCallback(() => {
+      if (
+        message.role === 'function' ||
+        (message.role === 'assistant' && message.function_name)
+      ) {
+        return <IconAbacus size={30} />;
+      } else if (message.role === 'assistant') {
+        return <IconRobot />;
+      } else {
+        return <IconUser />;
+      }
+    }, [message]);
+
     return (
       <div
         className={`group md:px-4 ${
@@ -145,11 +172,7 @@ export const ChatMessage: FC<Props> = memo(
       >
         <div className="relative m-auto flex p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
           <div className="min-w-[40px] text-right font-bold">
-            {['assistant', 'function'].includes(message.role) ? (
-              <IconRobot size={30} />
-            ) : (
-              <IconUser size={30} />
-            )}
+            {getIcon()}
           </div>
 
           <div className="prose mt-[-2px] w-full dark:prose-invert">
@@ -225,9 +248,7 @@ export const ChatMessage: FC<Props> = memo(
                   }}
                 >
                   {`${message.name ? message.name : message.content}${
-                    messageIsStreaming && messageIndex == 0
-                      ? '`▍`'
-                      : ''
+                    messageIsStreaming && messageIndex == 0 ? '`▍`' : ''
                   }`}
                 </MemoizedReactMarkdown>
 
