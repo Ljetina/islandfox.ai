@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function Footer1() {
   return (
@@ -17,17 +17,21 @@ export default function Footer1() {
                   </div>
                 </div>
                 <div className="col-lg-4">
-                  {/* TODO Add T&C and Privacy policy back */}
-                  {/* <div className="footer-menu">
+                  <div>
                     <ul className="list-wrap">
                       <li>
-                        <Link href="/contact">Terms & Conditions</Link>
+                        <Link target="_blank" href="/legal/terms_and_conditions">
+                          Terms & conditions
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/contact">Privacy Policy</Link>
+                        <Link target="_blank" href="/legal/privacy_policy">Privacy Policy</Link>
+                      </li>
+                      <li>
+                        <Link target="_blank" href="/md/ljetina_openai_data_processing_agreement.pdf">OpenAI Data Processing agreement</Link>
                       </li>
                     </ul>
-                  </div> */}
+                  </div>
                 </div>
               </div>
             </div>

@@ -20,15 +20,15 @@ export const useChatter = () => {
   } = useContext(ChatContext);
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(
-    `ws://localhost:3001/conversation/${selectedConversationId}`,
+    selectedConversationId
+      ? `ws://localhost:3001/conversation/${selectedConversationId}`
+      : null,
     {
       onOpen: () => console.log('opened'),
       //Will attempt to reconnect on all close events, such as server shutting down
       shouldReconnect: (closeEvent) => true,
     },
   );
-
-  const [outOfCredits, setOutOfCredits] = useState(false);
 
   const [query, setQuery] = useState('');
   const [lastHandledMessage, setLastHandledMessage] = useState(lastMessage);
@@ -143,7 +143,6 @@ export const useChatter = () => {
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
       } else if (serverMessage.type === 'out_of_credits') {
-        setOutOfCredits(true);
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
       } else if (serverMessage.type === 'remaining_credits') {
@@ -176,7 +175,5 @@ export const useChatter = () => {
 
   return {
     sendQuery,
-    outOfCredits,
-    setOutOfCredits,
   };
 };

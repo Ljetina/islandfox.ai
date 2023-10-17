@@ -131,7 +131,7 @@ const ChatHome = ({ conversationId }: Props) => {
 
   // ON LOAD --------------------------------------------
 
-  const { outOfCredits } = useChatter();
+  
 
   useEffect(() => {
     const settings = getSettings();
@@ -302,9 +302,6 @@ const ChatHome = ({ conversationId }: Props) => {
           {/* <Promptbar /> */}
         </div>
         {areSettingsOpen && <ActiveSettingsDialog onClose={onCloseSettings} />}
-        {outOfCredits && !hasClosedBilling && (
-          <BillingDialog onClose={onCloseBilling} />
-        )}
       </div>
     </>
   );
