@@ -71,7 +71,7 @@ const SettingDialog: FC<Props> = ({ open, onClose, onSave }) => {
         className="bg-gray-800 text-white w-96 p-6 rounded shadow"
         onClick={handleInsideClick}
       >
-        <h2 className="text-2xl font-bold mb-4">Jupyter Settings</h2>
+        <h2 className="text-2xl font-bold mb-4">Jupyter Server Settings</h2>
         {!canConnect && (
           <div className="bg-red-500 text-white p-2 mb-4 rounded">
             Failed to connect with the current settings. Please check your

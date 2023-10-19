@@ -20,12 +20,12 @@ export default function Footer1() {
                   <div>
                     <ul className="list-wrap">
                       <li>
-                        <Link target="_blank" href="/legal/terms_and_conditions">
+                        <Link href="/legal/terms_and_conditions">
                           Terms & conditions
                         </Link>
                       </li>
                       <li>
-                        <Link target="_blank" href="/legal/privacy_policy">Privacy Policy</Link>
+                        <Link href="/legal/privacy_policy">Privacy Policy</Link>
                       </li>
                       <li>
                         <Link target="_blank" href="/md/ljetina_openai_data_processing_agreement.pdf">OpenAI Data Processing agreement</Link>

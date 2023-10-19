@@ -14,7 +14,7 @@ export const NewConversationButton: FC<NewConversationButtonProps> = ({
       onClick={onNewConversation}
     >
       <IconPlus size={16} />
-      New conversation
+      New chat
     </button>
   );
 };

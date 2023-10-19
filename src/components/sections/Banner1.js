@@ -1,37 +1,64 @@
-import Link from "next/link"
-import Typewriter from 'typewriter-effect'
+import { useCallback } from 'react';
+
+import Link from 'next/link';
+
+import Typewriter from 'typewriter-effect';
 
 export default function Banner1() {
-    return (
-        <>
-            <section className="banner-area">
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-12">
-                            <div className="banner-content ta-animated-headline">
-                                <h2 className="title ah-headline wow fadeInUp" data-wow-delay=".2s">
-                                    <span>The chat assistant for the <br /> </span>
-                                    <Typewriter tag="span"
-                                        options={{
-                                            wrapperClassName: "ah-words-wrapper",
-                                            strings: ['power user', 'high achiever', 'state of flow', 'burst of inspiration', 'deep conversation', 'business edge'],
-                                            autoStart: true,
-                                            loop: true,
-                                        }}
-                                    />
-                                </h2>
-                                <p className="wow fadeInUp" data-wow-delay=".4s">We offer a premium chat assistant service that is deeply integrated with hand picked plugins. Keep the conversation going with automatic advanced memory and context management.</p>
-                                {/* <p className="wow fadeInUp" data-wow-delay=".4s">IslandFox.AI is not just another AI assistant. Designed for power users, it comes with best-in-class models, intelligent memory and context management, and convenient integrations with services like Google Search, Wikipedia, Arxiv, and more. Perfect for individuals or small-scale operations looking to harness the power of AI.</p> */}
-                                <div className="banner-btn">
-                                    <Link href="/waiting" className="gradient-btn wow fadeInLeft" data-wow-delay=".6s">Sign up for the waiting list</Link>
-                                    <Link href="/features" className="gradient-btn gradient-btn-two wow fadeInRight" data-wow-delay=".6s">See How IslandFox.AI Works</Link>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+  const toChat = useCallback(() => {
+    window.location.href = '/chat';
+  }, []);
+  return (
+    <>
+      <section className="banner-area">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="banner-content ta-animated-headline">
+                <h2
+                  className="title ah-headline wow fadeInUp"
+                  data-wow-delay=".2s"
+                >
+                  <span>
+                    Calling all <br />{' '}
+                  </span>
+                  <Typewriter
+                    tag="span"
+                    options={{
+                      wrapperClassName: 'ah-words-wrapper',
+                      strings: [
+                        'Data Scientists',
+                        'Researchers',
+                        'Data Analysts',
+                        'Machine Learning engineers',
+                        'Quants',
+                      ],
+                      autoStart: true,
+                      loop: true,
+                    }}
+                  />
+                </h2>
+                <p  data-wow-delay=".4s">
+                  Accelerate your data science projects with IslandFox.ai. By
+                  seamlessly connecting to your own Jupyter servers, notebooks
+                  and data infrastructure, we offer a new kind of chat
+                  assistance. We facilitate rapid data analysis, visualization,
+                  feature engineering and machine learning workflows.
+                </p>
+                <div className="banner-btn" onClick={toChat}>
+                  <div
+                    className="gradient-btn"
+                    data-wow-delay=".6s"
+                    onClick={toChat}
+                  >
+                    Get Started
+                  </div>
                 </div>
-            </section>
-
-        </>
-    )
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
 }

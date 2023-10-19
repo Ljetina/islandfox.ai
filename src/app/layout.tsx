@@ -25,6 +25,7 @@ export default async function RootLayout({
         {/* <title>{metadata.title}</title> */}
         {/* <meta name="description" content={metadata.description} /> */}
         {/* <link rel="shortcut icon" href="/assets/img/favicon.png" /> */}
+        <script async src="https://js.stripe.com/v3/buy-button.js"></script>
         <link
           rel="icon"
           type="image/png"

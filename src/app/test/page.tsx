@@ -13,6 +13,7 @@ export default function TestPage() {
     return <div>Loading...</div>;
   }
 
+  // @ts-ignore
   return <div>{JSON.stringify(initialData, 2)}</div>;
   
   // return (

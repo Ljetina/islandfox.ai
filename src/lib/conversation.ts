@@ -44,15 +44,11 @@ export const apiCreateConversation = async (
   newConversationData: ConversationData,
 ) => {
   try {
-    const response = await blurFetch({
+    const data = await blurFetch({
       pathname: 'conversation',
       method: 'POST',
       body: JSON.stringify(newConversationData),
     });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
     return data;
   } catch (error) {
     console.error('Error:', error);
@@ -68,11 +64,10 @@ export const apiGetConversationNotebookSettings = async (
   kernel_id: string | undefined;
 }> => {
   try {
-    const response = await blurFetch({
+    const data = await blurFetch({
       pathname: `conversation/${conversationId}/notebook`,
       method: 'GET',
     });
-    const data = await response.json();
     return data;
   } catch (error) {
     console.error('Error: ', error);
@@ -103,16 +98,11 @@ export const apiSaveNotebookSettings = async (
   settings: JupyterGlobalSettings,
 ) => {
   try {
-    const response = await blurFetch({
+    return await blurFetch({
       pathname: `user/notebook`,
       method: 'POST',
       body: JSON.stringify(settings),
     });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
   } catch (error) {
     console.error('Error: ', error);
   }
@@ -123,15 +113,11 @@ export const apiUpdateConversation = async (
   updatedData: Partial<ConversationData>,
 ) => {
   try {
-    const response = await blurFetch({
+    return await blurFetch({
       pathname: `conversation/${conversationId}`,
       method: 'PUT',
       body: JSON.stringify(updatedData),
     });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
   } catch (error) {
     console.error('Error:', error);
   }
@@ -143,9 +129,6 @@ export const apiDeleteConversation = async (conversationId: string) => {
       pathname: `conversation/${conversationId}`,
       method: 'DELETE',
     });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
   } catch (error) {
     console.error('Error:', error);
   }

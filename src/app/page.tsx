@@ -1,8 +1,5 @@
-// import { getServerSession } from 'next-auth';
-
-import { getServerSession } from "next-auth";
 import { WebHome } from "./home";
-import { authOptions } from "@/lib/auth";
+// import { authOptions } from "@/lib/auth";
 
 // import { LoginButton, LogoutButton } from '@/components/buttons.component';
 // Template components
@@ -20,7 +17,6 @@ import { authOptions } from "@/lib/auth";
 // import { authOptions } from '@/lib/auth';
 
 export default async function Home() {
-  const session = await getServerSession(authOptions);
   return <WebHome />
   // return <div>TEST</div>;
   // (

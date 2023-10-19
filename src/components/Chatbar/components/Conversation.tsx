@@ -1,4 +1,5 @@
 import {
+  IconArchive,
   IconCheck,
   IconMessage,
   IconPencil,
@@ -124,8 +125,8 @@ export const ConversationComponent = ({ conversation }: Props) => {
           }`}
           onClick={() => handleSelectConversation(conversation)}
           disabled={messageIsStreaming}
-          draggable="true"
-          onDragStart={(e) => handleDragStart(e, conversation)}
+          draggable="false"
+          // onDragStart={(e) => handleDragStart(e, conversation)}
         >
           <IconMessage size={18} />
           <div

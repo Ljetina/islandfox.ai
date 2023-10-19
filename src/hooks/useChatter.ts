@@ -65,7 +65,7 @@ export const useChatter = () => {
         console.error('failed to parse server message', e, lastMessage.data);
         return;
       }
-      console.log(serverMessage);
+      // console.log(serverMessage);
       if (serverMessage.type === 'message_ack') {
         const { userUuid, assistantUuid } = serverMessage.data as {
           userUuid: string;
@@ -89,10 +89,10 @@ export const useChatter = () => {
           typeof serverMessage.data == 'object' &&
           'functionName' in serverMessage.data
         ) {
-          console.log(serverMessage?.data?.functionArguments);
+          // console.log(serverMessage?.data?.functionArguments);
           try {
             const funcArgs = JSON.parse(serverMessage?.data?.functionArguments);
-            console.log({ funcArgs });
+            // console.log({ funcArgs });
             const functionName = serverMessage?.data?.functionName as string;
             handleUpdateMessageContent(
               currentAssisstantId as string,
@@ -147,6 +147,10 @@ export const useChatter = () => {
         setCurrentAssisstantId(null);
       } else if (serverMessage.type === 'remaining_credits') {
         setRemainingCredits(serverMessage.data.remainingCredits);
+      } else if (serverMessage.type == 'credit_topup') {
+        console.log('serverMessage.data', serverMessage.data);
+        setRemainingCredits(serverMessage.data.remainingCredits);
+        emit('credit_topup', {});
       }
     }
   }, [

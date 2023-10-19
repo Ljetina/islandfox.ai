@@ -1,64 +1,24 @@
 'use client';
 
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { useQuery } from 'react-query';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-// import { GetServerSideProps } from 'next';
-// import { useTranslation } from 'next-i18next';
-// import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-// import useErrorService from '@/services/errorService';
-// import useApiService from '@/services/useApiService';
 import Head from 'next/head';
 
-import { useChatter } from '@/hooks/useChatter';
-import { useCreateReducer } from '@/hooks/useCreateReducer';
-import { useInitialData } from '@/hooks/useInitialData';
-
 import { Conversation } from '@/types/chat';
-import { KeyValuePair } from '@/types/data';
-import { FolderInterface, FolderType } from '@/types/folder';
-import { OpenAIModelID, OpenAIModels } from '@/types/openai';
-import { Prompt } from '@/types/prompt';
+import { OpenAIModelID } from '@/types/openai';
 
 import ActiveConversation from '@/components/Chat/ActiveConversation';
 import { ActiveSettingsDialog } from '@/components/Chat/ActiveSettingsDialog';
-import { BillingDialog } from '@/components/Chat/BillingDialog';
-import { Chat } from '@/components/Chat/Chat';
-import List from '@/components/Chat/MessageVirtuoso';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 // import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
-import Promptbar from '@/components/Promptbar';
 
+// import Promptbar from '@/components/Promptbar';
 import '../globals.css';
-import { ChatContext, withChatProvider } from './chat.provider';
-import {
-  ChatInitialState,
-  InitialServerData,
-  initialState,
-} from './chat.state';
+import { ChatContext } from './chat.provider';
 
-import {
-  cleanConversationHistory,
-  cleanSelectedConversation,
-} from '@/lib/clean';
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/lib/const';
-import {
-  saveConversation,
-  saveConversations,
-  updateConversation,
-} from '@/lib/conversation';
-import { saveFolders } from '@/lib/folders';
-import { savePrompts } from '@/lib/prompts';
 import { getSettings } from '@/lib/settings';
-import { v4 as uuidv4 } from 'uuid';
+import { AccountDialog } from '@/components/Chat/AccountDialog';
 
 interface Props {
   // initialData: InitialServerData;
@@ -75,7 +35,7 @@ const ChatHome = ({ conversationId }: Props) => {
   const defaultModelId = OpenAIModelID.GPT_4;
 
   const {
-    state: { conversations, selectedConversationId, messages },
+    state: { conversations, selectedConversationId, messages, isLoggedIn },
   } = useContext(ChatContext);
 
   const selectedConversation = useMemo(
@@ -131,8 +91,6 @@ const ChatHome = ({ conversationId }: Props) => {
 
   // ON LOAD --------------------------------------------
 
-  
-
   useEffect(() => {
     const settings = getSettings();
     if (settings.theme) {
@@ -146,118 +104,9 @@ const ChatHome = ({ conversationId }: Props) => {
     //   dispatch({ field: 'showChatbar', value: false });
     //   dispatch({ field: 'showPromptbar', value: false });
     // }
-
-    // const showChatbar = localStorage.getItem('showChatbar');
-    // if (showChatbar) {
-    //   dispatch({ field: 'showChatbar', value: showChatbar === 'true' });
-    // }
-
-    // const showPromptbar = localStorage.getItem('showPromptbar');
-    // if (showPromptbar) {
-    //   dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
-    // }
-
-    // TODO these two are no longer necessary, they come from initialData, keeping for reference for now
-    // const folders = localStorage.getItem('folders');
-    // if (folders) {
-    //   dispatch({ field: 'folders', value: JSON.parse(folders) });
-    // }
-
-    // const prompts = localStorage.getItem('prompts');
-    // if (prompts) {
-    //   dispatch({ field: 'prompts', value: JSON.parse(prompts) });
-    // }
-
-    // TODO new  conversation, but also conversationHistory as a list? Not sure, I think this
-    // is replaced by conversations from initialData
-    // const conversationHistory = localStorage.getItem('conversationHistory');
-    // console.log({ conversationHistory });
-    // if (conversationHistory) {
-    //   const parsedConversationHistory: Conversation[] =
-    //     JSON.parse(conversationHistory);
-    //   const cleanedConversationHistory = cleanConversationHistory(
-    //     parsedConversationHistory,
-    //   );
-
-    //   dispatch({ field: 'conversations', value: cleanedConversationHistory });
-
-    //   if (conversationId && cleanedConversationHistory) {
-    //     const selectedConversation = cleanedConversationHistory.find(
-    //       (c) => c.id == conversationId,
-    //     );
-    //     console.log('DISPATCHING', { selectedConversation });
-    //     if (selectedConversation) {
-    //       dispatch({
-    //         field: 'selectedConversation',
-    //         value: selectedConversation,
-    //       });
-    //     } else {
-    //       dispatchDefaultNewConversation();
-    //     }
-    //   } else {
-    //     dispatchDefaultNewConversation();
-    //   }
-    // } else {
-    //   dispatchDefaultNewConversation();
-    // }
-    // function dispatchDefaultNewConversation() {
-    //   console.log('DEFAULT NEW CONVERSATION');
-    //   dispatch({
-    //     field: 'selectedConversation',
-    //     value: {
-    //       id: uuidv4(),
-    //       name: 'New Conversation',
-    //       messages: [],
-    //       model: OpenAIModels[defaultModelId],
-    //       prompt: DEFAULT_SYSTEM_PROMPT,
-    //       temperature: temperature ?? DEFAULT_TEMPERATURE,
-    //       folderId: null,
-    //     },
-    //   });
-    // }
-
-    // const selectedConversation = localStorage.getItem('selectedConversation');
-    // console.log({selectedConversation})
-    // if (selectedConversation) {
-    //   const parsedSelectedConversation: Conversation =
-    //     JSON.parse(selectedConversation);
-    //   const cleanedSelectedConversation = cleanSelectedConversation(
-    //     parsedSelectedConversation,
-    //   );
-
-    //   dispatch({
-    //     field: 'selectedConversation',
-    //     value: cleanedSelectedConversation,
-    //   });
-    // } else {
-    //   const lastConversation = conversations[conversations.length - 1];
-    //   dispatch({
-    //     field: 'selectedConversation',
-    //     value: {
-    //       id: uuidv4(),
-    //       name: 'New Conversation',
-    //       messages: [],
-    //       model: OpenAIModels[defaultModelId],
-    //       prompt: DEFAULT_SYSTEM_PROMPT,
-    //       temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
-    //       folderId: null,
-    //     },
-    //   });
-    // }
   }, [selectedConversationId]);
 
-  // console.log({ initialData });
-  // if (isLoading) {
-  //   return <div>Loading...</div>;
-  // }
-
-
   const [areSettingsOpen, setSettingsOpen] = useState(false);
-  const [hasClosedBilling, setHasClosedBilling] = useState(false);
-
-  const onCloseBilling = useCallback(() => {
-    setHasClosedBilling(true);
-  }, []);
 
   const onOpenSettings = useCallback(() => {
     setSettingsOpen(true);
@@ -294,7 +143,7 @@ const ChatHome = ({ conversationId }: Props) => {
           <Chatbar />
 
           <div className="flex flex-1">
-            {selectedConversationId && (
+            {selectedConversationId && isLoggedIn && (
               <ActiveConversation onOpenSettings={onOpenSettings} />
             )}
           </div>
@@ -302,6 +151,7 @@ const ChatHome = ({ conversationId }: Props) => {
           {/* <Promptbar /> */}
         </div>
         {areSettingsOpen && <ActiveSettingsDialog onClose={onCloseSettings} />}
+        {!isLoggedIn && <AccountDialog />}
       </div>
     </>
   );

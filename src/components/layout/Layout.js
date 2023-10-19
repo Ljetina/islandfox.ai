@@ -55,7 +55,7 @@ export default function Layout({
         />
         <div
           className="main-shape"
-          data-background="/assets/img/images/main_shape.png"
+          data-background="/assets/img/images/main_shape_1.png"
         />
         {breadcrumbTitle && <Breadcrumb breadcrumbTitle={breadcrumbTitle} />}
 

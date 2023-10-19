@@ -4,13 +4,17 @@ import React, { useEffect } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import '../globals.css';
 
 const RedirectPage: React.FC = () => {
-  const [, setIsLoggedIn] = useLocalStorage('isLoggedIn', false);
   const router = useRouter();
+  let debounce = false;
 
   useEffect(() => {
+    if (debounce) {
+      return;
+    }
+    debounce = true;
     const urlParams = new URLSearchParams(window.location.search);
     const name = decodeURIComponent(urlParams.get('name') || '');
     const pic = decodeURIComponent(urlParams.get('pic') || '');
@@ -18,7 +22,6 @@ const RedirectPage: React.FC = () => {
     localStorage.setItem('pic', pic);
     const preAuthPath = localStorage.getItem('preAuthPath');
     if (preAuthPath) {
-      setIsLoggedIn(true);
       router.push(preAuthPath, { scroll: false });
       localStorage.removeItem('preAuthPath');
     } else {
@@ -26,7 +29,14 @@ const RedirectPage: React.FC = () => {
     }
   }, []);
 
-  return <div>Redirecting...</div>;
+  return (
+    <div className="flex justify-center items-center h-screen bg-black text-white space-x-1">
+      Redirecting
+      <span className="animate-pulse">.</span>
+      <span className="animate-pulse delay-400">.</span>
+      <span className="animate-pulse delay-800">.</span>
+    </div>
+  );
 };
 
 export default RedirectPage;

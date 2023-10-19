@@ -1,3 +1,5 @@
+import { emitEvent } from './events';
+
 // Used by client components
 export const getEndpoint = () => {
   return '/api/chat';
@@ -31,22 +33,20 @@ export async function getConversationMessages({
   page: number;
   limit: number;
 }) {
-  const resp = await blurFetch({
+  return await blurFetch({
     pathname: `conversation/${conversation_id}/message${makeQueryString({
       page,
       limit,
     })}`,
     method: 'GET',
   });
-  return await resp.json();
 }
 
 export async function loadDemoConversation() {
-  const resp = await blurFetch({ pathname: 'demo/main', method: 'GET' });
-  return await resp.json();
+  return await blurFetch({ pathname: 'demo/main', method: 'GET' });
 }
 
-export const blurFetch = ({
+export const blurFetch = async ({
   pathname,
   method,
   body,
@@ -55,12 +55,28 @@ export const blurFetch = ({
   method: 'PUT' | 'GET' | 'DELETE' | 'POST';
   body?: BodyInit;
 }) => {
-  return fetch(`http://localhost:3001/${pathname}`, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body,
-  });
+  try {
+    const resp = await fetch(`http://localhost:3001/${pathname}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body,
+    });
+
+    const responseBody = resp.status !== 204 ? await resp.json() : '';
+    if (resp.ok) {
+      return responseBody
+    } else {
+      if ([401, 403].includes(resp.status)) {
+        emitEvent('logged_out');
+      }
+      throw Error('failed to fetch');
+    }
+  } catch (e) {
+    // e.
+    console.error('blur fetch', e);
+    throw e;
+  }
 };

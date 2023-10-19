@@ -1,33 +1,47 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 
-import { useChatter } from '@/hooks/useChatter';
-import { useCreateReducer } from '@/hooks/useCreateReducer';
+import { useEvent } from '@/hooks/useEvents';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { Conversation } from '@/types/chat';
-import { OpenAIModelID } from '@/types/openai';
 
 import { Conversations } from './components/Conversations';
+import { CreditDisplay } from './components/CreditDisplay';
 import { NewConversationButton } from './components/NewConversationButton';
 
-import { BillingDialog } from '../Chat/BillingDialog';
+import { Button } from '../Buttons/Button';
+import { TopUpDialog } from '../Chat/TopupDialog';
 import { LoginButton } from '../Login/LoginButton';
 import SettingDialog from '../Settings/GlobalSettings';
 import Sidebar from '../Sidebar/NewSidebar';
-import { ChatbarInitialState, initialState } from './Chatbar.state';
 
 import { ChatContext } from '@/app/chat/chat.provider';
 import { creditsToDollars } from '@/lib/billing';
-import { apiCreateConversation } from '@/lib/conversation';
 
 export const Chatbar = () => {
   const {
-    state: { conversations, uiShowConverations, remainingCredits },
+    state: {
+      conversations,
+      uiShowConverations,
+      remainingCredits,
+      tenantId,
+      email,
+      isLoggedIn,
+    },
     handleNewConversation,
     toggleShowConversation,
   } = useContext(ChatContext);
 
   const [isSettingsOpen, setSettingsOpen] = useState(false);
   const [isTopupOpen, setTopupOpen] = useState(false);
+
+  // const [displayPanels, setDisplayPanels] = useState(false);
+
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     setDisplayPanels(true);
+  //   }
+  // }, [isLoggedIn]);
   const onOpen = useCallback(() => {
     setSettingsOpen(true);
   }, [setSettingsOpen]);
@@ -36,15 +50,18 @@ export const Chatbar = () => {
   }, [setSettingsOpen]);
   const onSave = useCallback(() => {}, []);
 
-  const onCloseBilling = useCallback(() => {
+  const onCloseTopup = useCallback(() => {
     setTopupOpen(false);
   }, []);
 
-  const onOpenBilling = useCallback(() => {
+  const onOpenTopup = useCallback(() => {
     setTopupOpen(true);
   }, []);
 
-  // const { outOfCredits } = useChatter();
+  const onTopUp = useCallback(() => {
+    setTopupOpen(false);
+  }, []);
+  useEvent('credit_topup', onTopUp);
 
   useEffect(() => {
     if (remainingCredits < 0) {
@@ -58,55 +75,51 @@ export const Chatbar = () => {
       isOpen={uiShowConverations}
       toggleOpen={toggleShowConversation}
     >
-      <div className="sticky top-0">
-        <NewConversationButton onNewConversation={handleNewConversation} />
-      </div>
+      {isLoggedIn && (
+        <div className="sticky top-0">
+          <NewConversationButton onNewConversation={handleNewConversation} />
+        </div>
+      )}
+
       <div className="overflow-y-auto flex-grow">
-        <Conversations conversations={conversations as Conversation[]} />
+        {isLoggedIn && (
+          <Conversations conversations={conversations as Conversation[]} />
+        )}
       </div>
 
       <div className="sticky bottom-0">
-        <CreditDisplay
-          onClick={onOpenBilling}
-          remainingCredits={creditsToDollars(remainingCredits)}
-        />
         <div className="flex flex-col gap-4 px-4 py-2">
-          <button
-            onClick={onOpen}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
-          >
-            Settings
-          </button>
-          <LoginButton />
+          {isLoggedIn && (
+            <Button onClick={onOpen}>
+              {' '}
+              <img
+                src="/assets/img/logo/jupyter.png"
+                height={45}
+                width={45}
+                alt="Jupyter Icon"
+                className="inline-block mr-2"
+              />
+              Server Settings
+            </Button>
+          )}
+          {isLoggedIn && (
+            <CreditDisplay
+              onClickTopUp={onOpenTopup}
+              creditsInUsd={creditsToDollars(remainingCredits)}
+            />
+          )}
+          {isLoggedIn && <LoginButton />}
         </div>
       </div>
+
       <SettingDialog onClose={onClose} onSave={onSave} open={isSettingsOpen} />
-      {isTopupOpen && <BillingDialog onClose={onCloseBilling} />}
+      {isTopupOpen && (
+        <TopUpDialog
+          tenantId={tenantId as string}
+          email={email as string}
+          onClose={onCloseTopup}
+        />
+      )}
     </Sidebar>
   );
 };
-
-function CreditDisplay({
-  onClick,
-  remainingCredits,
-}: {
-  onClick: () => void;
-  remainingCredits: string;
-}) {
-  return (
-    <div className="flex items-center bg-white shadow rounded-md p-4">
-      <div className="text-sm text-gray-700 mr-4">
-        Remaining credits:{' '}
-        <span className="font-semibold">${remainingCredits}</span>
-      </div>
-      <button
-        onClick={onClick}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Top-Up
-      </button>
-    </div>
-  );
-}
-
-// Usage:

@@ -32,10 +32,13 @@ export function MessageListContainer() {
   } = useContext(ChatContext);
 
   const [shouldRender, setShouldRender] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setShouldRender(false);
     setTimeout(() => setShouldRender(true), 0);
+    const handle = setTimeout(() => setIsVisible(true), 2000)
+    return () => clearTimeout(handle);
   }, [selectedConversationId]);
 
   // If shouldRender is false, return null
@@ -44,7 +47,13 @@ export function MessageListContainer() {
   }
 
   return (
-    <div style={{ height: '100%', width: '100%' }}>
+    <div
+      style={{
+        height: '100%',
+        width: '100%',
+        visibility: isLoadingMore ? 'hidden' : 'visible',
+      }}
+    >
       <MessageVirtuoso
         virtuoso={virtuoso}
         messages={messages}

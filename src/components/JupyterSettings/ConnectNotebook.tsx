@@ -115,6 +115,16 @@ const ConnectNotebook: React.FC<ConversationSettingsProps> = ({}) => {
     }
   }, [selectedKernel, selectedNotebook, selectedSession, setIsSaving]);
 
+  const onClear = useCallback(async () => {
+    try {
+      setIsSaving(true);
+      await saveNotebookSettings({});
+      setIsConnectingNotebook(false);
+    } finally {
+      setIsSaving(false);
+    }
+  }, []);
+
   return (
     <>
       {isConnectingNotebook ? (
@@ -190,6 +200,12 @@ const ConnectNotebook: React.FC<ConversationSettingsProps> = ({}) => {
                   className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 mr-2"
                 >
                   Cancel
+                </button>
+                <button
+                  onClick={onClear}
+                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 mr-2"
+                >
+                  Clear
                 </button>
                 <button
                   onClick={onSave}

@@ -1,11 +1,10 @@
-import { Message } from '@/types/chat';
+// import { Message } from '@/types/chat';
+// import { StaticChatMessage } from './StaticChatMessage';
+// import { loadDemoConversation } from '@/lib/api';
+import ReactMarkdown from 'react-markdown';
 
-import { StaticChatMessage } from './StaticChatMessage';
-
-import { loadDemoConversation } from '@/lib/api';
-
-export async function FeaturesBox() {
-  const messages: Message[] = await loadDemoConversation();
+export async function Docs() {
+  //   const messages: Message[] = await loadDemoConversation();
   return (
     <section>
       {/* TODO Attempt to make the class work similar to the homepage to fix the shadow around the text */}
@@ -43,16 +42,16 @@ export async function FeaturesBox() {
             fontWeight: 'var(--tg-heading-font-weight)',
             textTransform: 'inherit',
           }}
-        >
-          GPT-4 combined with powerful always-on plugins
-        </h2>
+        ></h2>
         <div
           className="w-full max-w-2xl mx-auto overflow-hidden dark shadow-2xl rounded-lg"
           style={{ marginBottom: '150px' }}
         >
-          {messages.map((message, index) => {
+          <ReactMarkdown>## Hello there </ReactMarkdown>
+          {/* <p>Hello there</p> */}
+          {/* {messages.map((message, index) => {
             return <StaticChatMessage key={message.id} message={message} />;
-          })}
+          })} */}
         </div>
       </div>
     </section>

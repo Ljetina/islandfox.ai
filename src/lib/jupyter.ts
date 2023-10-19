@@ -48,7 +48,6 @@ export async function getAvailableNotebooks(settings: JupyterGlobalSettings) {
       `http://${settings.host}:${settings.port}/api/contents/${settings.notebookFolderPath}?token=${settings.serverToken}`,
     );
     const data = await notebooksResponse.json();
-    console.log({ notebooks: data });
     data.content.sort((a, b) => {
       if (a.name < b.name) {
         return -1;

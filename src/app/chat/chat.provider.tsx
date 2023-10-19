@@ -9,11 +9,14 @@ import { createContext } from 'react';
 
 import { useParams, useRouter } from 'next/navigation';
 
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+
 import { Conversation, Message, Role } from '@/types/chat';
 import { OpenAIModelID } from '@/types/openai';
 
 import { InitialServerData } from './chat.state';
 
+import { blurFetch } from '@/lib/api';
 import {
   apiCreateConversation,
   apiDeleteConversation,
@@ -30,6 +33,8 @@ import {
 import { apiUpdateUserPreferences } from '@/lib/user';
 
 export interface ClientState {
+  email?: string;
+  tenantId?: string;
   conversations: Conversation[];
   messages: Message[];
   uiShowPrompts: boolean;
@@ -42,6 +47,7 @@ export interface ClientState {
   jupyterSettings: JupyterGlobalSettings;
   notebookSettings: JupyterConversationSettings | null;
   remainingCredits: number;
+  isLoggedIn: boolean;
 }
 
 export interface ChatContextProps {
@@ -71,12 +77,13 @@ export interface ChatContextProps {
   ) => Promise<boolean>;
   updateNotebookSettings: () => Promise<void>;
   saveNotebookSettings: (props: {
-    kernelId: string;
-    sessionId: string;
-    notebookPath: string;
-    notebookName: string;
+    kernelId?: string;
+    sessionId?: string;
+    notebookPath?: string;
+    notebookName?: string;
   }) => Promise<Partial<JupyterConversationSettings> | undefined>;
   setRemainingCredits: (credits: number) => void;
+  setIsLoggedIn: (isLoggedIn: boolean) => void;
 }
 
 export const ChatContext = createContext<ChatContextProps>(undefined!);
@@ -88,6 +95,7 @@ export const ChatProvider = ({
 }) => {
   const params = useParams();
   const [conversations, setConversations] = useState<Conversation[]>([]);
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [remainingCredits, setRemainingCredits] = useState(0);
   const [selectedConversationId, setSelectedConversationId] = useState<
@@ -105,58 +113,72 @@ export const ChatProvider = ({
     serverToken: '',
     notebookFolderPath: '',
   });
+  const [email, setEmail] = useState<string | undefined>(undefined);
+  const [tenantId, setTenantId] = useState<string | undefined>(undefined);
   const [notebookSettings, setNotebookSettings] =
     useState<JupyterConversationSettings | null>(null);
   const router = useRouter();
 
-  // Initial Load
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   useEffect(() => {
-    fetch('http://localhost:3001/initial', {
-      method: 'GET',
-      credentials: 'include', // Include credentials to send the session cookie
-    })
-      .then((response) => response.json())
-      .then((data: InitialServerData) => {
-        setUiShowConverations(data.ui_show_conversations);
-        setUiShowPrompts(data.ui_show_prompts);
-        setConversations(data.conversations || []);
-        setRemainingCredits(data.tenant_credits);
-        setJupyterSettings({
-          host: data.jupyter_settings.host,
-          port: data.jupyter_settings.port,
-          serverToken: data.jupyter_settings.token,
-          notebookFolderPath: data.jupyter_settings.notebooks_folder_path,
-        });
-        let selectedConversation = null;
-        if (data.conversations && data.conversations.length > 0) {
-          if (selectedConversationId) {
-            selectedConversation = data.conversations.find(
-              (c) => c.id === selectedConversationId,
-            );
-          } else {
-            selectedConversation =
-              data.conversations[data.conversations.length - 1];
-          }
-        }
-        if (selectedConversation) {
-          setSelectedConversationId(selectedConversation.id);
-          setTotalCount(selectedConversation.message_count);
-          setFirstItemIndex(selectedConversation.message_count);
-        }
-        setLoading(false);
+    blurFetch({ pathname: 'auth/check', method: 'GET' })
+      .then((d) => {
+        setIsLoggedIn(true);
       })
-      .catch((error) => {
-        console.log({ error });
-        setLoading(false);
+      .catch((e) => {
+        setIsLoggedIn(false);
       });
   }, []);
 
+  // Initial Load
+  useEffect(() => {
+    if (isLoggedIn) {
+      blurFetch({ pathname: 'initial', method: 'GET' })
+        .then((data: InitialServerData) => {
+          setUiShowConverations(data.ui_show_conversations);
+          setUiShowPrompts(data.ui_show_prompts);
+          setConversations(data.conversations || []);
+          setRemainingCredits(data.tenant_credits);
+          setTenantId(data.tenant_id);
+          setEmail(data.email);
+          setJupyterSettings({
+            host: data.jupyter_settings.host,
+            port: data.jupyter_settings.port,
+            serverToken: data.jupyter_settings.token,
+            notebookFolderPath: data.jupyter_settings.notebooks_folder_path,
+          });
+          let selectedConversation = null;
+          if (data.conversations && data.conversations.length > 0) {
+            if (selectedConversationId) {
+              selectedConversation = data.conversations.find(
+                (c) => c.id === selectedConversationId,
+              );
+            } else {
+              selectedConversation =
+                data.conversations[data.conversations.length - 1];
+            }
+          }
+          if (selectedConversation) {
+            setSelectedConversationId(selectedConversation.id);
+            setTotalCount(selectedConversation.message_count);
+            setFirstItemIndex(selectedConversation.message_count);
+          }
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.log({ error });
+          setLoading(false);
+        });
+    }
+  }, [isLoggedIn]);
+
   // change conversation useEffect
   useEffect(() => {
-    if (selectedConversationId) {
+    if (isLoggedIn && selectedConversationId) {
       updateNotebookSettings();
     }
-  }, [selectedConversationId, setNotebookSettings]);
+  }, [isLoggedIn, selectedConversationId, setNotebookSettings]);
 
   const updateNotebookSettings = useCallback(async () => {
     if (selectedConversationId) {
@@ -179,10 +201,10 @@ export const ChatProvider = ({
       notebookPath,
       notebookName,
     }: {
-      kernelId: string;
-      sessionId: string;
-      notebookPath: string;
-      notebookName: string;
+      kernelId?: string;
+      sessionId?: string;
+      notebookPath?: string;
+      notebookName?: string;
     }) => {
       if (selectedConversationId) {
         await apiSaveConversationNotebookSettings({
@@ -213,8 +235,8 @@ export const ChatProvider = ({
     setTotalCount(0);
     setFirstItemIndex(0);
     const conversation = await apiCreateConversation({
-      model_id: OpenAIModelID.GPT_3_5,
-      prompt: 'test',
+      model_id: OpenAIModelID.GPT_4,
+      prompt: '',
       name: 'New',
       temperature: 0.5,
     });
@@ -380,7 +402,9 @@ export const ChatProvider = ({
 
   const handleUpdateGlobalNotebookSettings = useCallback(
     async (settings: any) => {
+      console.log({ settings });
       const savedSettings = await apiSaveNotebookSettings(settings);
+      console.log({ savedSettings });
       setJupyterSettings({
         host: savedSettings.host,
         port: savedSettings.port,
@@ -408,6 +432,9 @@ export const ChatProvider = ({
           jupyterSettings,
           notebookSettings,
           remainingCredits,
+          email,
+          tenantId,
+          isLoggedIn,
         },
         setRemainingCredits,
         handleNewConversation,
@@ -425,6 +452,7 @@ export const ChatProvider = ({
         handleUpdateGlobalNotebookSettings,
         updateNotebookSettings,
         saveNotebookSettings,
+        setIsLoggedIn,
       }}
     >
       {children}

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 
 import Pricing1 from '@/components/sections/Pricing1';
@@ -22,10 +23,7 @@ export function Pricing() {
           <div className="pricing-item-wrap">
             <div className="row justify-content-center">
               <div className="col-xl-4 col-lg-6 col-md-9 col-sm-10">
-                <div
-                  className="pricing-item active wow fadeInUp"
-                  data-wow-delay=".5s"
-                >
+                <div className="pricing-item" data-wow-delay=".5s">
                   <span className="popular">Most&nbsp;popular</span>
                   <div className="pricing-shape">
                     <svg
@@ -63,7 +61,10 @@ export function Pricing() {
                   <div className="pricing-top">
                     <div className="left-side">
                       <div className="icon">
-                        <img src="/assets/img/icon/pricing_icon.svg" alt="" />
+                        <Image
+                          alt="pricing icon"
+                          src="/assets/img/icon/pricing_icon.svg"
+                        />
                       </div>
                       <div className="content">
                         <h4 className="title">Pay&nbsp;as&nbsp;you&nbsp;go</h4>
@@ -88,10 +89,7 @@ export function Pricing() {
                 </div>
               </div>
               <div className="col-xl-4 col-lg-6 col-md-9 col-sm-10">
-                <div
-                  className="pricing-item wow fadeInRight"
-                  data-wow-delay=".2s"
-                >
+                <div className="pricing-item" data-wow-delay=".2s">
                   <div className="pricing-shape">
                     <svg
                       viewBox="0 0 410 616"

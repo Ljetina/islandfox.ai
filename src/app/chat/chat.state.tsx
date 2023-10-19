@@ -45,6 +45,7 @@ export const initialState: ClientState = {
 export interface InitialServerData {
   id: string;
   email: string;
+  tenant_id: string;
   name: string;
   ui_show_prompts: boolean;
   ui_show_conversations: boolean;

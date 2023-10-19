@@ -43,7 +43,7 @@ export function MessageVirtuoso({
     setTimeout(() => {
       setLoadMoreDelayPassed(true);
     }, 1000);
-  }, []);
+  }, [isLoadingMore]);
 
   // @ts-ignore
   const Header = React.forwardRef(({ style, ...props }, ref) => {
@@ -118,7 +118,7 @@ export function MessageVirtuoso({
         // @ts-ignore
         Footer,
         // @ts-ignore
-        Header,
+        // Header,
       }}
       atTopStateChange={atTopStateChange}
       atBottomStateChange={setAtBottom}

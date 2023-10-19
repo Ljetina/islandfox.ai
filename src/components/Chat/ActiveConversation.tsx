@@ -2,6 +2,7 @@ import React, {
   memo,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -24,18 +25,40 @@ interface ActiveConversationProps {
 const ActiveConversation: React.FC<ActiveConversationProps> = memo(
   ({ onOpenSettings }: ActiveConversationProps) => {
     const {
-      state: { selectedConversationId, conversations, messages },
+      state: {
+        selectedConversationId,
+        conversations,
+        messages,
+        remainingCredits,
+      },
     } = useContext(ChatContext);
 
     const emit = useEmitter();
-    const { sendQuery, outOfCredits } = useChatter();
+    const { sendQuery } = useChatter();
     const onScrollDown = useCallback(() => {
       emit('scrollDownClicked', null);
     }, [emit]);
 
+    const [areSettingsVisible, setSettingsVisible] = useState(false);
+    const [isListVisible, setListVisible] = useState(false);
+    useEffect(() => {
+      const handle = setTimeout(() => {
+        setSettingsVisible(true);
+      }, 500);
+      return () => clearTimeout(handle);
+    }, []);
+
     const selectedConveration = useMemo(() => {
       return conversations?.find((c) => c.id === selectedConversationId);
     }, [conversations, selectedConversationId]);
+
+    useEffect(() => {
+      setListVisible(false);
+      const handle = setTimeout(() => {
+        setListVisible(true);
+      }, 500);
+      return () => clearTimeout(handle);
+    }, [selectedConversationId]);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const stopConversationRef = useRef<boolean>(false);
@@ -50,14 +73,15 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
             onClearAll={() => console.log('clear all?')}
           />
 
-          {messages.length == 0 && selectedConversationId && (
-            <ConversationSettings />
-          )}
+          {areSettingsVisible &&
+            messages.length == 0 &&
+            selectedConversationId && <ConversationSettings />}
           <MessageListContainer />
           
+
           <ChatInput
             stopConversationRef={stopConversationRef}
-            outOfCredits={outOfCredits}
+            outOfCredits={remainingCredits < 100}
             textareaRef={textareaRef}
             onSend={sendQuery}
             onScrollDownClick={onScrollDown}

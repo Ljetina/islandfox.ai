@@ -1,20 +1,33 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 
+import { useEvent } from '@/hooks/useEvents';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import Spinner from '../Spinner/Spinner';
 import styles from './LoginButton.module.css';
 
+import { ChatContext } from '@/app/chat/chat.provider';
+import { blurFetch } from '@/lib/api';
+
 export const LoginButton: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useLocalStorage('isLoggedIn', false);
+  const {
+    state: { isLoggedIn },
+    setIsLoggedIn,
+  } = useContext(ChatContext);
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const onLoggedOut = useCallback(() => {
+    setIsLoggedIn(false);
+  }, []);
+
+  useEvent('logged_out', onLoggedOut);
 
   const handleLogin = () => {
     setIsLoading(true);
@@ -23,16 +36,12 @@ export const LoginButton: React.FC = () => {
   };
 
   const handleLogout = () => {
-    fetch('http://localhost:3001/logout', {
-      method: 'POST',
-      credentials: 'include',
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.loggedOut) {
-          setIsLoggedIn(data.loggedOut ? false : true);
-        }
-      });
+    blurFetch({ pathname: 'auth/logout', method: 'POST' }).then((data) => {
+      console.log({ loggedOut: data });
+      if (data.loggedOut) {
+        setIsLoggedIn(data.loggedOut ? false : true);
+      }
+    });
   };
   if (!isClient) {
     return null;
