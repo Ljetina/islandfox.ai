@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
+import useWebSocket from 'react-use-websocket';
 
 import { ServerMessage } from '@/types/chat';
 
@@ -19,9 +19,11 @@ export const useChatter = () => {
     setRemainingCredits,
   } = useContext(ChatContext);
 
-  const { sendMessage, lastMessage, readyState } = useWebSocket(
+  const { sendMessage, lastMessage, readyState, getWebSocket } = useWebSocket(
     selectedConversationId
-      ? `${process.env.NEXT_PUBLIC_WS_URL as string}/conversation/${selectedConversationId}`
+      ? `${
+          process.env.NEXT_PUBLIC_WS_URL as string
+        }/conversation/${selectedConversationId}`
       : null,
     {
       onOpen: () => console.log('opened'),
@@ -29,6 +31,15 @@ export const useChatter = () => {
       shouldReconnect: (closeEvent) => true,
     },
   );
+
+  useEffect(() => {
+    if (readyState === 1) {
+      const handle = setInterval(() => {
+        sendMessage('ping');
+      }, 10000);
+      return () => clearInterval(handle);
+    }
+  }, [sendMessage, readyState]);
 
   const [query, setQuery] = useState('');
   const [lastHandledMessage, setLastHandledMessage] = useState(lastMessage);
@@ -58,6 +69,9 @@ export const useChatter = () => {
   useEffect(() => {
     if (lastMessage && lastHandledMessage !== lastMessage) {
       setLastHandledMessage(lastMessage);
+      if (lastMessage?.data === 'pong') {
+        return;
+      }
       let serverMessage;
       try {
         serverMessage = JSON.parse(lastMessage?.data);
