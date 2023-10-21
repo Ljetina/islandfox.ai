@@ -18,8 +18,6 @@ import { FolderInterface } from '@/types/folder';
 
 import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
 
-import ChatContext from '@/app/chat/chat.context';
-
 interface Props {
   currentFolder: FolderInterface;
   searchTerm: string;

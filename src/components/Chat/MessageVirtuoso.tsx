@@ -83,7 +83,7 @@ export function MessageVirtuoso({
         );
       }
     },
-    [messages],
+    [messages, firstItemIndex],
   );
 
   const startReached = useCallback(async () => {

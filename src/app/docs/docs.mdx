@@ -1,0 +1,78 @@
+# Documentation
+
+Welcome to IslandFox.ai, the chat assistant service that connects seamlessly with your Jupyter server. This robust service maintains your notebook context in sync and facilitates various data science tasks.
+
+## Setting Up a Local Jupyter Server Using Docker
+
+> **NOTE:** If you already have a Jupyter server configured, skip this part and proceed to the next section.
+
+If you are starting from scratch and do not have a local Jupyter server already set up, this section will guide you on how to create one using Docker. 
+
+Here are the step-by-step guidelines:
+* [Install Docker](https://www.docker.com/products/docker-desktop/)
+Make sure it's running. You will have to start the docker desktop app again after restarts.
+* Run a local jupyter server, using [a jupyter provided docker image](https://hub.docker.com/r/jupyter/datascience-notebook)
+
+Please change the path in the below command, ~/notebooks, to any folder on your local computer that you would like to use to keep your .ipynb jupyter notebooks in. Data in this folder will be persisted between restarts of the jupyter server. 
+Also change the 'my-token' string to a secret value. You will need this value later.
+
+
+```bash
+cd ~
+mkdir notebooks
+docker run -it --rm -p 8888:8888 -v "$(pwd)/notebooks":/home/jovyan/work \
+    docker.io/jupyter/datascience-notebook \
+    start-notebook.py --IdentityProvider.token='my-token'
+```
+
+Keep the terminal open. You will have to run this command again after a computer restart. You can configure a docker container to [automatically start](https://docs.docker.com/config/containers/start-containers-automatically/) and go the background, so you don't have to think about this, but this is beyond the scope of this documentation.
+
+After running this command you will have a local jupyter server, with a jupyter labs web interface opened in your browser.
+
+![Jupyter Labs interface](/assets/img/docs/jupyter_labs.png)
+
+## Configuring the Jupyter Server
+
+Starting the Jupyter server is only part of the process. You must configure the server settings, so IslandFox.ai can find the server.
+
+![Jupyter Server Settings](/assets/img/docs/jupyter_server_settings.png)
+
+1. **URL:** Provide the server URL.
+2. **Port:** The port number to connect to the server.
+3. **Token:** A secure identifier token for access as entered into the command above.
+4. **Notebook Folder Path:** The folder path used to locate notebooks to be connected into chat conversations.
+
+## Connecting Your Notebook to a Conversation
+
+Before you can start an AI assisted task, you have to start a kernel and a session in the jupyter server. You can do this by creating a new notebook, then running a single cell.
+
+![Jupyter Labs prep session](/assets/img/docs/prep_session.png)
+
+This active session will appear in the dropdown on the IslandFox.ai UI, where you can link the notebook to a chat conversation.
+
+![Conversation Notebook Settings](/assets/img/docs/connect_dropdown.png)
+
+Save the settings. The chat assistant now has access to the notebook.
+
+![Conversation Notebook Settings](/assets/img/docs/connected_chat.png)
+
+## Using the Notebook Connection  
+
+The assistant has access to these functions and will use them automatically when relevant.
+
+1. **Add Cell:** Add a cell and automaticalliy execute it. The assistant will receive the result of the execution and the latest notebook state.
+2. **Read the Notebook:** After manually changing the notebook, you can ask the assistant to read the notebook to make sure it is up to date.
+3. **Update cell:** The assistant can edit a cell. This will not lead to an execution. It's usefull if you want to ask it for multiple changes, before running a cell manually.
+4. **Delete cell:** The assistant will help clean up a notebook if asked.
+
+![Functions demo](/assets/img/docs/functions_demo.png)
+![Functions demo result in notebook](/assets/img/docs/functions_demo_result.png)
+
+## Some more tips
+
+* **Using Jupyter interface:** Jupyter Labs (the UI) doesn't reload the notebook from disk automatically. You unfortunately have to hit refresh on the browser to see the update made by the assistant. We prefer using [Visual Studio Code](https://code.visualstudio.com/) as the user interface for notebooks for this reason.
+* **Keep the Notebook Compact:** Notebooks can get large quickly and the cost of reading it on every request runs up. For effective use of the chat assistant, keep your notebooks compact. For larger analysis, it can help to do multiple smaller steps in separate notebooks.
+* **VS-Code users** If you are using an IDE, make sure it is [set to auto-save](https://code.visualstudio.com/docs/editor/codebasics#_save-auto-save). Because the assistant will trigger file changes, if you have file changes that are not saved, you'll run into conflicts. When auto-save is on, the UI should change immediately when the assistant makes any changes.
+
+
+Happy analysis!

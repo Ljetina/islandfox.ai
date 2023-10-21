@@ -13,8 +13,15 @@ export const AccountDialog = (props: Props) => {
     return () => clearTimeout(handle);
   }, []);
   return (
-    <div className="block fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 p-4">
-      {isVisible && (
+    isVisible && (
+      <div
+        className="block fixed inset-0 flex flex-col items-center justify-center p-4"
+        style={{
+          backgroundImage: 'url(/assets/img/images/data_tranquil.jpeg)',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+        }}
+      >
         <>
           <img
             src="/assets/img/logo/logo.png"
@@ -22,19 +29,21 @@ export const AccountDialog = (props: Props) => {
             className="mb-4"
           />
           <LoginButton />
-          <p className="mt-4 text-center text-white">
-            By logging in to IslandFox.ai you agree to our&nbsp;
-            <a href="/legal/terms_and_conditions" className="underline">
-              Terms of Service
-            </a>
-            &nbsp;and to our &nbsp;
-            <a href="/legal/privacy_policy" className="underline">
-              Privacy Policy
-            </a>
-            .
-          </p>
+          <div style={{ width: 200 }}>
+            <p className="mt-4 text-center text-white">
+              By logging in to IslandFox.ai you agree to our&nbsp;
+              <a href="/legal/terms_and_conditions" className="underline">
+                Terms of Service
+              </a>
+              &nbsp;and to our &nbsp;
+              <a href="/legal/privacy_policy" className="underline">
+                Privacy Policy
+              </a>
+              .
+            </p>
+          </div>
         </>
-      )}
-    </div>
+      </div>
+    )
   );
 };

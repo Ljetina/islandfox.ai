@@ -6,7 +6,7 @@ const JupyterSettingsForm = () => {
   const [serverToken, setServerToken] = useState('');
   const [notebooksFolderPath, setNotebooksFolderPath] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
 
     // TODO: Make API call to update Jupyter settings

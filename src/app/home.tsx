@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 import Layout from '@/components/layout/Layout';
 import Banner1 from '@/components/sections/Banner1';
 
@@ -14,7 +16,6 @@ import '/public/assets/css/odometer.css';
 import '/public/assets/css/responsive.css';
 import '/public/assets/css/select2.min.css';
 import '/public/assets/css/style.css';
-import Image from 'next/image';
 
 export function WebHome() {
   return (
@@ -22,11 +23,9 @@ export function WebHome() {
       {/* @ts-ignore TODO */}
       <Layout mainCls="main-content fix" headTitle={'home'}>
         <Banner1 />
-        <div className="row">
-          <div style={{display: 'flex', flexDirection: 'row', width:'100%'}}>
-            <Image alt='robot helping out a data nerd' src="/assets/img/images/home_1.jpeg" style={{width: '50%'}}/>
-            <Image alt='desk robot on a desk' src="/assets/img/images/home_2.jpeg" style={{width: '50%'}}/>
-          </div>
+        <div style={{ flexDirection: 'row', display: 'flex' }}>
+          <img id="first-image" src="/assets/img/images/home_1.jpeg" />
+          <img id="second-image" src="/assets/img/images/home_2.jpeg" />
         </div>
       </Layout>
     </>

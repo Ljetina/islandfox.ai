@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 
 import { MessageVirtuoso } from './MessageVirtuoso';
+import { Message } from '@/types/chat';
 
 function makeMessages(count: number) {
   return Array.from({ length: count }, (_, i) => ({
@@ -25,7 +26,7 @@ export function SimpleList({ messages }: any) {
   console.log({ messages });
   return (
     <ul>
-      {messages.map((m) => (
+      {messages.map((m: Message) => (
         <li key={m.id}>{m.content}</li>
       ))}
     </ul>
@@ -77,6 +78,7 @@ export function MockedList({}) {
 
     setTimeout(() => {
       if (virtuoso.current && !atBottom) {
+        // @ts-ignore
         virtuoso.current.scrollToIndex({
           // messages.length instead of -1, because the m
           index: messages.length,
@@ -91,7 +93,7 @@ export function MockedList({}) {
     firstItemIndex,
     totalCount,
     setFirstItemIndex,
-    setTotalCount
+    setTotalCount,
   ]);
 
   return (
@@ -105,6 +107,7 @@ export function MockedList({}) {
         firstItemIndex={firstItemIndex}
         setAtBottom={setAtBottom}
       />
+      {/* @ts-ignore */}
       <button style={buttonStyle} onClick={addMessage}>
         Click me
       </button>

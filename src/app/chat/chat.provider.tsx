@@ -101,8 +101,8 @@ export const ChatProvider = ({
   const [selectedConversationId, setSelectedConversationId] = useState<
     string | undefined
   >(params && params.convid ? (params?.convid as string) : undefined);
-  const [uiShowConverations, setUiShowConverations] = useState(true);
-  const [uiShowPrompts, setUiShowPrompts] = useState(true);
+  const [uiShowConverations, setUiShowConverations] = useState(false);
+  const [uiShowPrompts, setUiShowPrompts] = useState(false);
   const [loading, setLoading] = useState(true);
   const [messageIsStreaming, setMessageIsStreaming] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -402,9 +402,7 @@ export const ChatProvider = ({
 
   const handleUpdateGlobalNotebookSettings = useCallback(
     async (settings: any) => {
-      console.log({ settings });
       const savedSettings = await apiSaveNotebookSettings(settings);
-      console.log({ savedSettings });
       setJupyterSettings({
         host: savedSettings.host,
         port: savedSettings.port,

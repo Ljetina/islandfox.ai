@@ -92,7 +92,6 @@ const ConnectNotebook: React.FC<ConversationSettingsProps> = ({}) => {
     (event: any) => {
       const id = event.target.value;
       const foundSession = sessions.find((s) => s.id === id);
-      console.log({ id, foundSession });
       setSelectedSession(foundSession);
     },
     [sessions, setSelectedSession],

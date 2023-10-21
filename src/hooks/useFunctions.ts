@@ -84,13 +84,19 @@ export function useFunctions(): {
       jupyterSettings,
     );
     content.cells[index].source = code;
-    content.cells[index].outputs = [];
     emitNotebookUpdate(sendMessage, content);
-    await updateNotebookContent(
-      notebookSettings.notebook_path,
+    const result = await executeCell(
       content,
+      index,
+      notebookSettings,
       jupyterSettings,
     );
+    return 'Cell has been updated. Output of execution: ' + result || '';
+    // await updateNotebookContent(
+    //   notebookSettings.notebook_path,
+    //   content,
+    //   jupyterSettings,
+    // );
   }
 
   async function deleteCellFunction({

@@ -320,9 +320,9 @@ export const ChatInput = ({
             {messageIsStreaming ? (
               <div className="h-4 w-4 animate-spin rounded-full border-t-2 border-neutral-800 opacity-60 dark:border-neutral-100"></div>
             ) : outOfCredits ? (
-              <IconSendOff size={18} />
+              <IconSendOff size={18} color='red' />
             ) : (
-              <IconSend size={18} />
+              <IconSend size={18} color='#ffcb00'/>
             )}
           </button>
 

@@ -38,7 +38,14 @@ export default function Banner1() {
                     }}
                   />
                 </h2>
-                <p  data-wow-delay=".4s">
+                <p
+                  style={{
+                    backgroundColor: 'rgba(50, 0, 75, 0.3)',
+                    borderRadius: '10px',
+                    padding: '10px',
+                    color: 'white'
+                  }}
+                >
                   Accelerate your data science projects with IslandFox.ai. By
                   seamlessly connecting to your own Jupyter servers, notebooks
                   and data infrastructure, we offer a new kind of chat

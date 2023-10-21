@@ -48,7 +48,7 @@ export async function getAvailableNotebooks(settings: JupyterGlobalSettings) {
       `http://${settings.host}:${settings.port}/api/contents/${settings.notebookFolderPath}?token=${settings.serverToken}`,
     );
     const data = await notebooksResponse.json();
-    data.content.sort((a, b) => {
+    data.content.sort((a: any, b: any) => {
       if (a.name < b.name) {
         return -1;
       } else if (a.name > b.name) {
@@ -70,7 +70,6 @@ export async function getAvailableKernels(settings: JupyterGlobalSettings) {
       `http://${settings.host}:${settings.port}/api/kernels?token=${settings.serverToken}`,
     );
     const data = await kernelsResponse.json();
-    console.log({ kernels: data });
     return data;
   } catch (error) {
     console.error('Error fetching kernels:', error);
@@ -104,6 +103,7 @@ export async function getNotebookContent(
       throw new Error('Network response was not ok');
     }
     const data = await response.json();
+    console.log(data.content);
     return data.content;
   } catch (error) {
     console.error('Error fetching notebook:', error);
@@ -215,11 +215,9 @@ export async function executeCell(
     });
 
     ws.addEventListener('message', function incoming(event) {
-      console.log({ event });
-      // data.
       const m = JSON.parse(event.data.toString());
-      // console.log('MESSAGE', m);
       if (m.msg_type == 'execute_result') {
+        content.cells[cellIndex].execution_count += 1;
         content.cells[cellIndex].outputs.push({
           output_type: 'execute_result',
           metadata: {},
@@ -245,6 +243,20 @@ export async function executeCell(
       } else if (m.msg_type == 'execute_reply') {
         resolve(responseCache.result);
         ws.close();
+      } else if (m.msg_type == 'display_data') {
+        content.cells[cellIndex].execution_count += 1;
+        content.cells[cellIndex].outputs.push({
+          output_type: 'display_data',
+          metadata: {},
+          execution_count: 1,
+          data: {
+            ...m.content.data,
+          },
+        });
+        queueTask(
+          updateNotebookContent(convSettings.notebook_path, content, settings),
+        );
+        responseCache.result = m.content.data['text/plain'];
       } else {
         console.log('unknown message type');
         console.log({ m });

@@ -31,6 +31,7 @@ import { ChatContext } from '@/app/chat/chat.provider';
 // import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
+import Image from 'next/image';
 
 export interface Props {
   message: Message;
@@ -155,7 +156,7 @@ export const ChatMessage: FC<Props> = memo(
       ) {
         return <IconAbacus size={30} />;
       } else if (message.role === 'assistant') {
-        return <IconRobot />;
+        return <IconIslandFox />;
       } else {
         return <IconUser />;
       }
@@ -276,3 +277,7 @@ export const ChatMessage: FC<Props> = memo(
   },
 );
 ChatMessage.displayName = 'ChatMessage';
+
+function IconIslandFox() {
+  return  <Image src="/assets/img/icon/icon_logo.png" alt='islandfox' width="24" height="24"/>
+}

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 
 // import { Head, Html, Main, NextScript } from 'next/document'
 
@@ -26,6 +27,16 @@ export default async function RootLayout({
         {/* <meta name="description" content={metadata.description} /> */}
         {/* <link rel="shortcut icon" href="/assets/img/favicon.png" /> */}
         <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GA_MEASUREMENT_ID}`} />
+        <Script id="google-analytics">
+          {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+ 
+          gtag('config', '${process.env.GA_MEASUREMENT_ID}');
+        `}
+        </Script>
         <link
           rel="icon"
           type="image/png"

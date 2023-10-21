@@ -24,7 +24,8 @@ export function Pricing() {
             <div className="row justify-content-center">
               <div className="col-xl-4 col-lg-6 col-md-9 col-sm-10">
                 <div className="pricing-item" data-wow-delay=".5s">
-                  <span className="popular">Most&nbsp;popular</span>
+                  {/* <span className="popular">Most&nbsp;popular</span> */}
+                  <span className="popular">&nbsp;</span>
                   <div className="pricing-shape">
                     <svg
                       viewBox="0 0 410 616"
@@ -61,7 +62,7 @@ export function Pricing() {
                   <div className="pricing-top">
                     <div className="left-side">
                       <div className="icon">
-                        <Image
+                        <img
                           alt="pricing icon"
                           src="/assets/img/icon/pricing_icon.svg"
                         />
@@ -76,13 +77,13 @@ export function Pricing() {
                   </div>
                   <div className="pricing-list">
                     <ul className="list-wrap">
-                      <li>All the plugins, all the time</li>
+                      {/* <li>All the plugins, all the time</li> */}
                       <li>Pricing per api call</li>
                       <li>125.000 OpenAI gpt-4 tokens / $10</li>
-                      <p>or</p>
-                      <li>2200 Google search requests / $10</li>
-                      <p>or</p>
-                      <li>5000 news queries / $10</li>
+                      {/* <p>or</p> */}
+                      {/* <li>2200 Google search requests / $10</li> */}
+                      {/* <p>or</p> */}
+                      {/* <li>5000 news queries / $10</li> */}
                       <li>Prepaid bundles are available in various sizes</li>
                     </ul>
                   </div>
