@@ -6,16 +6,16 @@ Welcome to IslandFox.ai, the chat assistant service that connects seamlessly wit
 
 > **NOTE:** If you already have a Jupyter server configured, skip this part and proceed to the next section.
 
-If you are starting from scratch and do not have a local Jupyter server already set up, this section will guide you on how to create one using Docker. 
+If you are starting from scratch and do not have a local Jupyter server already set up, this section will guide you on how to create one using Docker.
 
 Here are the step-by-step guidelines:
-* [Install Docker](https://www.docker.com/products/docker-desktop/)
-Make sure it's running. You will have to start the docker desktop app again after restarts.
-* Run a local jupyter server, using [a jupyter provided docker image](https://hub.docker.com/r/jupyter/datascience-notebook)
 
-Please change the path in the below command, ~/notebooks, to any folder on your local computer that you would like to use to keep your .ipynb jupyter notebooks in. Data in this folder will be persisted between restarts of the jupyter server. 
+- [Install Docker](https://www.docker.com/products/docker-desktop/)
+  Make sure it's running. You will have to start the docker desktop app again after restarts.
+- Run a local jupyter server, using [a jupyter provided docker image](https://hub.docker.com/r/jupyter/datascience-notebook)
+
+Please change the path in the below command, ~/notebooks, to any folder on your local computer that you would like to use to keep your .ipynb jupyter notebooks in. Data in this folder will be persisted between restarts of the jupyter server.
 Also change the 'my-token' string to a secret value. You will need this value later.
-
 
 ```bash
 cd ~
@@ -56,7 +56,7 @@ Save the settings. The chat assistant now has access to the notebook.
 
 ![Conversation Notebook Settings](/assets/img/docs/connected_chat.png)
 
-## Using the Notebook Connection  
+## Using the Notebook Connection
 
 The assistant has access to these functions and will use them automatically when relevant.
 
@@ -70,9 +70,12 @@ The assistant has access to these functions and will use them automatically when
 
 ## Some more tips
 
-* **Using Jupyter interface:** Jupyter Labs (the UI) doesn't reload the notebook from disk automatically. You unfortunately have to hit refresh on the browser to see the update made by the assistant. We prefer using [Visual Studio Code](https://code.visualstudio.com/) as the user interface for notebooks for this reason.
-* **Keep the Notebook Compact:** Notebooks can get large quickly and the cost of reading it on every request runs up. For effective use of the chat assistant, keep your notebooks compact. For larger analysis, it can help to do multiple smaller steps in separate notebooks.
-* **VS-Code users** If you are using an IDE, make sure it is [set to auto-save](https://code.visualstudio.com/docs/editor/codebasics#_save-auto-save). Because the assistant will trigger file changes, if you have file changes that are not saved, you'll run into conflicts. When auto-save is on, the UI should change immediately when the assistant makes any changes.
+- **Using Jupyter interface:** Jupyter Labs (the UI) doesn't reload the notebook from disk automatically. You unfortunately have to hit refresh on the browser to see the update made by the assistant. We prefer using [Visual Studio Code](https://code.visualstudio.com/) as the user interface for notebooks for this reason. It's free and works really well.
+- **Keep the Notebook Compact:** Notebooks can get large quickly and the cost of reading it on every request runs up. For effective use of the chat assistant, keep your notebooks compact. For larger analysis, it can help to do multiple smaller steps in separate notebooks. For example, make a notebook for data exploration. Then another one for feature engineering and another one for trying out various models. It will help the assistant stay focused.
+- **VS-Code users** If you are using an IDE, make sure it is [set to auto-save](https://code.visualstudio.com/docs/editor/codebasics#_save-auto-save). Because the assistant will trigger file changes, if you have file changes that are not saved, you'll run into conflicts. When auto-save is on, the UI should change immediately when the assistant makes any changes.
 
+### Visual Studio set up
+
+[The documentation](https://code.visualstudio.com/docs/datascience/jupyter-notebooks) article can help you get started using Jupyter notebooks in VS Code. Make sure to follow the steps at [this section](https://code.visualstudio.com/docs/datascience/jupyter-notebooks#_connect-to-a-remote-jupyter-server) to connect VS Code to the same Jupyter Server as the assistant.
 
 Happy analysis!
