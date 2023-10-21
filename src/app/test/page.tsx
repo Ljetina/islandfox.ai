@@ -12,8 +12,8 @@ export default function TestPage() {
   // }
 
   // @ts-ignore
-  return <div>{JSON.stringify(initialData, 2)}</div>;
-  
+  return 'TEST';
+
   // return (
   //   <div>
   //     <h1>Login Page</h1>
