@@ -21,7 +21,7 @@ export const useChatter = () => {
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     selectedConversationId
-      ? `ws://localhost:3001/conversation/${selectedConversationId}`
+      ? `${process.env.NEXT_PUBLIC_WS_URL as string}/conversation/${selectedConversationId}`
       : null,
     {
       onOpen: () => console.log('opened'),

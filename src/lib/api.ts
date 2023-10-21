@@ -56,7 +56,7 @@ export const blurFetch = async ({
   body?: BodyInit;
 }) => {
   try {
-    const resp = await fetch(`http://localhost:3001/${pathname}`, {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_BLUR_URL}/${pathname}`, {
       method,
       headers: {
         'Content-Type': 'application/json',

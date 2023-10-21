@@ -1,7 +1,6 @@
 import { FC, useContext, useState } from 'react';
 
 import { ChatContext } from '@/app/chat/chat.provider';
-import { DEFAULT_TEMPERATURE } from '@/lib/const';
 
 interface Props {
   label: string;
@@ -18,7 +17,7 @@ export const TemperatureSlider: FC<Props> = ({
   // @ts-ignore
   const lastConversation = conversations[conversations.length - 1];
   const [temperature, setTemperature] = useState(
-    lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+    lastConversation?.temperature ?? 0.5,
   );
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseFloat(event.target.value);

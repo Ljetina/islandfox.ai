@@ -32,7 +32,7 @@ export const LoginButton: React.FC = () => {
   const handleLogin = () => {
     setIsLoading(true);
     localStorage.setItem('preAuthPath', window.location.pathname);
-    window.location.href = 'http://localhost:3001/auth/google';
+    window.location.href = process.env.NEXT_PUBLIC_AUTH_URL as string;
   };
 
   const handleLogout = () => {
