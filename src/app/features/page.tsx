@@ -1,6 +1,6 @@
 import Layout from '@/components/layout/Layout';
 
-import { FeaturesBox } from './featureBox';
+// import { FeaturesBox } from './featureBox';
 
 import '/public/assets/css/animate.min.css';
 import '/public/assets/css/animatedheadline.css';
@@ -22,7 +22,7 @@ export default function Features() {
   return (
     // @ts-ignore
     <Layout mainCls="main-content fix" headTitle={'features'}>
-      <FeaturesBox />
+      {/* <FeaturesBox /> */}
     </Layout>
   );
 }
