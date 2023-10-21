@@ -45,23 +45,6 @@ export function MessageVirtuoso({
     }, 1000);
   }, [isLoadingMore]);
 
-  // @ts-ignore
-  const Header = React.forwardRef(({ style, ...props }, ref) => {
-    return (
-      <div
-        style={{
-          ...style,
-          textAlign: 'center',
-        }}
-        // @ts-ignore
-        ref={ref}
-        {...props}
-      >
-        {isLoadingMore ? 'Loading...' : null}
-      </div>
-    );
-  });
-
   const itemContent = useCallback(
     (index: number) => {
       const localIndex = firstItemIndex + messages.length - 1 - index;
@@ -161,3 +144,4 @@ const Footer = React.forwardRef<HTMLDivElement | null>(
     );
   },
 );
+Footer.displayName = 'Footer';

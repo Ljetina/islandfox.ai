@@ -458,14 +458,18 @@ export const ChatProvider = ({
   );
 };
 
+ChatProvider.displayName = 'ChatProvider';
+
 export const withChatProvider = <P extends object>(
   WrappedComponent: ComponentType<P>,
 ) => {
-  return (props: P) => {
+  const Wrapper = (props: P) => {
     return (
       <ChatProvider>
         <WrappedComponent {...props} />
       </ChatProvider>
     );
   };
+  Wrapper.displayName = 'ProviderWrapper';
+  return Wrapper;
 };
