@@ -237,7 +237,6 @@ export async function executeCell(
         content.cells[cellIndex].outputs.push({
           output_type: 'execute_result',
           metadata: {},
-          execution_count: 1,
           data: {
             ...m.content.data,
           },
@@ -264,7 +263,6 @@ export async function executeCell(
         content.cells[cellIndex].outputs.push({
           output_type: 'display_data',
           metadata: {},
-          execution_count: 1,
           data: {
             ...m.content.data,
           },
