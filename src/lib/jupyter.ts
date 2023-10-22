@@ -73,6 +73,7 @@ async function recursivelyFetchNotebooks(
 export async function getAvailableSessions(settings: JupyterGlobalSettings) {
   try {
     const notebooks = await recursivelyFetchNotebooks(settings, '', 0);
+    console.log({notebooks})
     const sessionsResponse = await fetch(
       `http://${settings.host}:${settings.port}/api/sessions?token=${settings.serverToken}`,
     );
