@@ -45,6 +45,9 @@ async function recursivelyFetchNotebooks(
 ) {
   const notebookResponse = await fetch(
     `http://${settings.host}:${settings.port}/api/contents/${path}?token=${settings.serverToken}`,
+    {
+      cache: 'no-cache',
+    },
   );
   const notebookData = await notebookResponse.json();
 
@@ -73,33 +76,44 @@ async function recursivelyFetchNotebooks(
 export async function getAvailableSessions(settings: JupyterGlobalSettings) {
   try {
     const notebooks = await recursivelyFetchNotebooks(settings, '', 0);
-    console.log({notebooks})
+    console.log({ notebooks });
     const sessionsResponse = await fetch(
       `http://${settings.host}:${settings.port}/api/sessions?token=${settings.serverToken}`,
+      {
+        cache: 'no-cache',
+      },
     );
     const data = await sessionsResponse.json();
-    const sessions: Session[] = data.map((session: any) => {
-      console.log(session);
-      let regex = /^(.*?)-jvsc-/;
-      let match = session.notebook.path.match(regex);
-      let path = session.notebook.path;
-      let name = session.notebook.name;
+    const sessions: Session[] = data
+      .map((session: any) => {
+        console.log(session);
+        let regex = /^(.*?)-jvsc-/;
+        let match = session.notebook.path.match(regex);
+        let path = session.notebook.path;
+        let name = session.notebook.name;
 
-      if (match && match[1]) {
-        let originalName = match[1] + '.ipynb';
-        name = originalName + ' (from VS Code)';
-        path = notebooks.find((n: any) => n.name == originalName).path;
-        console.log(originalName);
-      }
+        if (match && match[1]) {
+          let originalName = match[1] + '.ipynb';
+          name = originalName + ' (from VS Code)';
+          const foundNotebook = notebooks.find(
+            (n: any) => n.name == originalName,
+          );
+          if (foundNotebook) {
+            path = notebooks.find((n: any) => n.name == originalName).path;
+          } else {
+            return null;
+          }
+        }
 
-      return {
-        id: session.id,
-        path: path,
-        kernelId: session.kernel.id,
-        kernelName: session.kernel.name,
-        notebookName: name,
-      };
-    });
+        return {
+          id: session.id,
+          path: path,
+          kernelId: session.kernel.id,
+          kernelName: session.kernel.name,
+          notebookName: name,
+        };
+      })
+      .filter((s: Session | null) => s !== null);
     return sessions;
   } catch (error) {
     console.error('Error fetching sessions:', error);
@@ -114,6 +128,9 @@ export async function getNotebookContent(
   try {
     const response = await fetch(
       `http://${settings.host}:${settings.port}/api/contents/${notebookPath}?token=${settings.serverToken}`,
+      {
+        cache: 'no-cache',
+      },
     );
     if (!response.ok) {
       throw new Error('Network response was not ok');
