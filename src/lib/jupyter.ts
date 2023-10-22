@@ -31,17 +31,6 @@ export async function testConnection(settings: JupyterGlobalSettings) {
   }
 }
 
-export async function getAvailableNotebookOptions(
-  settings: JupyterGlobalSettings,
-) {
-  const [notebooks, kernels, sessions] = await Promise.all([
-    getAvailableNotebooks(settings),
-    getAvailableKernels(settings),
-    getAvailableSessions(settings),
-  ]);
-  return { notebooks, kernels, sessions };
-}
-
 export async function getAvailableNotebooks(settings: JupyterGlobalSettings) {
   try {
     const notebooksResponse = await fetch(
@@ -64,30 +53,51 @@ export async function getAvailableNotebooks(settings: JupyterGlobalSettings) {
   }
 }
 
-export async function getAvailableKernels(settings: JupyterGlobalSettings) {
-  try {
-    const kernelsResponse = await fetch(
-      `http://${settings.host}:${settings.port}/api/kernels?token=${settings.serverToken}`,
-    );
-    const data = await kernelsResponse.json();
-    return data;
-  } catch (error) {
-    console.error('Error fetching kernels:', error);
-    return false;
-  }
+export interface Session {
+  id: string;
+  kernelId: string;
+  kernelName: string;
+  path: string;
+  notebookName: string;
 }
 
 export async function getAvailableSessions(settings: JupyterGlobalSettings) {
   try {
+    const notebooksResponse = await fetch(
+      `http://${settings.host}:${settings.port}/api/contents/${settings.notebookFolderPath}?token=${settings.serverToken}`,
+    );
+    const notebooksData = await notebooksResponse.json();
     const sessionsResponse = await fetch(
       `http://${settings.host}:${settings.port}/api/sessions?token=${settings.serverToken}`,
     );
     const data = await sessionsResponse.json();
-    console.log({ sessions: data });
-    return data;
+    const sessions: Session[] = data.map((session: any) => {
+      let regex = /^(.*?)-jvsc-/;
+      let match = session.notebook.path.match(regex);
+      let path = session.notebook.path;
+      let name = session.notebook.name;
+
+      if (match && match[1]) {
+        let originalName = match[1] + '.ipynb';
+        name = originalName + ' (from VS Code)';
+        path = notebooksData.content.find(
+          (n: any) => n.name == originalName,
+        ).path;
+        console.log(originalName);
+      }
+
+      return {
+        id: session.id,
+        path: path,
+        kernelId: session.kernel.id,
+        kernelName: session.kernel.name,
+        notebookName: name,
+      };
+    });
+    return sessions;
   } catch (error) {
     console.error('Error fetching sessions:', error);
-    return false;
+    return [];
   }
 }
 
