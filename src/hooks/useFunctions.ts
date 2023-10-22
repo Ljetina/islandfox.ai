@@ -146,12 +146,32 @@ export function useFunctions(): {
     return 'new content has been emitted';
   }
 
+  async function readCellOutput({
+    index,
+    sendMessage,
+  }: {
+    index: number;
+    sendMessage: (message: string) => void;
+  }) {
+    if (!notebookSettings) {
+      return 'unable to connect to notebook';
+    }
+    const content = await getNotebookContent(
+      notebookSettings?.notebook_path as string,
+      jupyterSettings,
+    );
+
+    emitNotebookUpdate(sendMessage, content);
+    return content.cells[index].outputs
+  }
+
   return {
     functions: {
       add_cell: addCellFunction,
       update_cell: updateCellFunction,
       delete_cell: deleteCellFunction,
       read_cells: readCells,
+      read_cell_output: readCellOutput,
     },
   };
 }
