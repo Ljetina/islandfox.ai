@@ -78,6 +78,7 @@ export async function getAvailableSessions(settings: JupyterGlobalSettings) {
     );
     const data = await sessionsResponse.json();
     const sessions: Session[] = data.map((session: any) => {
+      console.log(session);
       let regex = /^(.*?)-jvsc-/;
       let match = session.notebook.path.match(regex);
       let path = session.notebook.path;
