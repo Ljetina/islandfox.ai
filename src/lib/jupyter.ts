@@ -76,7 +76,6 @@ async function recursivelyFetchNotebooks(
 export async function getAvailableSessions(settings: JupyterGlobalSettings) {
   try {
     const notebooks = await recursivelyFetchNotebooks(settings, '', 0);
-    console.log({ notebooks });
     const sessionsResponse = await fetch(
       `http://${settings.host}:${settings.port}/api/sessions?token=${settings.serverToken}`,
       {
@@ -86,7 +85,6 @@ export async function getAvailableSessions(settings: JupyterGlobalSettings) {
     const data = await sessionsResponse.json();
     const sessions: Session[] = data
       .map((session: any) => {
-        console.log(session);
         let regex = /^(.*?)-jvsc-/;
         let match = session.notebook.path.match(regex);
         let path = session.notebook.path;
@@ -254,6 +252,7 @@ export async function executeCell(
         content.cells[cellIndex].outputs.push({
           output_type: 'execute_result',
           metadata: {},
+          execution_count: content.cells[cellIndex].execution_count,
           data: {
             ...m.content.data,
           },
