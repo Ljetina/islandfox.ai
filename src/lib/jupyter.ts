@@ -2,7 +2,6 @@ export interface JupyterGlobalSettings {
   host: string;
   port: string;
   serverToken: string;
-  notebookFolderPath: string;
 }
 
 export interface JupyterConversationSettings {
@@ -16,7 +15,7 @@ export interface JupyterConversationSettings {
 export async function testConnection(settings: JupyterGlobalSettings) {
   try {
     const response = await fetch(
-      `http://${settings.host}:${settings.port}/api/contents/${settings.notebookFolderPath}?token=${settings.serverToken}`,
+      `http://${settings.host}:${settings.port}/api/contents?token=${settings.serverToken}`,
     );
 
     if (!response.ok) {
@@ -31,28 +30,6 @@ export async function testConnection(settings: JupyterGlobalSettings) {
   }
 }
 
-export async function getAvailableNotebooks(settings: JupyterGlobalSettings) {
-  try {
-    const notebooksResponse = await fetch(
-      `http://${settings.host}:${settings.port}/api/contents/${settings.notebookFolderPath}?token=${settings.serverToken}`,
-    );
-    const data = await notebooksResponse.json();
-    data.content.sort((a: any, b: any) => {
-      if (a.name < b.name) {
-        return -1;
-      } else if (a.name > b.name) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
-    return data.content;
-  } catch (error) {
-    console.error('Error fetching notebooks:', error);
-    return false;
-  }
-}
-
 export interface Session {
   id: string;
   kernelId: string;
@@ -61,12 +38,41 @@ export interface Session {
   notebookName: string;
 }
 
+async function recursivelyFetchNotebooks(
+  settings: JupyterGlobalSettings,
+  path = '',
+  depth = 0,
+) {
+  const notebookResponse = await fetch(
+    `http://${settings.host}:${settings.port}/api/contents/${path}?token=${settings.serverToken}`,
+  );
+  const notebookData = await notebookResponse.json();
+
+  if (!notebookData.content || depth > 3) {
+    return [];
+  } else {
+    let resList: any[] = [];
+    for (const contentItem of notebookData.content) {
+      if (contentItem.type === 'directory') {
+        const dirData = await recursivelyFetchNotebooks(
+          settings,
+          contentItem.path,
+          depth + 1,
+        );
+        console.log();
+        // @ts-ignore
+        resList = resList.concat(dirData);
+      } else if (contentItem.type === 'notebook') {
+        resList.push(contentItem);
+      }
+    }
+    return resList;
+  }
+}
+
 export async function getAvailableSessions(settings: JupyterGlobalSettings) {
   try {
-    const notebooksResponse = await fetch(
-      `http://${settings.host}:${settings.port}/api/contents/${settings.notebookFolderPath}?token=${settings.serverToken}`,
-    );
-    const notebooksData = await notebooksResponse.json();
+    const notebooks = await recursivelyFetchNotebooks(settings, '', 0);
     const sessionsResponse = await fetch(
       `http://${settings.host}:${settings.port}/api/sessions?token=${settings.serverToken}`,
     );
@@ -80,9 +86,7 @@ export async function getAvailableSessions(settings: JupyterGlobalSettings) {
       if (match && match[1]) {
         let originalName = match[1] + '.ipynb';
         name = originalName + ' (from VS Code)';
-        path = notebooksData.content.find(
-          (n: any) => n.name == originalName,
-        ).path;
+        path = notebooks.find((n: any) => n.name == originalName).path;
         console.log(originalName);
       }
 

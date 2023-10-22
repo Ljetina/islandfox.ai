@@ -9,8 +9,6 @@ import { createContext } from 'react';
 
 import { useParams, useRouter } from 'next/navigation';
 
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-
 import { Conversation, Message, Role } from '@/types/chat';
 import { OpenAIModelID } from '@/types/openai';
 
@@ -111,7 +109,6 @@ export const ChatProvider = ({
     host: '',
     port: '',
     serverToken: '',
-    notebookFolderPath: '',
   });
   const [email, setEmail] = useState<string | undefined>(undefined);
   const [tenantId, setTenantId] = useState<string | undefined>(undefined);
@@ -146,7 +143,6 @@ export const ChatProvider = ({
             host: data.jupyter_settings.host,
             port: data.jupyter_settings.port,
             serverToken: data.jupyter_settings.token,
-            notebookFolderPath: data.jupyter_settings.notebooks_folder_path,
           });
           let selectedConversation = null;
           if (data.conversations && data.conversations.length > 0) {
@@ -407,7 +403,6 @@ export const ChatProvider = ({
         host: savedSettings.host,
         port: savedSettings.port,
         serverToken: savedSettings.token,
-        notebookFolderPath: savedSettings.notebooks_folder_path,
       });
       return await testConnection(settings);
     },

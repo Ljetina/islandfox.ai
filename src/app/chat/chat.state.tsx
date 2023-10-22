@@ -54,7 +54,6 @@ export interface InitialServerData {
     host: string;
     port: string;
     token: string;
-    notebooks_folder_path: string;
   };
   conversations?: Conversation[];
   folders?: {

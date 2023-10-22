@@ -33,7 +33,6 @@ const SettingDialog: FC<Props> = ({ open, onClose, onSave }) => {
       host: settings.host,
       port: settings.port,
       serverToken: settings.serverToken,
-      notebookFolderPath: settings.notebookFolderPath,
     });
     if (testConnectionResult) {
       setIsSaving(false);
@@ -114,21 +113,6 @@ const SettingDialog: FC<Props> = ({ open, onClose, onSave }) => {
             type="text"
             name="serverToken"
             value={settings.serverToken}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-2">
-          <label
-            className="block text-sm mb-1 text-white"
-            htmlFor="notebookFolderPath"
-          >
-            Notebook Folder Path:
-          </label>
-          <input
-            className="w-full border border-gray-300 rounded p-2 bg-gray-700 text-white"
-            type="text"
-            name="notebookFolderPath"
-            value={settings.notebookFolderPath}
             onChange={handleChange}
           />
         </div>
