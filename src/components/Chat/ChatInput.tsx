@@ -35,6 +35,7 @@ interface Props {
   onSend: (content: string) => void;
   onRegenerate: () => void;
   onScrollDownClick: () => void;
+  onStopGenerating: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
   showScrollDownButton: boolean;
@@ -47,6 +48,7 @@ export const ChatInput = ({
   onSend,
   onRegenerate,
   onScrollDownClick,
+  onStopGenerating,
   stopConversationRef,
   textareaRef,
   showScrollDownButton,
@@ -115,10 +117,11 @@ export const ChatInput = ({
   };
 
   const handleStopConversation = () => {
-    stopConversationRef.current = true;
-    setTimeout(() => {
-      stopConversationRef.current = false;
-    }, 1000);
+    onStopGenerating();
+    // stopConversationRef.current = true;
+    // setTimeout(() => {
+    //   stopConversationRef.current = false;
+    // }, 1000);
   };
 
   const isMobile = () => {
@@ -320,9 +323,9 @@ export const ChatInput = ({
             {messageIsStreaming ? (
               <div className="h-4 w-4 animate-spin rounded-full border-t-2 border-neutral-800 opacity-60 dark:border-neutral-100"></div>
             ) : outOfCredits ? (
-              <IconSendOff size={18} color='red' />
+              <IconSendOff size={18} color="red" />
             ) : (
-              <IconSend size={18} color='#ffcb00'/>
+              <IconSend size={18} color="#ffcb00" />
             )}
           </button>
 

@@ -41,6 +41,14 @@ export const useChatter = () => {
     }
   }, [sendMessage, readyState]);
 
+  const stopGenerating = useCallback(() => {
+    sendMessage(
+      JSON.stringify({
+        action: 'abort',
+      }),
+    );
+  }, [sendMessage]);
+
   const [query, setQuery] = useState('');
   const [lastHandledMessage, setLastHandledMessage] = useState(lastMessage);
   const [currentAssisstantId, setCurrentAssisstantId] = useState<string | null>(
@@ -193,5 +201,6 @@ export const useChatter = () => {
 
   return {
     sendQuery,
+    stopGenerating,
   };
 };

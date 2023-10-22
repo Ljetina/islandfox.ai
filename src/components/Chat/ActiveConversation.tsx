@@ -34,7 +34,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
     } = useContext(ChatContext);
 
     const emit = useEmitter();
-    const { sendQuery } = useChatter();
+    const { sendQuery, stopGenerating } = useChatter();
     const onScrollDown = useCallback(() => {
       emit('scrollDownClicked', null);
     }, [emit]);
@@ -85,6 +85,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
             textareaRef={textareaRef}
             onSend={sendQuery}
             onScrollDownClick={onScrollDown}
+            onStopGenerating={stopGenerating}
             onRegenerate={() => {
               // if (currentMessage) {
               //   handleSend(currentMessage);
