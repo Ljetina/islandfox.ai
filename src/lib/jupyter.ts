@@ -287,6 +287,16 @@ export async function executeCell(
           updateNotebookContent(convSettings.notebook_path, content, settings),
         );
         responseCache.result = m.content.data['text/plain'];
+      } else if (m.msg_type == 'error') {
+        content.cells[cellIndex].execution_count += 1;
+        content.cells[cellIndex].outputs.push({
+          output_type: 'error',
+          ...m.content,
+        });
+        queueTask(
+          updateNotebookContent(convSettings.notebook_path, content, settings),
+        );
+        responseCache.result = m.content.ename + ' ' + (m.content.evalue || '');
       } else {
         console.log('unknown message type');
         console.log({ m });
