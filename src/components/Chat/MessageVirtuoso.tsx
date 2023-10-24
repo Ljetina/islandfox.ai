@@ -43,7 +43,7 @@ export function MessageVirtuoso({
     setLoadMoreDelayPassed(false);
     setTimeout(() => {
       setLoadMoreDelayPassed(true);
-    }, 1000);
+    }, 200);
   }, [isLoadingMore]);
 
   const itemContent = useCallback(

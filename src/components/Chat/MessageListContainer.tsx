@@ -56,7 +56,7 @@ export function MessageListContainer() {
 
   return (
     <div className="flex-grow">
-      {!shouldRender && <Spinner />}
+      {!shouldRender || isLoadingMore && <Spinner />}
       {shouldRender && (
         <MessageVirtuoso
           virtuoso={virtuoso}
