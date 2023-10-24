@@ -102,7 +102,6 @@ export const ChatInput = ({
     }
 
     if (!content) {
-      // alert(t('Please enter a message'));
       alert('Please enter a message');
       return;
     }
@@ -118,10 +117,6 @@ export const ChatInput = ({
 
   const handleStopConversation = () => {
     onStopGenerating();
-    // stopConversationRef.current = true;
-    // setTimeout(() => {
-    //   stopConversationRef.current = false;
-    // }, 1000);
   };
 
   const isMobile = () => {

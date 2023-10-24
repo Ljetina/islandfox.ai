@@ -19,6 +19,7 @@ import {
 } from 'react';
 
 import { useTranslation } from 'next-i18next';
+import Image from 'next/image';
 
 import { Message } from '@/types/chat';
 
@@ -31,7 +32,6 @@ import { ChatContext } from '@/app/chat/chat.provider';
 // import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
-import Image from 'next/image';
 
 export interface Props {
   message: Message;
@@ -162,6 +162,10 @@ export const ChatMessage: FC<Props> = memo(
       }
     }, [message]);
 
+    const filteredContent = useMemo(() => {
+      return message.content?.replace(/<o.*?ption>.*?<\/.*?ption>/g, '');
+    }, [message.content]);
+
     return (
       <div
         className={`group md:px-4 ${
@@ -172,15 +176,13 @@ export const ChatMessage: FC<Props> = memo(
         style={{ overflowWrap: 'anywhere' }}
       >
         <div className="relative m-auto flex p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
-          <div className="min-w-[40px] text-right font-bold">
-            {getIcon()}
-          </div>
+          <div className="min-w-[40px] text-right font-bold">{getIcon()}</div>
 
           <div className="prose mt-[-2px] w-full dark:prose-invert">
             {message.role === 'user' ? (
               <div className="flex w-full">
                 <div className="prose whitespace-pre-wrap dark:prose-invert flex-1">
-                  {message.content}
+                  {filteredContent}
                 </div>
               </div>
             ) : (
@@ -190,7 +192,6 @@ export const ChatMessage: FC<Props> = memo(
                   remarkPlugins={[remarkGfm, remarkMath]}
                   // rehypePlugins={[rehypeMathjax]}
                   components={{
-                    // TODO clear any
                     code({ node, inline, className, children, ...props }: any) {
                       if (children.length) {
                         if (children[0] == '▍') {
@@ -248,7 +249,7 @@ export const ChatMessage: FC<Props> = memo(
                     },
                   }}
                 >
-                  {`${message.name ? message.name : message.content}${
+                  {`${message.name ? message.name : filteredContent}${
                     messageIsStreaming && messageIndex == 0 ? '`▍`' : ''
                   }`}
                 </MemoizedReactMarkdown>
@@ -279,5 +280,12 @@ export const ChatMessage: FC<Props> = memo(
 ChatMessage.displayName = 'ChatMessage';
 
 function IconIslandFox() {
-  return  <Image src="/assets/img/icon/icon_logo.png" alt='islandfox' width="24" height="24"/>
+  return (
+    <Image
+      src="/assets/img/icon/icon_logo.png"
+      alt="islandfox"
+      width="24"
+      height="24"
+    />
+  );
 }

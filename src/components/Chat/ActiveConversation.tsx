@@ -15,6 +15,7 @@ import ActiveConversationHeader from './ActiveConverationHeader';
 import { ChatInput } from './ChatInput';
 import ConversationSettings from './ConversationSettings';
 import { MessageListContainer } from './MessageListContainer';
+import { SelectOptions } from './SelectOption';
 
 import { ChatContext } from '@/app/chat/chat.provider';
 
@@ -29,6 +30,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         selectedConversationId,
         conversations,
         messages,
+        messageIsStreaming,
         remainingCredits,
       },
     } = useContext(ChatContext);
@@ -64,9 +66,31 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
     const stopConversationRef = useRef<boolean>(false);
     const showScrollDownButton = true;
 
+    const onOption = useCallback(
+      (option: string) => {
+        sendQuery(option);
+      },
+      [sendQuery],
+    );
+
+    const options = useMemo(() => {
+      if (messages.length > 0) {
+        const lastMessage = messages[0];
+        if (lastMessage.role == 'assistant' && lastMessage.content) {
+          const optionRegex = /<option>(.*?)<\/option>/g;
+          let match;
+          const options = [];
+          while ((match = optionRegex.exec(lastMessage.content)) !== null) {
+            options.push(match[1]);
+          }
+          return options;
+        }
+      }
+    }, [messages]);
+
     return (
       <>
-        <div className="relative flex-1 overflow-hidden dark:bg-[#343541]">
+        <div className="relative flex-1 overflow-hidden dark:bg-[#343541] flex flex-col">
           <ActiveConversationHeader
             selectedConversation={selectedConveration}
             handleSettings={onOpenSettings}
@@ -77,7 +101,11 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
             messages.length == 0 &&
             selectedConversationId && <ConversationSettings />}
           <MessageListContainer />
-          
+
+          {!messageIsStreaming && (
+            <SelectOptions options={options} onOption={onOption} />
+          )}
+          <div className="mb-32" />
 
           <ChatInput
             stopConversationRef={stopConversationRef}

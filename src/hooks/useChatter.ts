@@ -154,12 +154,14 @@ export const useChatter = () => {
       } else if (serverMessage.type === 'response_done') {
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
-        emit('scrollDownClicked', null);
+        setTimeout(() => {
+          emit('scrollDownClicked', null);
+        }, 500);
       } else if (serverMessage.type === 'response_error') {
         console.log('error handling response');
         handleUpdateMessageContent(
           currentAssisstantId as string,
-          `Error from OpenAI API '${serverMessage.data.message}' \n\n Please try again later.`,
+          `\n\nError from OpenAI API '${serverMessage.data.message}' \n\n Please try again later.`,
           true,
         );
         setIsMessageStreaming(false);

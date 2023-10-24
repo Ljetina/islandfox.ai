@@ -91,7 +91,7 @@ export function MessageVirtuoso({
 
   return (
     <Virtuoso
-      style={{ height: 'calc(100% - 122px)', scrollbarWidth: 'thin' }}
+      style={{ height: 'calc(100%)', scrollbarWidth: 'thin' }}
       ref={virtuoso}
       totalCount={messages.length}
       firstItemIndex={firstItemIndex}

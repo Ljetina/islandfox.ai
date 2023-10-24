@@ -37,7 +37,7 @@ export function MessageListContainer() {
   useEffect(() => {
     setShouldRender(false);
     setTimeout(() => setShouldRender(true), 0);
-    const handle = setTimeout(() => setIsVisible(true), 2000)
+    const handle = setTimeout(() => setIsVisible(true), 2000);
     return () => clearTimeout(handle);
   }, [selectedConversationId]);
 
@@ -48,9 +48,10 @@ export function MessageListContainer() {
 
   return (
     <div
+      className="flex-grow"
       style={{
-        height: '100%',
-        width: '100%',
+        // height: '100%',
+        // width: '100%',
         visibility: isLoadingMore ? 'hidden' : 'visible',
       }}
     >

@@ -1,7 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 
 import { useEvent } from '@/hooks/useEvents';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { Conversation } from '@/types/chat';
 
@@ -35,13 +34,6 @@ export const Chatbar = () => {
   const [isSettingsOpen, setSettingsOpen] = useState(false);
   const [isTopupOpen, setTopupOpen] = useState(false);
 
-  // const [displayPanels, setDisplayPanels] = useState(false);
-
-  // useEffect(() => {
-  //   if (isLoggedIn) {
-  //     setDisplayPanels(true);
-  //   }
-  // }, [isLoggedIn]);
   const onOpen = useCallback(() => {
     setSettingsOpen(true);
   }, [setSettingsOpen]);
