@@ -1,0 +1,12 @@
+
+.connectNotebook a {
+  color: #5aa2f0; /* Brighter link color */
+  text-decoration: none; /* Removed underline for a cleaner look */
+  border-bottom: 1px dashed #5aa2f0; /* Added dashed underline for distinction */
+  transition: color 0.3s ease;
+}
+
+.connectNotebook a:hover {
+  color: #4981d0;
+  border-bottom-color: #4981d0; /* Hover effect for links */
+}

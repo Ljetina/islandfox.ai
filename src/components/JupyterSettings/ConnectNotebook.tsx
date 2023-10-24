@@ -1,9 +1,12 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 
 import Spinner from '../Spinner/Spinner';
+import styles from './ConnectNotebook.module.css';
 
 import { ChatContext } from '@/app/chat/chat.provider';
 import { Session, getAvailableSessions } from '@/lib/jupyter';
+
+console.log({ styles });
 
 interface ConversationSettingsProps {}
 
@@ -73,13 +76,14 @@ const ConnectNotebook: React.FC<ConversationSettingsProps> = ({}) => {
   return (
     <>
       {isConnectingNotebook ? (
-        <>
+        <div className={styles.connectNotebook}>
           <p>
             Connect this conversation to an active notebook session on a Jupyter
-            server
+            server. Please refer to the <a href="/docs">documentation</a> for
+            more details.
           </p>
 
-          <div>
+          <div className='mt-8'>
             <label className="block text-sm font-medium text-gray-300">
               Session
             </label>
@@ -99,7 +103,7 @@ const ConnectNotebook: React.FC<ConversationSettingsProps> = ({}) => {
             </select>
           </div>
 
-          <div className="flex justify-end mt-4">
+          <div className="flex justify-end mt-16">
             {isSaving ? (
               <Spinner />
             ) : (
@@ -125,7 +129,7 @@ const ConnectNotebook: React.FC<ConversationSettingsProps> = ({}) => {
               </>
             )}
           </div>
-        </>
+        </div>
       ) : (
         <button
           onClick={() => setIsConnectingNotebook(true)}
