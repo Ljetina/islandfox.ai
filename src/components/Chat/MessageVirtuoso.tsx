@@ -40,6 +40,7 @@ export function MessageVirtuoso({
   const [loadMoreDelayPassed, setLoadMoreDelayPassed] = useState(false);
 
   useEffect(() => {
+    setLoadMoreDelayPassed(false);
     setTimeout(() => {
       setLoadMoreDelayPassed(true);
     }, 1000);

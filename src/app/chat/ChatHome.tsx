@@ -1,39 +1,31 @@
 'use client';
 
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import Head from 'next/head';
 
 import { Conversation } from '@/types/chat';
 import { OpenAIModelID } from '@/types/openai';
 
+import { AccountDialog } from '@/components/Chat/AccountDialog';
 import ActiveConversation from '@/components/Chat/ActiveConversation';
 import { ActiveSettingsDialog } from '@/components/Chat/ActiveSettingsDialog';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
-// import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
 
-// import Promptbar from '@/components/Promptbar';
 import '../globals.css';
 import { ChatContext } from './chat.provider';
 
 import { getSettings } from '@/lib/settings';
-import { AccountDialog } from '@/components/Chat/AccountDialog';
 
-interface Props {
-  // initialData: InitialServerData;
-  conversationId?: string;
-}
-
-const ChatHome = ({ conversationId }: Props) => {
-  // const { initialData, isLoading } = useInitialData();
-
-  //   const { t } = useTranslation('chat');
-  //   const { getModels } = useApiService();
-  //   const { getModelsError } = useErrorService();
-  const [initialRender, setInitialRender] = useState<boolean>(true);
-  const defaultModelId = OpenAIModelID.GPT_4;
-
+const ChatHome = () => {
   const {
     state: { conversations, selectedConversationId, messages, isLoggedIn },
   } = useContext(ChatContext);

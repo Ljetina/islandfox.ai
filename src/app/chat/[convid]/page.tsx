@@ -5,5 +5,5 @@ export default async function ChatHomePage({
 }: {
   params: { convid: string };
 }) {
-  return <ChatHome conversationId={params.convid} />;
+  return <ChatHome />;
 }

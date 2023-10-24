@@ -33,35 +33,20 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
         messages,
         messageIsStreaming,
         remainingCredits,
+        isLoadingMore,
       },
     } = useContext(ChatContext);
 
     const emit = useEmitter();
-    const { sendQuery, stopGenerating, error, regenerateLastQuery } = useChatter();
+    const { sendQuery, stopGenerating, error, regenerateLastQuery } =
+      useChatter();
     const onScrollDown = useCallback(() => {
       emit('scrollDownClicked', null);
     }, [emit]);
 
-    const [areSettingsVisible, setSettingsVisible] = useState(false);
-    const [isListVisible, setListVisible] = useState(false);
-    useEffect(() => {
-      const handle = setTimeout(() => {
-        setSettingsVisible(true);
-      }, 500);
-      return () => clearTimeout(handle);
-    }, []);
-
     const selectedConveration = useMemo(() => {
       return conversations?.find((c) => c.id === selectedConversationId);
     }, [conversations, selectedConversationId]);
-
-    useEffect(() => {
-      setListVisible(false);
-      const handle = setTimeout(() => {
-        setListVisible(true);
-      }, 500);
-      return () => clearTimeout(handle);
-    }, [selectedConversationId]);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const stopConversationRef = useRef<boolean>(false);
@@ -102,9 +87,9 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
             onClearAll={() => console.log('clear all?')}
           />
 
-          {areSettingsVisible &&
-            messages.length == 0 &&
-            selectedConversationId && <ConversationSettings />}
+          {!isLoadingMore && messages.length == 0 && selectedConversationId && (
+            <ConversationSettings />
+          )}
           <MessageListContainer />
 
           {!messageIsStreaming && !error && (

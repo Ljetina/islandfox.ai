@@ -62,7 +62,6 @@ async function recursivelyFetchNotebooks(
           contentItem.path,
           depth + 1,
         );
-        console.log();
         // @ts-ignore
         resList = resList.concat(dirData);
       } else if (contentItem.type === 'notebook') {
@@ -134,7 +133,6 @@ export async function getNotebookContent(
       throw new Error('Network response was not ok');
     }
     const data = await response.json();
-    console.log(data.content);
     return data.content;
   } catch (error) {
     console.error('Error fetching notebook:', error);
@@ -298,8 +296,8 @@ export async function executeCell(
         );
         responseCache.result = m.content.ename + ' ' + (m.content.evalue || '');
       } else {
-        console.log('unknown message type');
-        console.log({ m });
+        // console.log('unknown message type');
+        // console.log({ m });
       }
     });
   });

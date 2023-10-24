@@ -136,7 +136,6 @@ export function useFunctions(): {
       notebookSettings?.notebook_path as string,
       jupyterSettings,
     );
-    console.log('content', content);
 
     emitNotebookUpdate(sendMessage, content);
     return 'new content has been emitted';

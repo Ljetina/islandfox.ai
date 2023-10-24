@@ -14,7 +14,7 @@ import { OpenAIModelID } from '@/types/openai';
 
 import { InitialServerData } from './chat.state';
 
-import { blurFetch } from '@/lib/api';
+import { blurFetch, getConversationMessages } from '@/lib/api';
 import {
   apiCreateConversation,
   apiDeleteConversation,
@@ -41,6 +41,9 @@ export interface ClientState {
   loading: boolean;
   messageIsStreaming: boolean;
   totalCount: number;
+  isLoadingMore: boolean;
+  hasMore: boolean;
+  page: number;
   firstItemIndex: number;
   jupyterSettings: JupyterGlobalSettings;
   notebookSettings: JupyterConversationSettings | null;
@@ -84,6 +87,7 @@ export interface ChatContextProps {
   }) => Promise<Partial<JupyterConversationSettings> | undefined>;
   setRemainingCredits: (credits: number) => void;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
+  loadMoreMessages: () => void;
 }
 
 export const ChatContext = createContext<ChatContextProps>(undefined!);
@@ -106,6 +110,10 @@ export const ChatProvider = ({
   const [loading, setLoading] = useState(true);
   const [messageIsStreaming, setMessageIsStreaming] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+
   const [firstItemIndex, setFirstItemIndex] = useState(totalCount);
   const [jupyterSettings, setJupyterSettings] = useState({
     host: '',
@@ -240,7 +248,8 @@ export const ChatProvider = ({
     });
     setSelectedConversationId(conversation.id);
     setConversations([...conversations, conversation]);
-    router.push('/chat/' + conversation.id);
+    // router.replace('/chat/' + conversation.id);
+    window.history.replaceState({}, '', '/chat/' + conversation.id);
   }, [
     conversations,
     setConversations,
@@ -293,7 +302,8 @@ export const ChatProvider = ({
         return;
       }
       setSelectedConversationId(conversation.id);
-      router.push('/chat/' + conversation.id);
+      // router.replace('/chat/' + conversation.id);
+      window.history.replaceState({}, '', '/chat/' + conversation.id);
     },
     [selectedConversationId],
   );
@@ -305,16 +315,9 @@ export const ChatProvider = ({
     });
   }, [uiShowConverations, setUiShowConverations]);
 
-  useEffect(() => {
-    console.log(messages.length);
-  }, [messages]);
-
   const handleRegenerateLastMessage = useCallback(() => {
-    console.log('HERE', messages.length);
     if (messages.length > 0) {
-      console.log('HERE1');
       const lastUserIndex = messages.findIndex((m) => m.role === 'user');
-      console.log({ lastUserIndex });
       const userMessage = messages[lastUserIndex];
       setMessages(messages.slice(lastUserIndex));
       setFirstItemIndex((fii) => fii + lastUserIndex);
@@ -394,6 +397,70 @@ export const ChatProvider = ({
     ],
   );
 
+  const loadPage = useCallback(
+    async (
+      {
+        page,
+        limit,
+      }: {
+        page: number;
+        limit: number;
+      },
+      replace?: boolean,
+    ): Promise<undefined> => {
+      try {
+        if (selectedConversationId) {
+          setIsLoadingMore(true);
+          const resp = await getConversationMessages({
+            conversation_id: selectedConversationId,
+            page: page,
+            limit: limit,
+          });
+          setTotalCount(resp.pagination.total_records);
+          if (resp.pagination.current_page < resp.pagination.total_pages) {
+            setPage(page);
+            setHasMore(true);
+          } else {
+            setHasMore(false);
+          }
+          const numAdded = handleAddMessagePage(resp.data, replace);
+          if (!replace) {
+            setFirstItemIndex((fii) => Math.max(fii - numAdded, 0));
+          }
+        }
+      } finally {
+        setIsLoadingMore(false);
+      }
+    },
+    [selectedConversationId, handleAddMessagePage],
+  );
+
+  useEffect(() => {
+    async function loadFirstPage() {
+      const conversation = conversations.find(
+        (c) => c.id === selectedConversationId,
+      );
+      if (conversation) {
+        setTotalCount(conversation?.message_count);
+        setFirstItemIndex(
+          conversation?.message_count -
+            Math.min(conversation?.message_count, 50),
+        );
+        await loadPage({ page: 1, limit: 50 }, true);
+      } else {
+        // This one doesn't replace as we only get here on an initial load.
+        await loadPage({ page: 1, limit: 50 }, false);
+      }
+    }
+    setHasMore(false);
+    setMessages([]);
+    loadFirstPage();
+  }, [selectedConversationId]);
+
+  const loadMoreMessages = useCallback(async () => {
+    return await loadPage({ page: page + 1, limit: 50 });
+  }, [loadPage, page]);
+
   const handleAddMessage = useCallback(
     (userUuid: string, assistantUuid: string, query: string) => {
       if (!selectedConversationId) {
@@ -472,6 +539,9 @@ export const ChatProvider = ({
           uiShowPrompts,
           messageIsStreaming,
           totalCount,
+          isLoadingMore,
+          hasMore,
+          page,
           firstItemIndex,
           jupyterSettings,
           notebookSettings,
@@ -489,6 +559,7 @@ export const ChatProvider = ({
         handleUpdateMessageContent,
         handleRegenerateLastMessage,
         handleAddMessagePage,
+        loadMoreMessages,
         handleAddMessage,
         handleAddAssistantMessage,
         handleDeleteMessage,

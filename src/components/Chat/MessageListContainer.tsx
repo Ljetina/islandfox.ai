@@ -2,15 +2,24 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { VirtuosoHandle } from 'react-virtuoso';
 
 import { useEvent } from '@/hooks/useEvents';
-import { useMoreMessages } from '@/hooks/useMoreMessages';
 
+import Spinner from '../Spinner';
 import { MessageVirtuoso } from './MessageVirtuoso';
 
 import { ChatContext } from '@/app/chat/chat.provider';
 
 export function MessageListContainer() {
-  const { loadMoreMessages, hasMore, totalCount, messages, isLoadingMore } =
-    useMoreMessages();
+  const {
+    state: {
+      selectedConversationId,
+      messages,
+      totalCount,
+      firstItemIndex,
+      hasMore,
+      isLoadingMore,
+    },
+    loadMoreMessages,
+  } = useContext(ChatContext);
 
   const [atBottom, setAtBottom] = useState(true);
   const virtuoso = useRef<VirtuosoHandle>(null);
@@ -27,43 +36,38 @@ export function MessageListContainer() {
 
   useEvent('scrollDownClicked', onDown);
 
-  const {
-    state: { firstItemIndex, selectedConversationId },
-  } = useContext(ChatContext);
-
   const [shouldRender, setShouldRender] = useState(true);
-  const [isVisible, setIsVisible] = useState(false);
+  const [lastConvId, setLastConvId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    setShouldRender(false);
-    setTimeout(() => setShouldRender(true), 0);
-    const handle = setTimeout(() => setIsVisible(true), 2000);
-    return () => clearTimeout(handle);
-  }, [selectedConversationId]);
-
-  // If shouldRender is false, return null
-  if (!shouldRender) {
-    return null;
-  }
+    if (selectedConversationId !== lastConvId && isLoadingMore) {
+      setShouldRender(false);
+    } else if (selectedConversationId !== lastConvId && !shouldRender) {
+      setShouldRender(true);
+      setLastConvId(selectedConversationId);
+    }
+  }, [
+    selectedConversationId,
+    lastConvId,
+    shouldRender,
+    setLastConvId,
+    isLoadingMore,
+  ]);
 
   return (
-    <div
-      className="flex-grow"
-      style={{
-        // height: '100%',
-        // width: '100%',
-        visibility: isLoadingMore ? 'hidden' : 'visible',
-      }}
-    >
-      <MessageVirtuoso
-        virtuoso={virtuoso}
-        messages={messages}
-        hasMore={hasMore}
-        isLoadingMore={isLoadingMore}
-        onLoadMore={loadMoreMessages}
-        firstItemIndex={firstItemIndex}
-        setAtBottom={setAtBottom}
-      />
+    <div className="flex-grow">
+      {!shouldRender && <Spinner />}
+      {shouldRender && (
+        <MessageVirtuoso
+          virtuoso={virtuoso}
+          messages={messages}
+          hasMore={hasMore}
+          isLoadingMore={isLoadingMore}
+          onLoadMore={loadMoreMessages}
+          firstItemIndex={firstItemIndex}
+          setAtBottom={setAtBottom}
+        />
+      )}
     </div>
   );
 }
