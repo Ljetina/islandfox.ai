@@ -11,10 +11,12 @@ import { ChatContext } from '@/app/chat/chat.provider';
 
 export const useChatter = () => {
   const {
-    state: { selectedConversationId },
+    state: { selectedConversationId, jupyterSettings, notebookSettings },
     handleAddMessage,
+    handleAddAssistantMessage,
     handleDeleteMessage,
     handleUpdateMessageContent,
+    handleRegenerateLastMessage,
     setIsMessageStreaming,
     setRemainingCredits,
   } = useContext(ChatContext);
@@ -32,6 +34,24 @@ export const useChatter = () => {
     },
   );
 
+  const [query, setQuery] = useState('');
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [lastHandledMessage, setLastHandledMessage] = useState(lastMessage);
+  const [currentAssisstantId, setCurrentAssisstantId] = useState<string | null>(
+    null,
+  );
+  const { functions } = useFunctions();
+
+  useEffect(() => {
+    if (
+      jupyterSettings.host &&
+      notebookSettings?.session_id &&
+      readyState == 1
+    ) {
+      functions.read_cells({ sendMessage });
+    }
+  }, [jupyterSettings, notebookSettings, readyState]);
+
   useEffect(() => {
     if (readyState === 1) {
       const handle = setInterval(() => {
@@ -48,13 +68,6 @@ export const useChatter = () => {
       }),
     );
   }, [sendMessage]);
-
-  const [query, setQuery] = useState('');
-  const [lastHandledMessage, setLastHandledMessage] = useState(lastMessage);
-  const [currentAssisstantId, setCurrentAssisstantId] = useState<string | null>(
-    null,
-  );
-  const { functions } = useFunctions();
 
   const emit = useEmitter();
 
@@ -74,6 +87,16 @@ export const useChatter = () => {
 
   const debouncedScrollDownClick = useDebounce(onScrollDown, 1000);
 
+  const regenerateLastQuery = useCallback(() => {
+    const messageId = handleRegenerateLastMessage();
+    setError(undefined);
+    setQuery('');
+    setIsMessageStreaming(true);
+    sendMessage(
+      JSON.stringify({ action: 'regenerate_message', text: messageId }),
+    );
+  }, [handleRegenerateLastMessage]);
+
   useEffect(() => {
     if (lastMessage && lastHandledMessage !== lastMessage) {
       setLastHandledMessage(lastMessage);
@@ -87,8 +110,17 @@ export const useChatter = () => {
         console.error('failed to parse server message', e, lastMessage.data);
         return;
       }
-      // console.log(serverMessage);
-      if (serverMessage.type === 'message_ack') {
+      if (serverMessage.type === 'message_regenerate_ack') {
+        const { userUuid, assistantUuid } = serverMessage.data as {
+          userUuid: string;
+          assistantUuid: string;
+        };
+        handleAddAssistantMessage(assistantUuid);
+        setCurrentAssisstantId(assistantUuid);
+        setTimeout(() => {
+          debouncedScrollDownClick();
+        }, 100);
+      } else if (serverMessage.type === 'message_ack') {
         const { userUuid, assistantUuid } = serverMessage.data as {
           userUuid: string;
           assistantUuid: string;
@@ -111,10 +143,8 @@ export const useChatter = () => {
           typeof serverMessage.data == 'object' &&
           'functionName' in serverMessage.data
         ) {
-          // console.log(serverMessage?.data?.functionArguments);
           try {
             const funcArgs = JSON.parse(serverMessage?.data?.functionArguments);
-            // console.log({ funcArgs });
             const functionName = serverMessage?.data?.functionName as string;
             handleUpdateMessageContent(
               currentAssisstantId as string,
@@ -150,7 +180,6 @@ export const useChatter = () => {
       } else if (serverMessage.type === 'start_function') {
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
-        // TODO fix up back-end functions
       } else if (serverMessage.type === 'response_done') {
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
@@ -159,13 +188,14 @@ export const useChatter = () => {
         }, 500);
       } else if (serverMessage.type === 'response_error') {
         console.log('error handling response');
-        handleUpdateMessageContent(
-          currentAssisstantId as string,
-          `\n\nError from OpenAI API '${serverMessage.data.message}' \n\n Please try again later.`,
-          true,
+        setError(
+          `Error from OpenAI API '${serverMessage.data.message}' \n\n Please try again later.`,
         );
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
+        setTimeout(() => {
+          emit('scrollDownClicked', null);
+        }, 100);
       } else if (serverMessage.type === 'out_of_credits') {
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
@@ -204,5 +234,7 @@ export const useChatter = () => {
   return {
     sendQuery,
     stopGenerating,
+    regenerateLastQuery,
+    error,
   };
 };

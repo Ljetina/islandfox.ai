@@ -6,8 +6,6 @@ import styles from './ConnectNotebook.module.css';
 import { ChatContext } from '@/app/chat/chat.provider';
 import { Session, getAvailableSessions } from '@/lib/jupyter';
 
-console.log({ styles });
-
 interface ConversationSettingsProps {}
 
 const ConnectNotebook: React.FC<ConversationSettingsProps> = ({}) => {

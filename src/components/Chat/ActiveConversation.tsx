@@ -14,6 +14,7 @@ import { useEmitter } from '@/hooks/useEvents';
 import ActiveConversationHeader from './ActiveConverationHeader';
 import { ChatInput } from './ChatInput';
 import ConversationSettings from './ConversationSettings';
+import ErrorComponent from './Error';
 import { MessageListContainer } from './MessageListContainer';
 import { SelectOptions } from './SelectOption';
 
@@ -36,7 +37,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
     } = useContext(ChatContext);
 
     const emit = useEmitter();
-    const { sendQuery, stopGenerating } = useChatter();
+    const { sendQuery, stopGenerating, error, regenerateLastQuery } = useChatter();
     const onScrollDown = useCallback(() => {
       emit('scrollDownClicked', null);
     }, [emit]);
@@ -73,6 +74,10 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       [sendQuery],
     );
 
+    const onRetry = useCallback(() => {
+      regenerateLastQuery();
+    }, [regenerateLastQuery]);
+
     const options = useMemo(() => {
       if (messages.length > 0) {
         const lastMessage = messages[0];
@@ -102,9 +107,10 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
             selectedConversationId && <ConversationSettings />}
           <MessageListContainer />
 
-          {!messageIsStreaming && (
+          {!messageIsStreaming && !error && (
             <SelectOptions options={options} onOption={onOption} />
           )}
+          <ErrorComponent error={error} onRetry={onRetry} />
           <div className="mb-32" />
 
           <ChatInput

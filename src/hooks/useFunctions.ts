@@ -92,11 +92,6 @@ export function useFunctions(): {
       jupyterSettings,
     );
     return 'Cell has been updated. Output of execution: ' + result || '';
-    // await updateNotebookContent(
-    //   notebookSettings.notebook_path,
-    //   content,
-    //   jupyterSettings,
-    // );
   }
 
   async function deleteCellFunction({
@@ -133,7 +128,7 @@ export function useFunctions(): {
   }: {
     sendMessage: (message: string) => void;
   }) {
-    if (!notebookSettings) {
+    if (!notebookSettings || !jupyterSettings.host) {
       return 'unable to connect to notebook';
     }
 
@@ -141,6 +136,7 @@ export function useFunctions(): {
       notebookSettings?.notebook_path as string,
       jupyterSettings,
     );
+    console.log('content', content);
 
     emitNotebookUpdate(sendMessage, content);
     return 'new content has been emitted';
@@ -162,7 +158,7 @@ export function useFunctions(): {
     );
 
     emitNotebookUpdate(sendMessage, content);
-    return content.cells[index].outputs
+    return content.cells[index].outputs;
   }
 
   return {

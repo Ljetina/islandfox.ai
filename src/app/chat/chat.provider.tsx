@@ -61,11 +61,13 @@ export interface ChatContextProps {
     content: string,
     append?: boolean,
   ) => void;
+  handleRegenerateLastMessage: () => string | undefined;
   handleAddMessage: (
     userUuid: string,
     assistantUuid: string,
     query: string,
   ) => void;
+  handleAddAssistantMessage: (assistantUuid: string) => void;
   handleDeleteMessage: (messageId: string) => void;
   setIsMessageStreaming: (isStreaming: boolean) => void;
   setTotalCount: React.Dispatch<React.SetStateAction<number>>;
@@ -303,6 +305,24 @@ export const ChatProvider = ({
     });
   }, [uiShowConverations, setUiShowConverations]);
 
+  useEffect(() => {
+    console.log(messages.length);
+  }, [messages]);
+
+  const handleRegenerateLastMessage = useCallback(() => {
+    console.log('HERE', messages.length);
+    if (messages.length > 0) {
+      console.log('HERE1');
+      const lastUserIndex = messages.findIndex((m) => m.role === 'user');
+      console.log({ lastUserIndex });
+      const userMessage = messages[lastUserIndex];
+      setMessages(messages.slice(lastUserIndex));
+      setFirstItemIndex((fii) => fii + lastUserIndex);
+      setTotalCount((tc) => tc - lastUserIndex);
+      return userMessage.id;
+    }
+  }, [messages]);
+
   const handleUpdateMessageContent = useCallback(
     (messageId: string, content: string, append = false) => {
       setMessages(
@@ -341,6 +361,37 @@ export const ChatProvider = ({
       }
     },
     [messages, setMessages, selectedConversationId],
+  );
+
+  const handleAddAssistantMessage = useCallback(
+    (assistantUuid: string) => {
+      if (!selectedConversationId) {
+        return;
+      }
+      const now = new Date().toString();
+      setMessages(
+        [
+          {
+            role: 'assistant' as Role,
+            content: '',
+            id: assistantUuid,
+            conversation_id: selectedConversationId,
+            created_at: now,
+            updated_at: now,
+          },
+          // @ts-ignore
+        ].concat(messages),
+      );
+      setFirstItemIndex((fii) => Math.max(fii - 1, 0));
+      setTotalCount((tc) => tc + 1);
+    },
+    [
+      selectedConversationId,
+      setMessages,
+      messages,
+      setFirstItemIndex,
+      setTotalCount,
+    ],
   );
 
   const handleAddMessage = useCallback(
@@ -436,8 +487,10 @@ export const ChatProvider = ({
         handleEditConversation,
         handleSelectConversation,
         handleUpdateMessageContent,
+        handleRegenerateLastMessage,
         handleAddMessagePage,
         handleAddMessage,
+        handleAddAssistantMessage,
         handleDeleteMessage,
         setIsMessageStreaming,
         setTotalCount,
