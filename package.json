@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_EXTRA_CA_CERTS=./global-bundle.pem next dev",
-    "build": "NODE_EXTRA_CA_CERTS=./global-bundle.pem next build",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint --quiet",
     "format": "prettier ./src --write"

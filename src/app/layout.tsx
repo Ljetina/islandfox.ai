@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { NextScript } from 'next/document';
 import { Inter } from 'next/font/google';
 import Head from 'next/head';
 import Script from 'next/script';
@@ -8,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'IslandFox.ai',
-  description: 'Chat assistant for power users',
+  description: 'Chat assistant for data tasks',
 };
 
 export default async function RootLayout({
@@ -19,19 +18,6 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <Head>
-        <Script async src="https://js.stripe.com/v3/buy-button.js" />
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
-        />
-        <Script id="google-analytics">
-          {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
- 
-          gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
-        `}
-        </Script>
         <link
           rel="icon"
           type="image/png"
@@ -62,11 +48,23 @@ export default async function RootLayout({
           rel="stylesheet"
         />
       </Head>
+      <Script async src="https://js.stripe.com/v3/buy-button.js" />
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
+      />
+      <Script id="google-analytics">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+ 
+          gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
+        `}
+      </Script>
       <body>
         <div className={inter.className}>
           <main>{children}</main>
         </div>
-        {/* <NextScript /> */}
       </body>
     </html>
   );
