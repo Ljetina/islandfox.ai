@@ -15,6 +15,7 @@ import '/public/assets/css/odometer.css';
 import '/public/assets/css/responsive.css';
 import '/public/assets/css/select2.min.css';
 import '/public/assets/css/style.css';
+import { useTrackPage } from '@/hooks/useTrackPage';
 
 // @ts-nocheck
 
