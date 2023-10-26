@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
+import Image from 'next/image';
+
 // import BackToTop from '../elements/BackToTop'
 import DataBg from '../elements/DataBg';
 import Breadcrumb from './Breadcrumb';
@@ -49,14 +51,22 @@ export default function Layout({
       <DataBg />
 
       <main className={mainCls ? mainCls : 'main-content'}>
-        <div
-          className="noise-bg"
-          data-background="/assets/img/bg/noise_bg.png"
-        />
-        <div
-          className="main-shape"
-          data-background="/assets/img/images/main_shape_1.png"
-        />
+        <div className="noise-bg">
+          <Image
+            fill
+            objectFit="cover"
+            src="/assets/img/bg/noise_bg.png"
+            alt="Noise Background"
+          />
+        </div>
+        <div className="main-shape">
+          <Image
+            fill
+            objectFit="cover"
+            src="/assets/img/images/main_shape_1.png"
+            alt="Main Shape"
+          />
+        </div>
         {breadcrumbTitle && <Breadcrumb breadcrumbTitle={breadcrumbTitle} />}
 
         {children}

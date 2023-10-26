@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 
 // import Sidebar from '../Sidebar';
@@ -27,7 +28,12 @@ export default function Header1({ scroll, isMobileMenu, handleMobileMenu }) {
                   <nav className="menu-nav">
                     <div className="logo">
                       <Link href="/">
-                        <img src="/assets/img/logo/logo.png" alt="Logo" />
+                        <Image
+                          src="/assets/img/logo/logo.png"
+                          alt="IslandFox.ai Logo"
+                          width={200}
+                          height={40}
+                        />
                       </Link>
                     </div>
                     <div className="navbar-wrap main-menu d-none d-lg-flex">
@@ -63,7 +69,12 @@ export default function Header1({ scroll, isMobileMenu, handleMobileMenu }) {
                     </div>
                     <div className="nav-logo">
                       <Link href="/">
-                        <img src="/assets/img/logo/logo.png" alt="Logo" />
+                        <Image
+                          src="/assets/img/logo/logo.png"
+                          alt="IslandFox.ai Logo"
+                          width={200}
+                          height={40}
+                        />
                       </Link>
                     </div>
                     {/* <div className="menu-outer">

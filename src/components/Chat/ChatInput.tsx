@@ -83,7 +83,7 @@ export const ChatInput = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    const maxLength = 10000;
+    const maxLength = 50000;
 
     if (maxLength && value.length > maxLength) {
       alert(

@@ -272,7 +272,7 @@ export const ChatProvider = ({
       setConversations(conversations.filter((c) => c.id !== conversation.id));
       await apiDeleteConversation(conversation.id);
     },
-    [conversations, setConversations],
+    [conversations, setConversations, selectedConversationId],
   );
 
   const handleEditConversation = useCallback(
@@ -363,7 +363,7 @@ export const ChatProvider = ({
         return deduplicatedMessages.length - originalLength;
       }
     },
-    [messages, setMessages, selectedConversationId],
+    [messages, setMessages],
   );
 
   const handleAddAssistantMessage = useCallback(
@@ -511,7 +511,7 @@ export const ChatProvider = ({
     (isStreaming: boolean) => {
       setMessageIsStreaming(isStreaming);
     },
-    [messageIsStreaming, setMessageIsStreaming],
+    [setMessageIsStreaming],
   );
 
   const handleUpdateGlobalNotebookSettings = useCallback(

@@ -1,9 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
-
-import Pricing1 from '@/components/sections/Pricing1';
 
 export function Pricing() {
   return (
@@ -62,9 +59,11 @@ export function Pricing() {
                   <div className="pricing-top">
                     <div className="left-side">
                       <div className="icon">
-                        <img
-                          alt="pricing icon"
+                        <Image
                           src="/assets/img/icon/pricing_icon.svg"
+                          alt="pricing icon"
+                          width={58}
+                          height={54}
                         />
                       </div>
                       <div className="content">
@@ -111,7 +110,12 @@ export function Pricing() {
                   <div className="pricing-top">
                     <div className="left-side">
                       <div className="icon">
-                        <img src="/assets/img/icon/pricing_icon.svg" alt="" />
+                        <Image
+                          src="/assets/img/icon/pricing_icon.svg"
+                          alt="pricing icon"
+                          width={58}
+                          height={54}
+                        />
                       </div>
                       <div className="content">
                         <h4 className="title">Enterprise</h4>
