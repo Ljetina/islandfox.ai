@@ -3,7 +3,6 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 
 import { useEvent } from '@/hooks/useEvents';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import Spinner from '../Spinner/Spinner';
 import styles from './LoginButton.module.css';
@@ -28,6 +27,14 @@ export const LoginButton: React.FC = () => {
   }, []);
 
   useEvent('logged_out', onLoggedOut);
+
+  useEffect(() => {
+    new Image().src = '/assets/img/icon/btn_google_signin_dark_normal_web.png';
+    new Image().src = '/assets/img/icon/btn_google_signin_dark_focus_web.png';
+    new Image().src = '/assets/img/icon/btn_google_signin_dark_pressed_web.png';
+    new Image().src =
+      '/assets/img/icon/btn_google_signin_dark_disabled_web.png';
+  }, []);
 
   const handleLogin = () => {
     setIsLoading(true);

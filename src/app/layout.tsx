@@ -1,12 +1,8 @@
 import type { Metadata } from 'next';
+import { NextScript } from 'next/document';
 import { Inter } from 'next/font/google';
+import Head from 'next/head';
 import Script from 'next/script';
-
-// import { Head, Html, Main, NextScript } from 'next/document'
-
-// import './globals.css';
-// import "slick-carousel/slick/slick-theme.css"
-// import "slick-carousel/slick/slick.css"
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,12 +18,11 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        {/* <title>{metadata.title}</title> */}
-        {/* <meta name="description" content={metadata.description} /> */}
-        {/* <link rel="shortcut icon" href="/assets/img/favicon.png" /> */}
-        <script async src="https://js.stripe.com/v3/buy-button.js"></script>
-        <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`} />
+      <Head>
+        <Script async src="https://js.stripe.com/v3/buy-button.js" />
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
+        />
         <Script id="google-analytics">
           {`
           window.dataLayer = window.dataLayer || [];
@@ -66,7 +61,7 @@ export default async function RootLayout({
           href="https://fonts.bunny.net/css?family=outfit:100,200,300,400,500,600,700|playfair-display:400,400i,500,500i,600,600i,700,700i,800,800i|plus-jakarta-sans:400,400i,500,500i,600,600i,700,700i,800,800i"
           rel="stylesheet"
         />
-      </head>
+      </Head>
       <body>
         <div className={inter.className}>
           <main>{children}</main>

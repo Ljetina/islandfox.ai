@@ -24,33 +24,17 @@ export function WebHome() {
       <Layout mainCls="main-content fix" headTitle={'home'}>
         <Banner1 />
         <div style={{ flexDirection: 'row', display: 'flex' }}>
-          <div
-            style={{
-              position: 'relative',
-              display: 'block',
-              width: '100%',
-              aspectRatio: '1/1',
-            }}
-          >
+          <div id="first-image">
             <Image
               fill
               alt="robot working together"
-              id="first-image"
               src="/assets/img/images/home_1.jpeg"
             />
           </div>
-          <div
-            style={{
-              position: 'relative',
-              display: 'block',
-              width: '100%',
-              aspectRatio: '1/1',
-            }}
-          >
+          <div id="second-image">
             <Image
               fill
               alt="desk robot"
-              id="second-image"
               src="/assets/img/images/home_2.jpeg"
             />
           </div>

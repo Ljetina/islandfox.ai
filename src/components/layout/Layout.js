@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
 // import BackToTop from '../elements/BackToTop'
-import DataBg from '../elements/DataBg';
 import Breadcrumb from './Breadcrumb';
 import PageHead from './PageHead';
 import Footer1 from './footer/Footer1';
@@ -48,21 +47,18 @@ export default function Layout({
         isMobileMenu={isMobileMenu}
         handleMobileMenu={handleMobileMenu}
       />
-      <DataBg />
 
       <main className={mainCls ? mainCls : 'main-content'}>
         <div className="noise-bg">
-          <Image
+          {/* <Image
             fill
-            objectFit="cover"
             src="/assets/img/bg/noise_bg.png"
             alt="Noise Background"
-          />
+          /> */}
         </div>
         <div className="main-shape">
           <Image
             fill
-            objectFit="cover"
             src="/assets/img/images/main_shape_1.png"
             alt="Main Shape"
           />

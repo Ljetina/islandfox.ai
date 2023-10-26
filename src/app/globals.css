@@ -50,15 +50,17 @@ body {
 }
 
 #first-image {
+  position: relative;
   display: block;
-  width: 50%;
-  height: auto;
+  width: 100%;
+  aspect-ratio: calc(1/1);
 }
 
 #second-image {
+  position: relative;
   display: block;
-  width: 50%;
-  height: auto;
+  width: 100%;
+  aspect-ratio: calc(1/1);
 }
 
 @media screen and (max-width: 768px) /* change the breakpoint accordingly */ {

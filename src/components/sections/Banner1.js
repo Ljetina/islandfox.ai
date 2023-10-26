@@ -40,7 +40,7 @@ export default function Banner1() {
                 </h2>
                 <p
                   style={{
-                    backgroundColor: 'rgba(50, 0, 75, 0.3)',
+                    backgroundColor: 'rgba(50, 0, 75, 0.1)',
                     borderRadius: '10px',
                     padding: '10px',
                     color: 'white'

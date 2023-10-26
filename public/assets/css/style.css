@@ -152,8 +152,10 @@ main.main-content {
 }
 
 .noise-bg {
-  background-size: cover;
+  /* background-size: cover; */
   background-position: center;
+  background-image: url(/assets/img/bg/noise_tile.png);
+  background-repeat: repeat;
   width: 100%;
   height: 100%;
   position: absolute;

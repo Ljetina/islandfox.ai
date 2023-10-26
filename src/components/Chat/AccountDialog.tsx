@@ -6,6 +6,7 @@ interface Props {}
 
 export const AccountDialog = (props: Props) => {
   const [isVisible, setIsVisible] = useState(false);
+
   useEffect(() => {
     const handle = setTimeout(() => {
       setIsVisible(true);
