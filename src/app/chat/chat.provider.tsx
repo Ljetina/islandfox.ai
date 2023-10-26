@@ -49,6 +49,7 @@ export interface ClientState {
   notebookSettings: JupyterConversationSettings | null;
   remainingCredits: number;
   isLoggedIn: boolean;
+  hasCheckedAuth: boolean;
 }
 
 export interface ChatContextProps {
@@ -127,13 +128,16 @@ export const ChatProvider = ({
   const router = useRouter();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
 
   useEffect(() => {
     blurFetch({ pathname: 'auth/check', method: 'GET' })
       .then((d) => {
+        setHasCheckedAuth(true);
         setIsLoggedIn(true);
       })
       .catch((e) => {
+        setHasCheckedAuth(true);
         setIsLoggedIn(false);
       });
   }, []);
@@ -549,6 +553,7 @@ export const ChatProvider = ({
           email,
           tenantId,
           isLoggedIn,
+          hasCheckedAuth
         },
         setRemainingCredits,
         handleNewConversation,

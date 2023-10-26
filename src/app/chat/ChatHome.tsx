@@ -27,7 +27,7 @@ import { getSettings } from '@/lib/settings';
 
 const ChatHome = () => {
   const {
-    state: { conversations, selectedConversationId, messages, isLoggedIn },
+    state: { conversations, selectedConversationId, isLoggedIn, hasCheckedAuth },
   } = useContext(ChatContext);
 
   const selectedConversation = useMemo(
@@ -110,14 +110,13 @@ const ChatHome = () => {
 
   return (
     <>
-      <Head>
+      <Head key={'root'}>
         <title>IslandFox AI</title>
         <meta name="description" content="Chat assistant for Power Users" />
         <meta
           name="viewport"
           content="height=device-height, width=device-width, initial-scale=1, user-scalable=no"
         />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <div
         className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${'dark'}`}
@@ -132,7 +131,7 @@ const ChatHome = () => {
         </div>
 
         <div className="flex h-full w-full pt-[48px] sm:pt-0">
-          <Chatbar />
+          {isLoggedIn && <Chatbar />}
 
           <div className="flex flex-1">
             {selectedConversationId && isLoggedIn && (
@@ -143,7 +142,7 @@ const ChatHome = () => {
           {/* <Promptbar /> */}
         </div>
         {areSettingsOpen && <ActiveSettingsDialog onClose={onCloseSettings} />}
-        {!isLoggedIn && <AccountDialog />}
+        {!isLoggedIn && hasCheckedAuth && <AccountDialog />}
       </div>
     </>
   );

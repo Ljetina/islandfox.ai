@@ -44,7 +44,6 @@ export const LoginButton: React.FC = () => {
 
   const handleLogout = () => {
     blurFetch({ pathname: 'auth/logout', method: 'POST' }).then((data) => {
-      console.log({ loggedOut: data });
       if (data.loggedOut) {
         setIsLoggedIn(data.loggedOut ? false : true);
       }

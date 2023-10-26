@@ -17,8 +17,8 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="en">
-      <Head>
-        <link
+      <head>
+      <link
           rel="icon"
           type="image/png"
           sizes="16x16"
@@ -47,7 +47,7 @@ export default async function RootLayout({
           href="https://fonts.bunny.net/css?family=outfit:100,200,300,400,500,600,700|playfair-display:400,400i,500,500i,600,600i,700,700i,800,800i|plus-jakarta-sans:400,400i,500,500i,600,600i,700,700i,800,800i"
           rel="stylesheet"
         />
-      </Head>
+      </head>
       <Script async src="https://js.stripe.com/v3/buy-button.js" />
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
