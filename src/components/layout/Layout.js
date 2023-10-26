@@ -49,13 +49,7 @@ export default function Layout({
       />
 
       <main className={mainCls ? mainCls : 'main-content'}>
-        <div className="noise-bg">
-          {/* <Image
-            fill
-            src="/assets/img/bg/noise_bg.png"
-            alt="Noise Background"
-          /> */}
-        </div>
+        <div className="noise-bg"></div>
         <div className="main-shape">
           <Image
             fill

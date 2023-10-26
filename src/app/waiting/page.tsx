@@ -19,6 +19,7 @@ import '/public/assets/css/style.css';
 // @ts-nocheck
 
 export default function Waiting() {
+  useTrackPage();
   const [email, setEmail] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
 

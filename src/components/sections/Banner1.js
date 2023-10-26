@@ -1,13 +1,20 @@
 import { useCallback } from 'react';
 
-import Link from 'next/link';
+
+
+import { trackEvent } from '@/hooks/useTrackPage';
+
+
 
 import Typewriter from 'typewriter-effect';
 
+
 export default function Banner1() {
   const toChat = useCallback(() => {
+    trackEvent({ action: 'click', category: 'button', label: 'get-started' });
     window.location.href = '/chat';
   }, []);
+
   return (
     <>
       <section className="banner-area">
@@ -43,7 +50,7 @@ export default function Banner1() {
                     backgroundColor: 'rgba(50, 0, 75, 0.1)',
                     borderRadius: '10px',
                     padding: '10px',
-                    color: 'white'
+                    color: 'white',
                   }}
                 >
                   Accelerate your data science projects with IslandFox.ai. By
@@ -52,7 +59,7 @@ export default function Banner1() {
                   assistance. We facilitate rapid data analysis, visualization,
                   feature engineering and machine learning workflows.
                 </p>
-                <div className="banner-btn" onClick={toChat}>
+                <div className="banner-btn">
                   <div
                     className="gradient-btn"
                     data-wow-delay=".6s"

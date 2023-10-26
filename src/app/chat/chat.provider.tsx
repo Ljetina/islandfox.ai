@@ -29,6 +29,7 @@ import {
   testConnection,
 } from '@/lib/jupyter';
 import { apiUpdateUserPreferences } from '@/lib/user';
+import { trackEvent } from '@/hooks/useTrackPage';
 
 export interface ClientState {
   email?: string;
@@ -240,6 +241,7 @@ export const ChatProvider = ({
   );
 
   const handleNewConversation = useCallback(async () => {
+    trackEvent({ action: 'click', category: 'button', label: 'new_conversation' });
     setMessages([]);
     setSelectedConversationId(undefined);
     setTotalCount(0);

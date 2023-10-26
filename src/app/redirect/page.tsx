@@ -5,8 +5,10 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import '../globals.css';
+import { useTrackPage } from '@/hooks/useTrackPage';
 
 const RedirectPage: React.FC = () => {
+  useTrackPage();
   const router = useRouter();
   let debounce = false;
 

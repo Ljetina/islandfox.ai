@@ -3,6 +3,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 
 import { useEvent } from '@/hooks/useEvents';
+import { trackEvent } from '@/hooks/useTrackPage';
 
 import Spinner from '../Spinner/Spinner';
 import styles from './LoginButton.module.css';
@@ -23,6 +24,7 @@ export const LoginButton: React.FC = () => {
   }, []);
 
   const onLoggedOut = useCallback(() => {
+    trackEvent({ action: 'click', category: 'button', label: 'logout' });
     setIsLoggedIn(false);
   }, []);
 
@@ -37,6 +39,7 @@ export const LoginButton: React.FC = () => {
   }, []);
 
   const handleLogin = () => {
+    trackEvent({ action: 'click', category: 'button', label: 'login_google' });
     setIsLoading(true);
     localStorage.setItem('preAuthPath', window.location.pathname);
     window.location.href = process.env.NEXT_PUBLIC_AUTH_URL as string;

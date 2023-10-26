@@ -2,11 +2,13 @@ import { useCallback } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { trackEvent } from '@/hooks/useTrackPage';
 
 // import Sidebar from '../Sidebar';
 
 export default function Header1({ scroll, isMobileMenu, handleMobileMenu }) {
   const toChat = useCallback(() => {
+    trackEvent({ action: 'click', category: 'button', label: 'login' });
     window.location.href = '/chat';
   }, []);
   return (

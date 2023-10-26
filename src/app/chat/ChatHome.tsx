@@ -1,18 +1,12 @@
 'use client';
 
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import Head from 'next/head';
 
+import { useTrackPage } from '@/hooks/useTrackPage';
+
 import { Conversation } from '@/types/chat';
-import { OpenAIModelID } from '@/types/openai';
 
 import { AccountDialog } from '@/components/Chat/AccountDialog';
 import ActiveConversation from '@/components/Chat/ActiveConversation';
@@ -27,8 +21,15 @@ import { getSettings } from '@/lib/settings';
 
 const ChatHome = () => {
   const {
-    state: { conversations, selectedConversationId, isLoggedIn, hasCheckedAuth },
+    state: {
+      conversations,
+      selectedConversationId,
+      isLoggedIn,
+      hasCheckedAuth,
+    },
   } = useContext(ChatContext);
+
+  useTrackPage('/chat');
 
   const selectedConversation = useMemo(
     () => conversations?.find((c) => c.id === selectedConversationId),

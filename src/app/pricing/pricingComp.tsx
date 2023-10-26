@@ -1,8 +1,10 @@
 'use client';
 
+import { useTrackPage } from '@/hooks/useTrackPage';
 import Image from 'next/image';
 
 export function Pricing() {
+  useTrackPage();
   return (
     <>
       <section className="pricing-area pb-110" style={{ paddingTop: '150px' }}>

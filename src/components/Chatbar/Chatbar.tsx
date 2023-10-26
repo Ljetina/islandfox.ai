@@ -16,6 +16,7 @@ import Sidebar from '../Sidebar/NewSidebar';
 
 import { ChatContext } from '@/app/chat/chat.provider';
 import { creditsToDollars } from '@/lib/billing';
+import { trackEvent } from '@/hooks/useTrackPage';
 
 export const Chatbar = () => {
   const {
@@ -35,22 +36,27 @@ export const Chatbar = () => {
   const [isTopupOpen, setTopupOpen] = useState(false);
 
   const onOpen = useCallback(() => {
+    trackEvent({ action: 'click', category: 'button', label: 'open_jupyter_server_settings' });
     setSettingsOpen(true);
   }, [setSettingsOpen]);
   const onClose = useCallback(() => {
+    trackEvent({ action: 'click', category: 'button', label: 'close_jupyter_server_settings' });
     setSettingsOpen(false);
   }, [setSettingsOpen]);
   const onSave = useCallback(() => {}, []);
 
   const onCloseTopup = useCallback(() => {
+    trackEvent({ action: 'click', category: 'button', label: 'close_top-up' });
     setTopupOpen(false);
   }, []);
 
   const onOpenTopup = useCallback(() => {
+    trackEvent({ action: 'click', category: 'button', label: 'top-up' });
     setTopupOpen(true);
   }, []);
 
   const onTopUp = useCallback(() => {
+    trackEvent({ action: 'event', category: 'conversion', label: 'top-up_complete' });
     setTopupOpen(false);
   }, []);
   useEvent('credit_topup', onTopUp);

@@ -2,6 +2,8 @@
 
 import Image from 'next/image';
 
+import { useTrackPage } from '@/hooks/useTrackPage';
+
 import Layout from '@/components/layout/Layout';
 import Banner1 from '@/components/sections/Banner1';
 
@@ -18,6 +20,7 @@ import '/public/assets/css/select2.min.css';
 import '/public/assets/css/style.css';
 
 export function WebHome() {
+  useTrackPage();
   return (
     <>
       {/* @ts-ignore TODO */}
@@ -32,11 +35,7 @@ export function WebHome() {
             />
           </div>
           <div id="second-image">
-            <Image
-              fill
-              alt="desk robot"
-              src="/assets/img/images/home_2.jpeg"
-            />
+            <Image fill alt="desk robot" src="/assets/img/images/home_2.jpeg" />
           </div>
         </div>
       </Layout>

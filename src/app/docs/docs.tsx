@@ -1,8 +1,12 @@
 'use client';
+
+import { useTrackPage } from '@/hooks/useTrackPage';
+
 import DocsMd from './docs.mdx';
 import styles from './docs.module.css';
 
 export function Docs() {
+  useTrackPage();
   return (
     <section>
       <div
@@ -12,7 +16,7 @@ export function Docs() {
         }}
       >
         <div
-        //   className={`${styles.docsContainer} w-full max-w-2xl mx-auto overflow-hidden shadow-2xl rounded-lg`}
+          //   className={`${styles.docsContainer} w-full max-w-2xl mx-auto overflow-hidden shadow-2xl rounded-lg`}
           className={`${styles.docsContainer}`}
           style={{ marginBottom: '150px' }}
         >
