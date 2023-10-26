@@ -17,6 +17,7 @@ type EventParams = {
   category?: string;
   label?: string;
   value?: number;
+  send_to?: string;
 };
 
 export function trackEvent({
@@ -24,6 +25,7 @@ export function trackEvent({
   category,
   label,
   value,
+  send_to,
 }: EventParams): void {
   // @ts-ignore
   if (window.gtag) {
@@ -32,6 +34,7 @@ export function trackEvent({
       event_category: category,
       event_label: label,
       value: value,
+      send_to: send_to
     });
   }
 }

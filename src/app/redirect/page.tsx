@@ -4,8 +4,9 @@ import React, { useEffect } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { trackEvent, useTrackPage } from '@/hooks/useTrackPage';
+
 import '../globals.css';
-import { useTrackPage } from '@/hooks/useTrackPage';
 
 const RedirectPage: React.FC = () => {
   useTrackPage();
@@ -20,6 +21,13 @@ const RedirectPage: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const name = decodeURIComponent(urlParams.get('name') || '');
     const pic = decodeURIComponent(urlParams.get('pic') || '');
+    if (!localStorage.getItem('name')) {
+      // Track the conversion on first login
+      trackEvent({
+        action: 'conversion',
+        send_to: 'AW-11389553886/blCDCMqT4fAYEN6Z-7Yq',
+      });
+    }
     localStorage.setItem('name', name);
     localStorage.setItem('pic', pic);
     const preAuthPath = localStorage.getItem('preAuthPath');
