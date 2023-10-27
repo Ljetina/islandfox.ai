@@ -2,7 +2,6 @@ import React, {
   memo,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -16,10 +15,10 @@ import { ChatInput } from './ChatInput';
 import ConversationSettings from './ConversationSettings';
 import ErrorComponent from './Error';
 import { MessageListContainer } from './MessageListContainer';
+import { NotebookConnectionHeader } from './NotebookConnectionHeader';
 import { SelectOptions } from './SelectOption';
 
 import { ChatContext } from '@/app/chat/chat.provider';
-import { NotebookConnectionHeader } from './NotebookConnectionHeader';
 
 interface ActiveConversationProps {
   onOpenSettings: () => void;
@@ -44,6 +43,8 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
     const onScrollDown = useCallback(() => {
       emit('scrollDownClicked', null);
     }, [emit]);
+
+    const [content, setContent] = useState<string>('');
 
     const selectedConveration = useMemo(() => {
       return conversations?.find((c) => c.id === selectedConversationId);
@@ -79,6 +80,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       }
     }, [messages]);
 
+    console.log(textareaRef?.current?.value)
     return (
       <>
         <div className="relative flex-1 overflow-hidden dark:bg-[#343541] flex flex-col">
@@ -95,7 +97,11 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
           <MessageListContainer />
 
           {!messageIsStreaming && !error && (
-            <SelectOptions options={options} onOption={onOption} />
+            <SelectOptions
+              options={options}
+              onOption={onOption}
+              disableKeys={textareaRef?.current?.value !== ''}
+            />
           )}
           <ErrorComponent error={error} onRetry={onRetry} />
           <div className="mb-32" />
@@ -104,6 +110,8 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
             stopConversationRef={stopConversationRef}
             outOfCredits={remainingCredits < 100}
             textareaRef={textareaRef}
+            content={content}
+            setContent={setContent}
             onSend={sendQuery}
             onScrollDownClick={onScrollDown}
             onStopGenerating={stopGenerating}

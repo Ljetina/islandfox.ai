@@ -7,12 +7,13 @@ import { KeyButton } from './KeyButton';
 interface Props {
   options?: string[];
   onOption: (option: string) => void;
+  disableKeys: boolean;
 }
 
-export const SelectOptions = ({ options, onOption }: Props) => {
+export const SelectOptions = ({ options, onOption, disableKeys }: Props) => {
   useEffect(() => {
     let handleKeyDown: (event: KeyboardEvent) => void;
-    if (options) {
+    if (options && !disableKeys) {
       const keys: string[] = [];
       for (let x = 0; x < options?.length; ++x) {
         keys.push(x + 1 + '');
@@ -32,7 +33,7 @@ export const SelectOptions = ({ options, onOption }: Props) => {
         window.removeEventListener('keydown', handleKeyDown);
       }
     };
-  }, [options]);
+  }, [options, disableKeys]);
 
   return options ? (
     <div className="flex flex-row flex-wrap justify-center max-w-full">
@@ -44,8 +45,11 @@ export const SelectOptions = ({ options, onOption }: Props) => {
             }
             onClick={() => onOption(option)}
           >
-            <div className="flex flex-row items-center">
-              <KeyButton character={index + 1 + ' '} /> <span>{option}</span>
+            <div className="flex flex-row items-center justify-center">
+              {!disableKeys && <KeyButton character={index + 1 + ' '} />}{' '}
+              <div className="h-9 flex justify-center items-center">
+                <div>{option}</div>
+              </div>
             </div>
           </button>
         </div>

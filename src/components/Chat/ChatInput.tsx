@@ -8,8 +8,10 @@ import {
   IconSendOff,
 } from '@tabler/icons-react';
 import {
+  Dispatch,
   KeyboardEvent,
   MutableRefObject,
+  SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -42,6 +44,8 @@ interface Props {
   model?: OpenAIModel;
   hasMessages: boolean;
   outOfCredits: boolean;
+  content: string;
+  setContent: Dispatch<SetStateAction<string>>;
 }
 
 export const ChatInput = ({
@@ -50,6 +54,8 @@ export const ChatInput = ({
   onScrollDownClick,
   onStopGenerating,
   stopConversationRef,
+  content,
+  setContent,
   textareaRef,
   showScrollDownButton,
   model,
@@ -63,7 +69,6 @@ export const ChatInput = ({
   } = useContext(ChatContext);
   const prompts: Prompt[] = [];
 
-  const [content, setContent] = useState<string>();
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [showPromptList, setShowPromptList] = useState(false);
   const [activePromptIndex, setActivePromptIndex] = useState(0);
@@ -130,7 +135,7 @@ export const ChatInput = ({
   const handleInitModal = () => {
     const selectedPrompt = filteredPrompts[activePromptIndex];
     if (selectedPrompt) {
-      setContent((prevContent) => {
+      setContent((prevContent: string) => {
         const newContent = prevContent?.replace(
           /\/\w*$/,
           selectedPrompt.content,
