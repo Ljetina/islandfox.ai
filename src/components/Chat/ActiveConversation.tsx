@@ -19,6 +19,7 @@ import { MessageListContainer } from './MessageListContainer';
 import { SelectOptions } from './SelectOption';
 
 import { ChatContext } from '@/app/chat/chat.provider';
+import { NotebookConnectionHeader } from './NotebookConnectionHeader';
 
 interface ActiveConversationProps {
   onOpenSettings: () => void;
@@ -86,6 +87,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
             handleSettings={onOpenSettings}
             onClearAll={() => console.log('clear all?')}
           />
+          <NotebookConnectionHeader />
 
           {!isLoadingMore && messages.length == 0 && selectedConversationId && (
             <ConversationSettings />

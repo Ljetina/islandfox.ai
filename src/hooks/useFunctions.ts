@@ -42,7 +42,7 @@ export function useFunctions(): {
     cell_type: 'code' | 'markdown';
     sendMessage: (message: string) => void;
   }): Promise<string> {
-    if (!notebookSettings) {
+    if (!notebookSettings?.session_id) {
       return 'unable to connect to notebook';
     }
     const content = await getNotebookContent(

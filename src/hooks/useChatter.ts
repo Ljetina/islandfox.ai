@@ -1,8 +1,6 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 
-import { ServerMessage } from '@/types/chat';
-
 import { useDebounce } from './useDebounce';
 import { useEmitter } from './useEvents';
 import { useFunctions } from './useFunctions';
@@ -14,7 +12,6 @@ export const useChatter = () => {
     state: { selectedConversationId, jupyterSettings, notebookSettings },
     handleAddMessage,
     handleAddAssistantMessage,
-    handleDeleteMessage,
     handleUpdateMessageContent,
     handleRegenerateLastMessage,
     setIsMessageStreaming,
@@ -205,6 +202,8 @@ export const useChatter = () => {
         console.log('serverMessage.data', serverMessage.data);
         setRemainingCredits(serverMessage.data.remainingCredits);
         emit('credit_topup', {});
+      } else if (serverMessage.type === 'notebook_cache') {
+        emit('notebook_cache', serverMessage.data);
       }
     }
   }, [
