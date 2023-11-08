@@ -50,7 +50,7 @@ const ConversationSettings: React.FC<ConversationSettingsProps> = ({}) => {
     },
     [selectedConveration],
   );
-  const models = [OpenAIModels['gpt-4'], OpenAIModels['gpt-3.5-turbo']];
+  const models = [OpenAIModels['gpt-4'], OpenAIModels['gpt-3.5-turbo'], OpenAIModels['gpt-4-1106-preview']];
 
   return (
     <>
