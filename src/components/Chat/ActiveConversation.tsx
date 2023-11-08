@@ -80,7 +80,6 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       }
     }, [messages]);
 
-    console.log(textareaRef?.current?.value)
     return (
       <>
         <div className="relative flex-1 overflow-hidden dark:bg-[#343541] flex flex-col">
