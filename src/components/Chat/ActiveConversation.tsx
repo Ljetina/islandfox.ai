@@ -69,7 +69,7 @@ const ActiveConversation: React.FC<ActiveConversationProps> = memo(
       if (messages.length > 0) {
         const lastMessage = messages[0];
         if (lastMessage.role == 'assistant' && lastMessage.content) {
-          const optionRegex = /<option>(.*?)<\/option>/g;
+          const optionRegex = /<option>(.*?)<\/option>/gi;
           let match;
           const options = [];
           while ((match = optionRegex.exec(lastMessage.content)) !== null) {
