@@ -163,7 +163,7 @@ export const ChatMessage: FC<Props> = memo(
     }, [message]);
 
     const filteredContent = useMemo(() => {
-      return message.content?.replace(/<o.*?ption>.*?<\/.*?ption>/g, '');
+      return message.content?.replace(/<o.*?ption>.*?<\/.*?ption>/gi, '');
     }, [message.content]);
 
     return (
