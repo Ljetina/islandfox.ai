@@ -24,15 +24,20 @@ export function MessageListContainer() {
   const [atBottom, setAtBottom] = useState(true);
   const virtuoso = useRef<VirtuosoHandle>(null);
 
-  const onDown = useCallback(() => {
-    if (virtuoso) {
-      virtuoso.current?.scrollToIndex({
-        index: totalCount - 1,
-        align: 'end',
-        behavior: 'smooth',
-      });
-    }
-  }, [virtuoso, totalCount]);
+  const onDown = useCallback(
+    (fromAppend: boolean) => {
+      if (virtuoso) {
+        if (fromAppend && atBottom) {
+          virtuoso.current?.scrollToIndex({
+            index: totalCount - 1,
+            align: 'end',
+            behavior: 'smooth',
+          });
+        }
+      }
+    },
+    [virtuoso, totalCount],
+  );
 
   useEvent('scrollDownClicked', onDown);
 
@@ -56,7 +61,7 @@ export function MessageListContainer() {
 
   return (
     <div className="flex-grow">
-      {!shouldRender || isLoadingMore && <Spinner />}
+      {!shouldRender || (isLoadingMore && <Spinner />)}
       {shouldRender && (
         <MessageVirtuoso
           virtuoso={virtuoso}

@@ -74,12 +74,12 @@ export const useChatter = () => {
     callCount.current++;
 
     if (callCount.current % 20 === 0) {
-      emit('scrollDownClicked', null);
+      emit('scrollDownClicked', true);
     }
   }, [emit]);
 
   const onScrollDown = useCallback(() => {
-    emit('scrollDownClicked', null);
+    emit('scrollDownClicked', true);
   }, [emit]);
 
   const debouncedScrollDownClick = useDebounce(onScrollDown, 1000);
