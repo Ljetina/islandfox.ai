@@ -173,6 +173,9 @@ export const useChatter = () => {
               e,
               serverMessage,
             );
+            setError(`Error \n\n Please try again later.`);
+            setIsMessageStreaming(false);
+            setCurrentAssisstantId(null);
           }
         }
       } else if (serverMessage.type === 'start_function') {
