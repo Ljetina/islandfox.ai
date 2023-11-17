@@ -258,7 +258,7 @@ export async function executeCell(
         queueTask(
           updateNotebookContent(convSettings.notebook_path, content, settings),
         );
-        responseCache.result = m.content.data['text/plain'];
+        // responseCache.result = m.content.data['text/plain'];
       } else if (m.msg_type == 'stream') {
         content.cells[cellIndex].outputs.push({
           name: 'stdout',
@@ -268,33 +268,35 @@ export async function executeCell(
         queueTask(
           updateNotebookContent(convSettings.notebook_path, content, settings),
         );
-        responseCache.result += m.content.text;
+        // responseCache.result += m.content.text;
       } else if (m.msg_type == 'execute_reply') {
-        resolve(responseCache.result);
+        resolve(content.cells[cellIndex].outputs);
         ws.close();
       } else if (m.msg_type == 'display_data') {
         content.cells[cellIndex].execution_count += 1;
-        content.cells[cellIndex].outputs.push({
+        const output = {
           output_type: 'display_data',
           metadata: {},
           data: {
             ...m.content.data,
           },
-        });
+        }
+        content.cells[cellIndex].outputs.push(output);
         queueTask(
           updateNotebookContent(convSettings.notebook_path, content, settings),
         );
-        responseCache.result = m.content.data['text/plain'];
+        // responseCache.result = output;
       } else if (m.msg_type == 'error') {
         content.cells[cellIndex].execution_count += 1;
-        content.cells[cellIndex].outputs.push({
+        const output = {
           output_type: 'error',
           ...m.content,
-        });
+        }
+        content.cells[cellIndex].outputs.push(output);
         queueTask(
           updateNotebookContent(convSettings.notebook_path, content, settings),
         );
-        responseCache.result = m.content.ename + ' ' + (m.content.evalue || '');
+        // responseCache.result = output;
       } else {
         // console.log('unknown message type');
         // console.log({ m });

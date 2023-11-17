@@ -103,6 +103,7 @@ export const useChatter = () => {
       let serverMessage;
       try {
         serverMessage = JSON.parse(lastMessage?.data);
+        // console.log('serverMessage', serverMessage)
       } catch (e) {
         console.error('failed to parse server message', e, lastMessage.data);
         return;
@@ -181,7 +182,7 @@ export const useChatter = () => {
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
         setTimeout(() => {
-          emit('scrollDownClicked', null);
+          emit('scrollDownClicked', true);
         }, 500);
       } else if (serverMessage.type === 'response_error') {
         console.log('error handling response');
@@ -191,7 +192,7 @@ export const useChatter = () => {
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
         setTimeout(() => {
-          emit('scrollDownClicked', null);
+          emit('scrollDownClicked', true);
         }, 100);
       } else if (serverMessage.type === 'out_of_credits') {
         setIsMessageStreaming(false);
@@ -199,7 +200,7 @@ export const useChatter = () => {
       } else if (serverMessage.type === 'remaining_credits') {
         setRemainingCredits(serverMessage.data.remainingCredits);
       } else if (serverMessage.type == 'credit_topup') {
-        console.log('serverMessage.data', serverMessage.data);
+        // console.log('serverMessage.data', serverMessage.data);
         setRemainingCredits(serverMessage.data.remainingCredits);
         emit('credit_topup', {});
       } else if (serverMessage.type === 'notebook_cache') {

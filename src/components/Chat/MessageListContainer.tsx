@@ -27,7 +27,7 @@ export function MessageListContainer() {
   const onDown = useCallback(
     (fromAppend: boolean) => {
       if (virtuoso) {
-        if (fromAppend && atBottom) {
+        if ((fromAppend && atBottom) || !fromAppend) {
           virtuoso.current?.scrollToIndex({
             index: totalCount - 1,
             align: 'end',

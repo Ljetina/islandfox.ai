@@ -41,7 +41,7 @@ export function useFunctions(): {
     code: string;
     cell_type: 'code' | 'markdown';
     sendMessage: (message: string) => void;
-  }): Promise<string> {
+  }): Promise<any> {
     if (!notebookSettings?.session_id) {
       return 'unable to connect to notebook';
     }
@@ -64,7 +64,8 @@ export function useFunctions(): {
       notebookSettings,
       jupyterSettings,
     );
-    return 'Cell has been added. Output of execution: ' + result || '';
+    // return 'Cell has been added. Output of execution: ' + result || '';
+    return result;
   }
 
   async function updateCellFunction({
@@ -91,7 +92,7 @@ export function useFunctions(): {
       notebookSettings,
       jupyterSettings,
     );
-    return 'Cell has been updated. Output of execution: ' + result || '';
+    return result;
   }
 
   async function deleteCellFunction({
