@@ -139,6 +139,12 @@ export async function getNotebookContent(
     return null;
   }
 }
+function filterCellsWithoutSource(content: any) {
+  content.cells = content.cells.filter(
+    (c: any) => !(c.cell_type === 'code' && !c.source),
+  );
+  return content;
+}
 
 export async function updateNotebookContent(
   notebookPath: string,
@@ -154,7 +160,7 @@ export async function updateNotebookContent(
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          content: content,
+          content: filterCellsWithoutSource(content),
           type: 'notebook',
         }),
       },
@@ -280,7 +286,7 @@ export async function executeCell(
           data: {
             ...m.content.data,
           },
-        }
+        };
         content.cells[cellIndex].outputs.push(output);
         queueTask(
           updateNotebookContent(convSettings.notebook_path, content, settings),
@@ -291,7 +297,7 @@ export async function executeCell(
         const output = {
           output_type: 'error',
           ...m.content,
-        }
+        };
         content.cells[cellIndex].outputs.push(output);
         queueTask(
           updateNotebookContent(convSettings.notebook_path, content, settings),

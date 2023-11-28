@@ -80,12 +80,12 @@ export const NotebookConnectionHeader: FC<Props> = ({}) => {
           <p>
             <span
               className={
-                notebookTokenSize > 1500 ? 'text-red-700' : 'text-gray-700'
+                notebookTokenSize > 3000 ? 'text-red-700' : 'text-gray-700'
               }
             >
               {notebookTokenSize}
             </span>{' '}
-            / 1500
+            / 3000
           </p>
         </div>
         <div className="text-sm text-gray-700">
