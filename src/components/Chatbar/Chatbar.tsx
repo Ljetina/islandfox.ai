@@ -62,7 +62,7 @@ export const Chatbar = () => {
   useEvent('credit_topup', onTopUp);
 
   useEffect(() => {
-    if (remainingCredits < 0) {
+    if (remainingCredits <= 0) {
       setTopupOpen(true);
     }
   }, [remainingCredits]);
