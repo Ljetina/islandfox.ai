@@ -44,7 +44,8 @@ export interface ServerMessage {
     | 'append_to_message'
     | 'response_done'
     | 'start_function'
-    | 'start_frontend_function';
+    | 'start_frontend_function'
+    | 'conversation_name';
   data?:
     | string
     | { userUuid: string; assistantUuid: string }

@@ -14,6 +14,7 @@ export const useChatter = () => {
     handleAddAssistantMessage,
     handleUpdateMessageContent,
     handleRegenerateLastMessage,
+    handleUpdateConversationName,
     setIsMessageStreaming,
     setRemainingCredits,
   } = useContext(ChatContext);
@@ -181,6 +182,12 @@ export const useChatter = () => {
       } else if (serverMessage.type === 'start_function') {
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
+      } else if (serverMessage.type === 'conversation_name') {
+        const { conversationId, conversationName } = serverMessage.data as {
+          conversationId: string;
+          conversationName: string;
+        }
+        handleUpdateConversationName(conversationId, conversationName);
       } else if (serverMessage.type === 'response_done') {
         setIsMessageStreaming(false);
         setCurrentAssisstantId(null);
