@@ -41,7 +41,7 @@ export const ConversationComponent = ({ conversation }: Props) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState('');
-  const [prevName, setPrevName] = useState(conversation.name);
+  const [conversationName, setConversationName] = useState(conversation.name);
   const [isTyping, setIsTyping] = useState(false);
   const [typedText, setTypedText] = useState('');
 
@@ -108,7 +108,7 @@ export const ConversationComponent = ({ conversation }: Props) => {
   useEffect(() => {
     if (
       selectedConversationId === conversation.id &&
-      prevName === 'New' &&
+      conversationName === 'New' &&
       conversation.name !== 'New'
     ){
       setIsTyping(true);
@@ -118,7 +118,7 @@ export const ConversationComponent = ({ conversation }: Props) => {
       }, 150);
       return () => clearInterval(timeoutId);
     }
-    setPrevName(conversation.name);
+    setConversationName(conversation.name);
   }, [conversation.name, typedText]);
 
   return (
@@ -153,7 +153,7 @@ export const ConversationComponent = ({ conversation }: Props) => {
               selectedConversationId === conversation.id ? 'pr-12' : 'pr-1'
             }`}
           >
-            {isTyping ? typedText : conversation.name}
+            {isTyping ? typedText : conversationName}
           </div>
         </button>
       )}
