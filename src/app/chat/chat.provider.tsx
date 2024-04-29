@@ -74,6 +74,10 @@ export interface ChatContextProps {
   ) => void;
   handleAddAssistantMessage: (assistantUuid: string) => void;
   handleDeleteMessage: (messageId: string) => void;
+  handleUpdateConversationName: (
+    conversationId: string,
+    conversationName: string
+  ) => void;
   setIsMessageStreaming: (isStreaming: boolean) => void;
   setTotalCount: React.Dispatch<React.SetStateAction<number>>;
   setFirstItemIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -520,6 +524,20 @@ export const ChatProvider = ({
     [setMessageIsStreaming],
   );
 
+  const handleUpdateConversationName = useCallback(
+    (conversationId: string, conversationName: string) => {
+      setConversations(
+        conversations.map((c) => {
+          if (c.id == conversationId) {
+            return { ...c, name: conversationName };
+          }
+          return c;
+        }),
+      );
+    },
+    [setConversations, conversations]
+  );
+
   const handleUpdateGlobalNotebookSettings = useCallback(
     async (settings: any) => {
       const savedSettings = await apiSaveNotebookSettings(settings);
@@ -570,6 +588,7 @@ export const ChatProvider = ({
         handleAddMessage,
         handleAddAssistantMessage,
         handleDeleteMessage,
+        handleUpdateConversationName,
         setIsMessageStreaming,
         setTotalCount,
         setFirstItemIndex,

@@ -41,6 +41,9 @@ export const ConversationComponent = ({ conversation }: Props) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState('');
+  const [conversationName, setConversationName] = useState(conversation.name);
+  const [isTyping, setIsTyping] = useState(false);
+  const [typedText, setTypedText] = useState('');
 
   const handleEnterDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
@@ -102,6 +105,22 @@ export const ConversationComponent = ({ conversation }: Props) => {
     }
   }, [isRenaming, isDeleting]);
 
+  useEffect(() => {
+    if (
+      selectedConversationId === conversation.id &&
+      conversationName === 'New' &&
+      conversation.name !== 'New'
+    ){
+      setIsTyping(true);
+
+      const timeoutId = setInterval(() => {
+        setTypedText(conversation.name.slice(0, typedText.length + 1));
+      }, 150);
+      return () => clearInterval(timeoutId);
+    }
+    setConversationName(conversation.name);
+  }, [conversation.name, typedText]);
+
   return (
     <div className="relative flex items-center">
       {isRenaming && selectedConversationId === conversation.id ? (
@@ -134,7 +153,7 @@ export const ConversationComponent = ({ conversation }: Props) => {
               selectedConversationId === conversation.id ? 'pr-12' : 'pr-1'
             }`}
           >
-            {conversation.name}
+            {isTyping ? typedText : conversationName}
           </div>
         </button>
       )}
