@@ -8,6 +8,7 @@ import React, {
 
 import { Conversation } from '@/types/chat';
 import { OpenAIModel, OpenAIModels } from '@/types/openai';
+import { GroqModel, GroqModels } from '@/types/groq';
 
 import ConnectNotebook from '../JupyterSettings/ConnectNotebook';
 import { ModelSelect } from './ModelSelect';
@@ -50,7 +51,15 @@ const ConversationSettings: React.FC<ConversationSettingsProps> = ({}) => {
     },
     [selectedConveration],
   );
-  const models = [OpenAIModels['gpt-4'], OpenAIModels['gpt-3.5-turbo'], OpenAIModels['gpt-4-1106-preview']];
+  const models = [
+    OpenAIModels['gpt-4'],
+    OpenAIModels['gpt-3.5-turbo'],
+    OpenAIModels['gpt-4-1106-preview'],
+    GroqModels['llama3-8b-8192'],
+    GroqModels['llama3-70b-8192'],
+    // GroqModels['mixtral-8x7b-32768'],
+    // GroqModels['gemma-7b-it'],
+  ];
 
   return (
     <>
