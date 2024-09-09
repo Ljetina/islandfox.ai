@@ -12,7 +12,7 @@ import Typewriter from 'typewriter-effect';
 export default function Banner1() {
   const toChat = useCallback(() => {
     trackEvent({ action: 'click', category: 'button', label: 'get-started' });
-    window.location.href = '/chat';
+    window.location.href = 'https://github.com/Ljetina/islandfox.ai';
   }, []);
 
   return (
@@ -27,23 +27,8 @@ export default function Banner1() {
                   data-wow-delay=".2s"
                 >
                   <span>
-                    Calling all <br />{' '}
+                    Open Source Chat UI <br />
                   </span>
-                  <Typewriter
-                    tag="span"
-                    options={{
-                      wrapperClassName: 'ah-words-wrapper',
-                      strings: [
-                        'Data Scientists',
-                        'Researchers',
-                        'Data Analysts',
-                        'Machine Learning engineers',
-                        'Quants',
-                      ],
-                      autoStart: true,
-                      loop: true,
-                    }}
-                  />
                 </h2>
                 <p
                   style={{
@@ -53,11 +38,8 @@ export default function Banner1() {
                     color: 'white',
                   }}
                 >
-                  Accelerate your data science projects with IslandFox.ai. By
-                  seamlessly connecting to your own Jupyter servers, notebooks
-                  and data infrastructure, we offer a new kind of chat
-                  assistance. We facilitate rapid data analysis, visualization,
-                  feature engineering and machine learning workflows.
+                  Formerly commercial, now fully open source conversational interface
+                  for data science work.                  
                 </p>
                 <div className="banner-btn">
                   <div
